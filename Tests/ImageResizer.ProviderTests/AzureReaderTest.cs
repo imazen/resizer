@@ -463,11 +463,11 @@ namespace ImageResizer.ProviderTests
             var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
-            var actual = Assert.Throws<StorageException>(() => target.FileExists(virtualPath, null));
+            var actual = Assert.Throws<Azure.RequestFailedException>(() => target.FileExists(virtualPath, null));
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<StorageException>(actual);
+            Assert.IsType<Azure.RequestFailedException>(actual);
         }
 
         /// <summary>
@@ -535,11 +535,11 @@ namespace ImageResizer.ProviderTests
             var virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
 
             // Act
-            var actual = Assert.Throws<StorageException>(() => target.GetFile(virtualPath, null));
+            var actual = Assert.Throws<Azure.RequestFailedException>(() => target.GetFile(virtualPath, null));
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<StorageException>(actual);
+            Assert.IsType<Azure.RequestFailedException>(actual);
         }
 
         /// <summary>
@@ -608,11 +608,11 @@ namespace ImageResizer.ProviderTests
             var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
-            var actual = Assert.Throws<StorageException>(() => target.GetFile(virtualPath, null));
+            var actual = Assert.Throws<Azure.RequestFailedException>(() => target.GetFile(virtualPath, null));
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<StorageException>(actual);
+            Assert.IsType<Azure.RequestFailedException>(actual);
         }
 
         /// <summary>
@@ -712,11 +712,11 @@ namespace ImageResizer.ProviderTests
             var target = reader.GetFile(virtualPath, null);
 
             // Act
-            var actual = Assert.Throws<FileNotFoundException>(() => target.Open());
+            var actual = Assert.Throws<Imazen.Common.Storage.BlobMissingException>(() => target.Open());
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<FileNotFoundException>(actual);
+            Assert.IsType<Imazen.Common.Storage.BlobMissingException>(actual);
         }
 
         /// <summary>
@@ -735,11 +735,11 @@ namespace ImageResizer.ProviderTests
             var target = reader.GetFile(virtualPath, null);
 
             // Act
-            var actual = Assert.Throws<FileNotFoundException>(() => target.Open());
+            var actual = Assert.Throws<Imazen.Common.Storage.BlobMissingException>(() => target.Open());
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<FileNotFoundException>(actual);
+            Assert.IsType<Imazen.Common.Storage.BlobMissingException>(actual);
         }
 
         /// <summary>
