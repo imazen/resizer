@@ -86,10 +86,10 @@ jobs:
       - name: Publish nuget packages to GitHub packages
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
         run: |
-          dotnet nuget push bin/Release/ImageResizer.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Storage.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Plugins.AzureReader2.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Plugins.Imageflow --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Plugins.HybridCache --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Plugins.S3Reader2 --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/ImageResizer.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/ImageResizer.Storage.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/ImageResizer.Plugins.AzureReader2.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/ImageResizer.Plugins.Imageflow.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/ImageResizer.Plugins.HybridCache.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/ImageResizer.Plugins.S3Reader2.5* --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
 
