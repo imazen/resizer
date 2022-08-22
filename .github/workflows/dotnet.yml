@@ -51,9 +51,16 @@ jobs:
       - name: Pack
         run: dotnet pack ImageResizer.sln -c Release --include-source
       
-      - name: Add Azure Nuget feed
-        run: dotnet nuget add source --name azureimazen "https://pkgs.dev.azure.com/imazenio/_packaging/imazenio/nuget/v3/index.json"
-        
+      - name: Add Azure & Myget Nuget feed
+        run: |
+          dotnet nuget add source --name azureimazen "https://pkgs.dev.azure.com/imazenio/_packaging/imazenio/nuget/v3/index.json"
+# dotnet nuget add source --name mygetresizerelite "https://www.myget.org/F/imageresizer-agpl-or-elite-license/api/v2/package" 
+#https://www.myget.org/F/imazen-nightlies/api/v2/package
+
+# NOT pushing to myget, that's deprecated
+# NOT uploading stuff to S3 buckets
+# NOT uploading .zip to github... yet
+      
       - name: Publish nuget packages to Azure if a prerelease
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable != 'true'
         run: |
