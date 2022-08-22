@@ -1,5 +1,9 @@
+## ImageResizer v5 Breaking changes (in progress)
 
-V5 URL API
+
+
+## V5 URL API Breaking changes
+
 * The following commands are supported: `mode`, `anchor`, `flip`, `sflip`,
     `quality`, `zoom`, `dpr`, `crop`, `cropxunits`, `cropyunits`,
     `w`, `h`, `width`, `height`, `maxwidth`, `maxheight`, `format`,
@@ -40,22 +44,26 @@ Things you would expect to be gone:
 * &memcache is gone, it's not a great idea in the first place and never exited pre-alpha
 * With Imageflow, Jpeg subsampling is auto-selected by chroma evaluation, so `subsampling` is ignored (it's also not supported in GDI)
 
+## V5 C# API breaking changes:
 
+These are not likely to impact you. 
 
+* Many items have been deprecated for removal in ImageResizer 6.0
+* Add the Imazen.Common nuget package to your project, some interfaces and classes have moved there.
+* Replaced use of ImageResizer.Configuration.Issues namespace with Imazen.Common.Issues. All members are idential, but this changes the type signature of many common members such as .IssueSink, .configurationSectionIssues, .AllIssues, .GetIssues()
+* ImageResizer.Storage.IBlobMetadata no longer includes setters on Exists and LastModifiedDateUtc
+* ImageResizer.Plugins.Basic.SpeedOrQuality and ImageResizer.Plugins.Basic.NoCacheHandler, ImageResizer.Plugins.Basic.IEPngFix has been removed.
+* Synchronous mode for the HttpModule has been removed, resulting in some additional API deletions and changes.
+    * ImageResizer.Caching.ICacheProvider and .ICacheSelectionEventArgs are gone since synchronous caches are no longer supported.
+    * Removed ImageResizer.Configuration.CacheSelectionHandler 
+    * Removed PipelineConfig.SelectCachingSystem, PipelineConfig.GetCacheProvider, and PipelineConfig.GetCachingSystem.
+    * PluginConfig.CachingSystems is now a list of IAsyncTyrantCache not ICache;
+    * Removed ImageResizer.Configuration.Config.IsVirtualFile, .VirtualFile, and .GetCacheProvider()
+    * protected AsyncInterceptModule.HandleRequest signature changed
+    
+* ImageResizer.Configuration.PluginConfig.LoggingAvaialableEvent has been renamed to ImageResizer.Configuration.PluginConfig.LoggingAvailableEvent
+* ImageResizer.Plugins.AzureReader2.AzureReader2Plugin.CloudBlobClient and .GetBlobRefAsync has been removed as part of the upgrade to Microsoft.Azure API
+* ImageResizer.InterceptModule has been replaced by AsyncInterceptModule (and inherits from it for web.config compat). This means all those protected methods have vanished.
+* ImageResizer.Configuration.Performance has been refactored to use Imazen.Common, and thus some classes and interfaces are missing.
+* ImageResizer.Util.BuildDateAttribute has moved to Imazen.Common.Licensing.BuildDateAttribute
 
-
-TODO: expose jpeg.progressive in Instructions class- Supported by Imageflow, but not GDI, WIC, or WPF
-TODO: maybe implement `dpi` - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
- 
- 
-V5 C# API:
-
-REVISIT: private readonly string[] _supportedFileExtensions = new string[]
-            { "bmp", "gif", "exif", "png", "tif", "tiff", "tff", "jpg", "jpeg", "jpe", "jif", "jfif", "jfi" };
-
-
-
-Many classes and interfaces have moved to the Imazen.Common nuget package - add that to your project and a good 
-IDE can probably automatically find the new namespaces.
-
- 
