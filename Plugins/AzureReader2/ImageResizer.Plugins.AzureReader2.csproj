@@ -7,6 +7,7 @@
     <PackageId>ImageResizer.Plugins.AzureReader2</PackageId>
     <AssemblyTitle>ImageResizer plugin for resizing images from Azure Blob Storage</AssemblyTitle>
     <Description>ImageResizer plugin for resizing images from Azure Blob Storage</Description>
+      <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <Import Project="..\..\nuget\NugetPackages.targets" />

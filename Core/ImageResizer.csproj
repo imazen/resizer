@@ -7,6 +7,7 @@
     <PackageId>ImageResizer</PackageId>
     <AssemblyTitle>The core HttpModule for ImageResizer</AssemblyTitle>
     <Description>Lightweight HttpModule, REST API, and managed API for *safe* and highly-optimized server-side image processing.</Description>
+      <IsPackable>true</IsPackable>
   </PropertyGroup>
   
   <Import Project="..\nuget\NugetPackages.targets" />

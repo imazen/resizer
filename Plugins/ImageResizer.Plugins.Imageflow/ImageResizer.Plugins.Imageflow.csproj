@@ -7,6 +7,7 @@
     <PackageId>ImageResizer.Plugins.Imageflow</PackageId>
     <AssemblyTitle>Imageflow backend for ImageResizer</AssemblyTitle>
     <Description>Fast image processing and compression backend for the ImageResizer HttpModule.</Description>
+      <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <Import Project="..\..\nuget\NugetPackages.targets" />
