@@ -42,9 +42,6 @@ jobs:
         shell: bash
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
 
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
-
       - name: Build Solution
         run:  dotnet build -c Release ImageResizer.sln
       
