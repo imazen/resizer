@@ -20,76 +20,49 @@ jobs:
     runs-on: windows-latest
     
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget
 
       - uses: nowsprinting/check-version-format-action@v3
         id: version
         with:
           prefix: 'v'
 
-      - name: Set the release version
-        run: echo "TAGGED_VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+      - name: Set the release version (if applicable)
+        run: |
+          echo "TAGGED_VERSION=${{ steps.version.outputs.full_without_prefix }}" >> $GITHUB_ENV
+          echo Set version to ${{ steps.version.outputs.full_without_prefix }}
         shell: bash
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
-        
+
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Setup NuGet
-        uses: NuGet/setup-nuget@v1
-        with:
-          nuget-api-key: ${{ secrets.NuGetAPIKey }}
-          nuget-version: '6.x'
-
-#      - name: Setup VSTest
-#        uses: darenm/Setup-VSTest@v1
-#
-#
-#      - name: Install NPM
-#        uses: actions/setup-node@v1
-#        with:
-#          node-version: '12'
-#      - run: npm install -g azurite
-#
-#      - name: Start Azurite Blob Emulator
-#        shell: cmd
-#        run: start /B azurite-blob
-        
-#      - name: Install Azurite
-#        id: azuright
-#        uses: potatoqualitee/azuright@v1.1
-#        with:
-#          self-signed-cert: true
-#        
-        
-      - name: Navigate to Workspace
-        run: cd $GITHUB_WORKSPACE
-
-#      - name: Restore Packages
-#        run: dotnet restore ImageResizer.sln
-
       - name: Build Solution
-        run: 
-          dotnet build -c Release ImageResizer.sln
-
+        run:  dotnet build -c Release ImageResizer.sln
+      
       - name: Test Solution (except azure)
         run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln
 
       - name: Pack
-        run: dotnet pack ImageResizer.sln -c Release
-        
-#https://github.com/dotnet/sdk/issues/27320
+        run: dotnet pack ImageResizer.sln -c Release --include-source
       
-      - name: Add Github Nuget source
-        run: dotnet nuget add source --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/OWNER/index.json"
+      - name: Add Azure Nuget feed
+        run: dotnet nuget add source --name azureimazen "https://pkgs.dev.azure.com/imazenio/_packaging/imazenio/nuget/v3/index.json"
         
-      - name: Publish nuget packages to GitHub packages
-        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
+      - name: Publish nuget packages to Azure if a prerelease
+        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable != 'true'
         run: |
-          dotnet nuget push bin/Release/ImageResizer.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Storage.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Plugins.AzureReader2.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Plugins.Imageflow.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Plugins.HybridCache.5*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-          dotnet nuget push bin/Release/ImageResizer.Plugins.S3Reader2.5* --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-
+          dotnet nuget push bin/Release/*.nupkg --skip-duplicate --api-key ${{ secrets.AZURE_NUGET_KEY }}  --source "azureimazen"
+          
+      - name: Publish nuget packages to Nuget.org if a stable release
+        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable == 'true'
+        run: |
+          dotnet nuget push bin/Release/*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} 
