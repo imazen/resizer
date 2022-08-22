@@ -25,26 +25,21 @@
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     </PropertyGroup>
     
-    <PropertyGroup>
-        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <RestoreLockedMode>true</RestoreLockedMode>
-        <NoWarn>NU1603</NoWarn>
-        <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
-    </PropertyGroup>
 
-<!--    <PropertyGroup>-->
-<!--        <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>-->
-<!--        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>-->
-<!--        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>-->
-<!--    </PropertyGroup>-->
-    
     <PropertyGroup Condition="'$(CI)' == 'True'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <RestoreLockedMode>true</RestoreLockedMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(CI)' == 'true'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <RestoreLockedMode>true</RestoreLockedMode>
     </PropertyGroup>
-
+ 
+    <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <NoWarn>NU1603</NoWarn>
+        <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+    </PropertyGroup>
     <PropertyGroup>
         <IntermediateOutputPath>$(SolutionDir)/obj/$(Configuration)</IntermediateOutputPath>
         <OutputPath>$(SolutionDir)/bin/$(Configuration)</OutputPath>
