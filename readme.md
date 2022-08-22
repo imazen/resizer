@@ -1,7 +1,8 @@
 <a name="top"></a>
 
 ## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
-[![Build status - develop](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop?svg=true&passingText=develop%20-%20passing&failingText=develop%20-%20failed)](https://ci.appveyor.com/project/imazen/resizer/branch/develop) &nbsp; View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [stable (master)](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
+[![Build status for develop branch](https://github.com/imazen/resizer/actions/workflows/dotnet.yml/badge.svg?branch=develop)](https://github.com/imazen/resizer/actions/workflows/dotnet.yml)
+ View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [stable (master)](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
 
 ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) 
 
