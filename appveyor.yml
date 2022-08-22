@@ -2,6 +2,11 @@ clone_depth: 1
 version: 4.1.3.{build}
 image: Visual Studio 2017
 
+branches:
+  only:
+    - support/v3
+    - support/v4
+    - 
 services:
   - mssql2017
   - mongodb 
