@@ -15,10 +15,7 @@
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <IntermediateOutputPath>$(SolutionDir)/obj/$(Configuration)</IntermediateOutputPath>
-        <OutputPath>$(SolutionDir)/bin/$(Configuration)</OutputPath>
-    </PropertyGroup>
+
 
 <!--    <ItemGroup>
         <None Include="..\icon.png" Pack="true" PackagePath=""/>

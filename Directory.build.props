@@ -45,5 +45,8 @@
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
-    
+    <PropertyGroup>
+        <IntermediateOutputPath>$(SolutionDir)/obj/$(Configuration)</IntermediateOutputPath>
+        <OutputPath>$(SolutionDir)/bin/$(Configuration)</OutputPath>
+    </PropertyGroup>
 </Project>
