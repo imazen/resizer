@@ -15,9 +15,14 @@
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
     </PropertyGroup>
 
-
+    <ItemGroup>
+        <AssemblyAttribute Include="Imazen.Common.Licensing.BuildDateAttribute">
+            <_Parameter1>$([System.DateTime]::UtcNow.ToString("o"))</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 
 <!--    <ItemGroup>
         <None Include="..\icon.png" Pack="true" PackagePath=""/>
     </ItemGroup>-->
+    
 </Project>

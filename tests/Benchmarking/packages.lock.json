@@ -155,7 +155,10 @@
         }
       },
       "imazen.profiling": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Imazen.Common": "0.7.0"
+        }
       }
     },
     ".NETFramework,Version=v4.7.2/win7-x86": {
