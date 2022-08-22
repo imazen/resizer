@@ -19,23 +19,37 @@ namespace ImageResizer.TestAPISurface
 
         private string GetApiTextDir()
         {
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string solutionDir = null;
-            while (dir != null)
+            string codeBase = null;
+            try
             {
-                if (File.Exists(Path.Combine(dir, "ImageResizer.sln")))
+                codeBase = new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath;
+            }
+            catch { }
+
+            var searchLocations = new string[] { Assembly.GetExecutingAssembly().Location, typeof(ImageResizer.BoxEdges).Assembly.Location, codeBase };
+            foreach(var location in searchLocations)
+            {
+                var attempt = location != null ? FindSolutionDir(Path.GetDirectoryName(location), "ImageResizer.sln") : null;
+                if (attempt != null) return Path.Combine(attempt, "tests", "api-surface");
+            }
+            return null;
+        }
+
+        private string FindSolutionDir(string startDir, string filename)
+        {
+            var dir = startDir;
+            while (!string.IsNullOrEmpty(dir))
+            {
+                if (File.Exists(Path.Combine(dir, filename)))
                 {
-                    solutionDir = dir;
-                    break;
+                    return dir;
                 }
-                var parent =  Path.GetDirectoryName(dir);
-                if (parent == dir) break;
+                var parent = Path.GetDirectoryName(dir);
+                if (parent == dir) return null;
                 dir = parent;
             }
-
-            return solutionDir == null ? null : Path.Combine(solutionDir, "tests", "api-surface");
+            return null;
         }
-        
         
         [Fact]
         public void GenerateAPISurfaceText()
