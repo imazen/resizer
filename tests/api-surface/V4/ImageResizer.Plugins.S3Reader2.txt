@@ -1,0 +1,43 @@
+[assembly: ImageResizer.Util.BuildDate("2017-05-05T12:13:13.1434691+00:00")]
+[assembly: ImageResizer.Util.Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
+[assembly: ImageResizer.Util.Edition("R4Performance")]
+[assembly: System.Runtime.InteropServices.Guid("8edaeb47-7067-4c77-aa1b-ffbeeab5e81d")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
+namespace ImageResizer
+{
+    public static class ImageUploadHelperS3Extensions { }
+}
+namespace ImageResizer.Plugins.S3Reader2
+{
+    public class S3PathEventArgs : System.EventArgs
+    {
+        public S3PathEventArgs(string path) { }
+        public string Bucket { get; }
+        public string Key { get; }
+        public string Path { get; set; }
+        public void AssertBucketMatches(params string[] buckets) { }
+        public void PrefixBucket(string bucket) { }
+        public void ThrowException() { }
+        public void ThrowInvalidCaseException() { }
+    }
+    public class S3Reader2 : ImageResizer.Storage.BlobProviderBase, ImageResizer.Plugins.IMultiInstancePlugin, ImageResizer.Plugins.IRedactDiagnostics
+    {
+        public S3Reader2() { }
+        public S3Reader2(System.Collections.Specialized.NameValueCollection args) { }
+        protected string[] AllowedBuckets { get; set; }
+        public string Region { get; set; }
+        public Amazon.S3.AmazonS3Client S3Client { get; set; }
+        public bool UseHttps { get; set; }
+        public event ImageResizer.Plugins.S3Reader2.S3Reader2.RewriteBucketAndKeyPath PreS3RequestFilter;
+        public override System.Threading.Tasks.Task<ImageResizer.Storage.IBlobMetadata> FetchMetadataAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public string FilterPath(string path) { }
+        public System.Collections.Generic.IEnumerable<string> GetAllowedBuckets() { }
+        public override ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public override System.Threading.Tasks.Task<System.IO.Stream> OpenAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public ImageResizer.Plugins.S3Reader2.S3PathEventArgs ParseAndFilterPath(string virtualPath) { }
+        public ImageResizer.Configuration.Xml.Node RedactFrom(ImageResizer.Configuration.Xml.Node resizer) { }
+        public void SetAllowedBuckets(System.Collections.Generic.IEnumerable<string> buckets) { }
+        public override bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public delegate void RewriteBucketAndKeyPath(ImageResizer.Plugins.S3Reader2.S3Reader2 sender, ImageResizer.Plugins.S3Reader2.S3PathEventArgs e);
+    }
+}

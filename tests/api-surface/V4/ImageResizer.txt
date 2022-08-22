@@ -1,0 +1,2166 @@
+[assembly: ImageResizer.Util.BuildDate("2017-05-05T12:13:13.1434691+00:00")]
+[assembly: ImageResizer.Util.Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
+[assembly: System.CLSCompliant(false)]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ImageResizer.Plugins.LicenseVerifier.Tests")]
+[assembly: System.Runtime.InteropServices.ComVisible(true)]
+[assembly: System.Runtime.InteropServices.Guid("2df254c3-25f6-48c3-b45f-8d59e0d27077")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
+namespace ImageResizer
+{
+    [System.Flags]
+    public enum AnchorLocation
+    {
+        TopLeft = 1,
+        TopCenter = 2,
+        TopRight = 4,
+        MiddleLeft = 16,
+        MiddleCenter = 32,
+        MiddleRight = 64,
+        BottomLeft = 256,
+        BottomCenter = 512,
+        BottomRight = 1024,
+    }
+    public class AsyncInterceptModule : System.Web.IHttpModule
+    {
+        public AsyncInterceptModule() { }
+        protected ImageResizer.Configuration.IPipelineConfig conf { get; }
+        protected System.Threading.Tasks.Task CheckRequest_PostAuthorizeRequest_Async(object sender, System.EventArgs e) { }
+        public void Dispose() { }
+        protected void FileMissing(System.Web.HttpContext httpContext, string virtualPath, System.Collections.Specialized.NameValueCollection q) { }
+        protected virtual System.Threading.Tasks.Task HandleRequest(System.Web.HttpContext context, ImageResizer.Configuration.HttpModuleRequestAssistant ra, ImageResizer.Plugins.IVirtualFileAsync vf) { }
+        public void Init(System.Web.HttpApplication context) { }
+        public class AsyncResponsePlan : ImageResizer.Plugins.IAsyncResponsePlan
+        {
+            public AsyncResponsePlan() { }
+            public ImageResizer.Plugins.WriteResultAsyncDelegate CreateAndWriteResultAsync { get; set; }
+            public string EstimatedContentType { get; set; }
+            public string EstimatedFileExtension { get; set; }
+            public ImageResizer.Plugins.ReadStreamAsyncDelegate OpenSourceStreamAsync { get; set; }
+            public string RequestCachingKey { get; set; }
+            public System.Collections.Specialized.NameValueCollection RewrittenQuerystring { get; set; }
+        }
+    }
+    public class BoxEdges
+    {
+        public BoxEdges(ImageResizer.BoxEdges original) { }
+        public BoxEdges(double all) { }
+        public BoxEdges(double left, double top, double right, double bottom) { }
+        public double All { get; }
+        public double Bottom { get; }
+        public bool IsEmpty { get; }
+        public double Left { get; }
+        public double Right { get; }
+        public double Top { get; }
+        public static ImageResizer.BoxEdges Empty { get; }
+        public float[] GetEdgeOffsets() { }
+        public ImageResizer.BoxEdges SetAll(double all) { }
+        public ImageResizer.BoxEdges SetBottom(double bottom) { }
+        public ImageResizer.BoxEdges SetLeft(double left) { }
+        public ImageResizer.BoxEdges SetRight(double right) { }
+        public ImageResizer.BoxEdges SetTop(double top) { }
+        public override string ToString() { }
+        public static ImageResizer.BoxEdges Parse(string text, ImageResizer.BoxEdges fallbackValue) { }
+    }
+    [System.Obsolete("Obsolete. Use Mode=Crop to specify automatic cropping. Set CropTopLeft and CropTo" +
+        "pRight to specify custom coordinates. Will be removed in V3.5 or V4.")]
+    public enum CropMode
+    {
+        None = 0,
+        [System.Obsolete("Use Mode=Crop instead.")]
+        Auto = 1,
+        Custom = 2,
+    }
+    [System.Obsolete("Obsolete. Specify 0 for a crop unit to indicate source pixel coordinates.  Will b" +
+        "e removed in V3.5 or V4.")]
+    public enum CropUnits
+    {
+        SourcePixels = 0,
+        Custom = 1,
+    }
+    public enum FitMode
+    {
+        None = 0,
+        Max = 1,
+        Pad = 2,
+        Crop = 3,
+        Carve = 4,
+        Stretch = 5,
+    }
+    public enum FlipMode
+    {
+        None = 0,
+        [ImageResizer.ExtensionMethods.EnumString("h")]
+        X = 4,
+        [ImageResizer.ExtensionMethods.EnumString("v")]
+        Y = 6,
+        [ImageResizer.ExtensionMethods.EnumString("both")]
+        XY = 2,
+    }
+    public enum GrayscaleMode
+    {
+        [ImageResizer.ExtensionMethods.EnumString("false")]
+        None = 0,
+        [ImageResizer.ExtensionMethods.EnumString("true")]
+        Y = 1,
+        NTSC = 1,
+        RY = 2,
+        BT709 = 3,
+        Flat = 4,
+    }
+    public class ImageBuilder : ImageResizer.Resizing.AbstractImageProcessor, ImageResizer.Plugins.IFileExtensionPlugin, ImageResizer.Plugins.IQuerystringPlugin
+    {
+        protected ImageResizer.Encoding.IEncoderProvider _encoderProvider;
+        protected ImageResizer.Plugins.ISettingsModifier _settingsModifier;
+        protected ImageBuilder() { }
+        public ImageBuilder(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Encoding.IEncoderProvider encoderProvider, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier) { }
+        public ImageBuilder(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Encoding.IEncoderProvider encoderProvider, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier, int? maxConcurrentJobs) { }
+        public ImageResizer.Encoding.IEncoderProvider EncoderProvider { get; }
+        public int? MaxConcurrentJobs { get; }
+        public ImageResizer.Plugins.ISettingsModifier SettingsModifier { get; }
+        public ImageResizer.Plugins.IVirtualImageProvider VirtualFileProvider { get; }
+        public static ImageResizer.ImageBuilder Current { get; }
+        public virtual ImageResizer.ImageJob Build(ImageResizer.ImageJob job) { }
+        [System.Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This m" +
+            "ethod returns an unmanaged, non-garbage collected object that can kill your serv" +
+            "er. Use Build(source, dest, instructions) instead of handling the Bitmap instanc" +
+            "e yourself.")]
+        public virtual System.Drawing.Bitmap Build(object source, ImageResizer.ResizeSettings settings) { }
+        [System.Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This m" +
+            "ethod returns an unmanaged, non-garbage collected object that can kill your serv" +
+            "er. Use Build(source, dest) instead of handling the Bitmap instance yourself.")]
+        public virtual System.Drawing.Bitmap Build(object source, ImageResizer.ResizeSettings settings, bool disposeSource) { }
+        public virtual ImageResizer.ImageJob Build(object source, object dest, ImageResizer.Instructions instructions) { }
+        public virtual void Build(object source, object dest, ImageResizer.ResizeSettings settings) { }
+        public virtual void Build(object source, object dest, ImageResizer.ResizeSettings settings, bool disposeSource) { }
+        [System.Obsolete("Use .Build(new ImageJob(source, dest, settings, disposeSource, addFileExtension))" +
+            ".FinalPath  instead")]
+        public virtual string Build(object source, object dest, ImageResizer.ResizeSettings settings, bool disposeSource, bool addFileExtension) { }
+        protected override ImageResizer.Resizing.RequestedAction BuildJob(ImageResizer.ImageJob job) { }
+        protected System.Drawing.Bitmap BuildJobBitmapToBitmap(ImageResizer.ImageJob job, System.Drawing.Bitmap source, bool transparencySupported) { }
+        protected override ImageResizer.Resizing.RequestedAction BuildJobBitmapToStream(ImageResizer.ImageJob job, System.Drawing.Bitmap source, System.IO.Stream dest) { }
+        public virtual ImageResizer.ImageBuilder Copy() { }
+        public virtual ImageResizer.ImageBuilder Create(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Encoding.IEncoderProvider writer, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier) { }
+        protected override ImageResizer.Resizing.RequestedAction CreateImageAttribues(ImageResizer.Resizing.ImageState s) { }
+        public override System.Drawing.Bitmap DecodeStream(System.IO.Stream s, ImageResizer.ResizeSettings settings, string optionalPath) { }
+        protected override ImageResizer.Resizing.RequestedAction EndLayout(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction EndProcess(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction FlushChanges(ImageResizer.Resizing.ImageState s) { }
+        public virtual System.Drawing.Size GetFinalSize(System.Drawing.Size originalSize, ImageResizer.Instructions q) { }
+        public virtual System.Drawing.Size GetFinalSize(System.Drawing.Size originalSize, ImageResizer.ResizeSettings q) { }
+        public System.IO.Stream GetStreamFromSource(object source, ImageResizer.ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetSupportedFileExtensions() { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        protected override ImageResizer.Resizing.RequestedAction InternalGraphicsDrawImage(ImageResizer.Resizing.ImageState state, System.Drawing.Bitmap dest, System.Drawing.Bitmap source, System.Drawing.PointF[] targetArea, System.Drawing.RectangleF sourceArea, float[][] colorMatrix) { }
+        protected override ImageResizer.Resizing.RequestedAction Layout(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction LayoutBorder(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction LayoutImage(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction LayoutMargin(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction LayoutNormalize(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction LayoutPadding(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction LayoutRotate(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction LayoutRound(ImageResizer.Resizing.ImageState s) { }
+        [System.Obsolete("This method returns an unmanaged, shoot-yourself-in-the-foot Bitmap instance. Use" +
+            " Build(ImageJob) or LoadImageInfo(source, new string[]{\"source.width\",\"source.he" +
+            "ight\"})")]
+        public virtual System.Drawing.Bitmap LoadImage(object source, ImageResizer.ResizeSettings settings) { }
+        [System.Obsolete("This method returns an unmanaged, shoot-yourself-in-the-foot Bitmap instance. Use" +
+            " Build(ImageJob) or LoadImageInfo(source, new string[]{\"source.width\",\"source.he" +
+            "ight\"})")]
+        public virtual System.Drawing.Bitmap LoadImage(object source, ImageResizer.ResizeSettings settings, bool restoreStreamPos) { }
+        public virtual System.Collections.Generic.IDictionary<string, object> LoadImageInfo(object source, System.Collections.Generic.IEnumerable<string> requestedInfo) { }
+        protected override ImageResizer.Resizing.RequestedAction PostDecodeStream(ref System.Drawing.Bitmap b, ImageResizer.ResizeSettings settings) { }
+        protected override ImageResizer.Resizing.RequestedAction PrepareDestinationBitmap(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction PrepareSourceBitmap(ImageResizer.Resizing.ImageState s) { }
+        public virtual void Process(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction ProcessFinalBitmap(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction Render(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction RenderBackground(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction RenderBorder(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction RenderImage(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction RenderPadding(ImageResizer.Resizing.ImageState s) { }
+        public virtual System.Drawing.PointF[] TranslatePoints(System.Drawing.PointF[] sourcePoints, System.Drawing.Size originalSize, ImageResizer.ResizeSettings q) { }
+    }
+    public class ImageCorruptedException : ImageResizer.ImageProcessingException
+    {
+        public ImageCorruptedException(string message, System.Exception innerException) { }
+    }
+    public class ImageJob
+    {
+        public ImageJob() { }
+        public ImageJob(object source, System.Collections.Generic.IEnumerable<string> requestedImageInfo) { }
+        public ImageJob(System.IO.Stream sourceStream, System.IO.Stream destStream, ImageResizer.Instructions instructions) { }
+        [System.Obsolete("Use Instructions instead of ResizeSettings")]
+        public ImageJob(System.IO.Stream sourceStream, System.IO.Stream destStream, ImageResizer.ResizeSettings settings) { }
+        public ImageJob(object source, object dest, ImageResizer.Instructions instructions) { }
+        [System.Obsolete("Use Instructions instead of ResizeSettings")]
+        public ImageJob(object source, object dest, ImageResizer.ResizeSettings settings) { }
+        public ImageJob(string sourcePath, string destPath, ImageResizer.Instructions instructions) { }
+        [System.Obsolete("Use Instructions instead of ResizeSettings")]
+        public ImageJob(string sourcePath, string destPath, ImageResizer.ResizeSettings settings) { }
+        public ImageJob(object source, object dest, ImageResizer.Instructions instructions, bool disposeSource, bool addFileExtension) { }
+        [System.Obsolete("Use Instructions instead of ResizeSettings")]
+        public ImageJob(object source, object dest, ImageResizer.ResizeSettings settings, bool disposeSource, bool addFileExtension) { }
+        public bool AddFileExtension { get; set; }
+        public bool AllowDestinationPathVariables { get; set; }
+        public bool CreateParentDirectory { get; set; }
+        public long DecodeTicks { get; set; }
+        public object Dest { get; set; }
+        public bool DisposeDestinationStream { get; set; }
+        public bool DisposeSourceObject { get; set; }
+        public long EncodeTicks { get; set; }
+        public int? FinalHeight { get; }
+        public string FinalPath { get; set; }
+        public int? FinalWidth { get; }
+        public ImageResizer.Instructions Instructions { get; set; }
+        public string InstructionsAsString { get; set; }
+        public ImageResizer.Plugins.IProfiler Profiler { get; set; }
+        public System.Collections.Generic.List<string> RequestedInfo { get; set; }
+        public bool ResetSourceStream { get; set; }
+        public object Result { get; set; }
+        public string ResultFileExtension { get; }
+        public System.Collections.Generic.Dictionary<string, object> ResultInfo { get; set; }
+        public string ResultMimeType { get; }
+        [System.Obsolete("Use Instructions instead.")]
+        public ImageResizer.ResizeSettings Settings { get; set; }
+        public object Source { get; set; }
+        public int? SourceHeight { get; }
+        public string SourcePathData { get; set; }
+        public int? SourceWidth { get; }
+        public long TotalTicks { get; set; }
+        public ImageResizer.ImageJob Build() { }
+        public ImageResizer.ImageJob CreateDir() { }
+        public string ResolveTemplatedPath(string path, ImageResizer.Util.PathUtils.VariableResolverCallback resolver) { }
+    }
+    public class ImageMissingException : ImageResizer.ImageProcessingException
+    {
+        public ImageMissingException(string message) { }
+        public ImageMissingException(string message, string safeMessage) { }
+        public ImageMissingException(string message, string safeMessage, System.Exception innerException) { }
+    }
+    public class ImageProcessingException : System.Web.HttpException
+    {
+        public ImageProcessingException(string message) { }
+        public ImageProcessingException(int httpCode, string message) { }
+        public ImageProcessingException(int httpCode, string message, string safeMessage) { }
+        public ImageProcessingException(int httpCode, string message, string safeMessage, System.Exception innerException) { }
+        protected string PublicSafeMessage { get; set; }
+    }
+    public class Instructions : ImageResizer.Collections.QuerystringBase<ImageResizer.Instructions>
+    {
+        public Instructions() { }
+        public Instructions(System.Collections.Specialized.NameValueCollection col) { }
+        public Instructions(string queryString) { }
+        public double? Alpha { get; set; }
+        public ImageResizer.AnchorLocation? Anchor { get; set; }
+        public bool? AutoRotate { get; set; }
+        public string BackgroundColor { get; set; }
+        public double? Blur { get; set; }
+        public ImageResizer.BoxEdges Border { get; set; }
+        public string BorderColor { get; set; }
+        public double? Brightness { get; set; }
+        public string Builder { get; set; }
+        public ImageResizer.ServerCacheMode? Cache { get; set; }
+        public double? Contrast { get; set; }
+        public double[] CropRectangle { get; set; }
+        public double? CropXUnits { get; set; }
+        public double? CropYUnits { get; set; }
+        public string Decoder { get; set; }
+        public string Dither { get; set; }
+        public string Encoder { get; set; }
+        public string FallbackImage { get; set; }
+        public ImageResizer.FlipMode? FinalFlip { get; set; }
+        public string Format { get; set; }
+        public int? Frame { get; set; }
+        public ImageResizer.GrayscaleMode? Grayscale { get; set; }
+        public int? Height { get; set; }
+        public bool? IgnoreICC { get; set; }
+        public bool? Invert { get; set; }
+        public int? JpegQuality { get; set; }
+        public ImageResizer.JpegSubsamplingMode? JpegSubsampling { get; set; }
+        public ImageResizer.BoxEdges Margin { get; set; }
+        public ImageResizer.FitMode? Mode { get; set; }
+        public ImageResizer.OutputFormat? OutputFormat { get; set; }
+        public ImageResizer.BoxEdges Padding { get; set; }
+        public string PaddingColor { get; set; }
+        public int? Page { get; set; }
+        public byte? PaletteSize { get; set; }
+        public string Preset { get; set; }
+        public ImageResizer.ProcessWhen? Process { get; set; }
+        public double? RemoveNoise { get; set; }
+        public double? Rotate { get; set; }
+        public double[] RoundCorners { get; set; }
+        public double? Saturation { get; set; }
+        public ImageResizer.ScaleMode? Scale { get; set; }
+        public bool? Sepia { get; set; }
+        public double? Sharpen { get; set; }
+        public ImageResizer.FlipMode? SourceFlip { get; set; }
+        public double? SourceRotate { get; set; }
+        public double? TrimPadding { get; set; }
+        public byte? TrimThreshold { get; set; }
+        public string Watermark { get; set; }
+        public int? Width { get; set; }
+        public double? Zoom { get; set; }
+        public string ToQueryString() { }
+        public override string ToString() { }
+    }
+    public class InterceptModule : System.Web.IHttpModule
+    {
+        public InterceptModule() { }
+        protected ImageResizer.Configuration.IPipelineConfig conf { get; }
+        protected virtual void CheckRequest_PostAuthorizeRequest(object sender, System.EventArgs e) { }
+        protected virtual void HandleRequest(System.Web.HttpContext context, ImageResizer.Configuration.HttpModuleRequestAssistant ra, ImageResizer.Plugins.IVirtualFile vf) { }
+        protected void context_PreSendRequestHeaders(object sender, System.EventArgs e) { }
+    }
+    public enum JpegSubsamplingMode
+    {
+        Default = 0,
+        [ImageResizer.ExtensionMethods.EnumString("411", true)]
+        Y4Cb1Cr1 = 4,
+        [ImageResizer.ExtensionMethods.EnumString("420", true)]
+        Y4Cb2Cr0 = 8,
+        [ImageResizer.ExtensionMethods.EnumString("422", true)]
+        Y4Cb2Cr2 = 16,
+        [ImageResizer.ExtensionMethods.EnumString("444", true)]
+        HighestQuality = 32,
+        [ImageResizer.ExtensionMethods.EnumString("444", true)]
+        Y4Cb4Cr4 = 32,
+    }
+    public class LicenseException : ImageResizer.ImageProcessingException
+    {
+        public LicenseException(string message) { }
+        public LicenseException(string message, System.Exception innerException) { }
+    }
+    public enum OutputFormat
+    {
+        [ImageResizer.ExtensionMethods.EnumString("exif")]
+        [ImageResizer.ExtensionMethods.EnumString("jfi")]
+        [ImageResizer.ExtensionMethods.EnumString("jfif")]
+        [ImageResizer.ExtensionMethods.EnumString("jif")]
+        [ImageResizer.ExtensionMethods.EnumString("jpe")]
+        [ImageResizer.ExtensionMethods.EnumString("jpg", true)]
+        Jpeg = 8,
+        Png = 16,
+        Gif = 32,
+    }
+    public enum ProcessWhen
+    {
+        No = 0,
+        Always = 1,
+        Default = 2,
+    }
+    [System.Serializable]
+    public class ResizeSettings : ImageResizer.Collections.QuerystringBase<ImageResizer.ResizeSettings>
+    {
+        public ResizeSettings() { }
+        public ResizeSettings(System.Collections.Specialized.NameValueCollection col) { }
+        public ResizeSettings(string queryString) { }
+        public ResizeSettings(System.Collections.Specialized.NameValueCollection col, System.Collections.Specialized.NameValueCollection defaultSettings) { }
+        public ResizeSettings(string queryString, System.Collections.Specialized.NameValueCollection defaultSettings) { }
+        public ResizeSettings(int width, int height, ImageResizer.FitMode mode, string imageFormat) { }
+        public System.Drawing.ContentAlignment Anchor { get; set; }
+        public System.Drawing.Color BackgroundColor { get; set; }
+        public ImageResizer.Resizing.BoxPadding Border { get; set; }
+        public System.Drawing.Color BorderColor { get; set; }
+        public ImageResizer.ServerCacheMode Cache { get; set; }
+        public System.Drawing.PointF CropBottomRight { get; set; }
+        [System.Obsolete("Replaced by Mode=Crop. Use CropTopLeft and CropTopRight instead for setting a cus" +
+            "tom crop mode.")]
+        public ImageResizer.CropMode CropMode { get; set; }
+        public System.Drawing.PointF CropTopLeft { get; set; }
+        protected double[] CropValues { get; set; }
+        public double CropXUnits { get; set; }
+        public double CropYUnits { get; set; }
+        public System.Drawing.RotateFlipType Flip { get; set; }
+        public string Format { get; set; }
+        public int Height { get; set; }
+        public ImageResizer.Resizing.BoxPadding Margin { get; set; }
+        public int MaxHeight { get; set; }
+        public int MaxWidth { get; set; }
+        public ImageResizer.FitMode Mode { get; set; }
+        public ImageResizer.Resizing.BoxPadding Padding { get; set; }
+        public System.Drawing.Color PaddingColor { get; set; }
+        public ImageResizer.ProcessWhen Process { get; set; }
+        public int Quality { get; set; }
+        public double Rotate { get; set; }
+        public ImageResizer.ScaleMode Scale { get; set; }
+        public System.Drawing.RotateFlipType SourceFlip { get; set; }
+        [System.Obsolete("Replaced by Mode=Stretch")]
+        public ImageResizer.StretchMode Stretch { get; set; }
+        public int Width { get; set; }
+        public void Normalize() { }
+        public ImageResizer.ResizeSettings Normalize(string primary, string secondary) { }
+        public void SetDefaultImageFormat(string format) { }
+        public override string ToString() { }
+        public string ToStringEncoded() { }
+        public bool WasOneSpecified(params string[] keys) { }
+        protected double get(string name, double defaultValue) { }
+        protected int get(string name, int defaultValue) { }
+        public System.Drawing.RectangleF getCustomCropSourceRect(System.Drawing.SizeF imageSize) { }
+        protected void set(string name, double value) { }
+        protected void set(string name, int value) { }
+    }
+    public class ResizerSection : System.Configuration.ConfigurationSection
+    {
+        [System.CLSCompliant(false)]
+        protected volatile ImageResizer.Configuration.Xml.Node n;
+        protected object nSync;
+        protected ImageResizer.Configuration.Issues.IssueSink sink;
+        [System.CLSCompliant(false)]
+        protected volatile System.Xml.XmlDocument xmlDoc;
+        public ResizerSection() { }
+        public ResizerSection(ImageResizer.Configuration.Xml.Node root) { }
+        public ResizerSection(string xml) { }
+        public ImageResizer.Configuration.Issues.IssueSink IssueSink { get; }
+        protected override bool OnDeserializeUnrecognizedAttribute(string name, string value) { }
+        protected override bool OnDeserializeUnrecognizedElement(string elementName, System.Xml.XmlReader reader) { }
+        protected override bool SerializeToXmlElement(System.Xml.XmlWriter writer, string elementName) { }
+        public string getAttr(string selector, string defaultValue) { }
+        public ImageResizer.Configuration.Xml.Node getCopyOfNode(string selector) { }
+        public ImageResizer.Configuration.Xml.Node getCopyOfRootNode() { }
+        public void replaceRootNode(ImageResizer.Configuration.Xml.Node n) { }
+        public void setAttr(string selector, string value) { }
+    }
+    public enum ScaleMode
+    {
+        [ImageResizer.ExtensionMethods.EnumString("down")]
+        DownscaleOnly = 0,
+        [ImageResizer.ExtensionMethods.EnumString("up")]
+        UpscaleOnly = 1,
+        Both = 2,
+        [ImageResizer.ExtensionMethods.EnumString("canvas")]
+        UpscaleCanvas = 3,
+    }
+    public enum ServerCacheMode
+    {
+        No = 0,
+        Always = 1,
+        Default = 2,
+    }
+    [System.Obsolete("Use Mode=FitMode.Stretch instead. Will be removed in V3.5 or V4.")]
+    public enum StretchMode
+    {
+        Proportionally = 0,
+        Fill = 1,
+    }
+}
+namespace ImageResizer.Caching
+{
+    public delegate void ApplyResponseHeadersDelegate(ImageResizer.Caching.IResponseHeaders headers, System.Web.HttpContext context);
+    public delegate System.IO.Stream GetSourceImageDelegate();
+    public interface ICache
+    {
+        bool CanProcess(System.Web.HttpContext current, ImageResizer.Caching.IResponseArgs e);
+        void Process(System.Web.HttpContext current, ImageResizer.Caching.IResponseArgs e);
+    }
+    public interface ICacheProvider
+    {
+        ImageResizer.Caching.ICache GetCachingSystem(System.Web.HttpContext context, ImageResizer.Caching.IResponseArgs responseArgs);
+    }
+    public interface IResponseArgs
+    {
+        [System.Obsolete("RequestKey will include the modified date if present. No longer populated")]
+        ImageResizer.Caching.ModifiedDateDelegate GetModifiedDateUTC { get; }
+        [System.Obsolete("RequestKey will include the modified date if present. No longer populated")]
+        bool HasModifiedDate { get; }
+        string RequestKey { get; }
+        ImageResizer.Caching.ResizeImageDelegate ResizeImageToStream { get; }
+        ImageResizer.Caching.IResponseHeaders ResponseHeaders { get; set; }
+        System.Collections.Specialized.NameValueCollection RewrittenQuerystring { get; }
+        string SuggestedExtension { get; }
+    }
+    public interface IResponseHeaders
+    {
+        bool ApplyDuringPreSendRequestHeaders { get; set; }
+        ImageResizer.Caching.ApplyResponseHeadersDelegate ApplyToResponse { get; set; }
+        System.Web.HttpCacheability CacheControl { get; set; }
+        string ContentType { get; set; }
+        System.Collections.Specialized.NameValueCollection DefaultHeaders { get; set; }
+        System.DateTime Expires { get; set; }
+        System.Collections.Specialized.NameValueCollection Headers { get; set; }
+        System.DateTime LastModified { get; set; }
+        System.Collections.Generic.List<System.Web.Caching.CacheDependency> ServerCacheDependencies { get; set; }
+        bool SuppressVaryHeader { get; set; }
+        bool ValidUntilExpires { get; set; }
+    }
+    public delegate System.DateTime ModifiedDateDelegate();
+    public delegate void ResizeImageDelegate(System.IO.Stream s);
+    public class ResponseArgs : ImageResizer.Caching.IResponseArgs
+    {
+        protected ImageResizer.Caching.IResponseHeaders responseHeaders;
+        protected System.Collections.Specialized.NameValueCollection rewrittenQuerystring;
+        public ResponseArgs() { }
+        [System.Obsolete("RequestKey will include the modified date if present. No longer populated")]
+        public ImageResizer.Caching.ModifiedDateDelegate GetModifiedDateUTC { get; set; }
+        public ImageResizer.Caching.GetSourceImageDelegate GetSourceImage { get; set; }
+        [System.Obsolete("RequestKey will include the modified date if present. No longer populated")]
+        public bool HasModifiedDate { get; set; }
+        public string RequestKey { get; set; }
+        public ImageResizer.Caching.ResizeImageDelegate ResizeImageToStream { get; set; }
+        public ImageResizer.Caching.IResponseHeaders ResponseHeaders { get; set; }
+        public System.Collections.Specialized.NameValueCollection RewrittenQuerystring { get; set; }
+        public string SuggestedExtension { get; set; }
+    }
+    public class ResponseHeaders : ImageResizer.Caching.IResponseHeaders
+    {
+        public ResponseHeaders() { }
+        public bool ApplyDuringPreSendRequestHeaders { get; set; }
+        public ImageResizer.Caching.ApplyResponseHeadersDelegate ApplyToResponse { get; set; }
+        public System.Web.HttpCacheability CacheControl { get; set; }
+        public string ContentType { get; set; }
+        public System.Collections.Specialized.NameValueCollection DefaultHeaders { get; set; }
+        public System.DateTime Expires { get; set; }
+        public System.Collections.Specialized.NameValueCollection Headers { get; set; }
+        public System.DateTime LastModified { get; set; }
+        public System.Collections.Generic.List<System.Web.Caching.CacheDependency> ServerCacheDependencies { get; set; }
+        public bool SuppressVaryHeader { get; set; }
+        public bool ValidUntilExpires { get; set; }
+        public static void DefaultApplyToResponseMethod(ImageResizer.Caching.IResponseHeaders headers, System.Web.HttpContext context) { }
+    }
+}
+namespace ImageResizer.Collections
+{
+    public class QuerystringBase<TK> : System.Collections.Specialized.NameValueCollection
+        where TK : ImageResizer.Collections.QuerystringBase<TK>
+    {
+        public QuerystringBase() { }
+        public QuerystringBase(System.Collections.Specialized.NameValueCollection q) { }
+        public T? Get<T>(string name)
+            where T :  struct, System.IConvertible { }
+        public T Get<T>(string name, T defaultValue)
+            where T :  struct, System.IConvertible { }
+        public T? Get<T>(string name, T? defaultValue)
+            where T :  struct, System.IConvertible { }
+        public TK Set<T>(string name, T? val)
+            where T :  struct, System.IConvertible { }
+        public TK SetAsString<T>(string name, T val)
+            where T :  class { }
+    }
+    public class ReverseEnumerable<T> : System.Collections.Generic.IEnumerable<T>, System.Collections.IEnumerable
+    {
+        public ReverseEnumerable(System.Collections.ObjectModel.ReadOnlyCollection<T> collection) { }
+        public System.Collections.Generic.IEnumerator<T> GetEnumerator() { }
+    }
+    public class ReverseEnumerator<T> : System.Collections.Generic.IEnumerator<T>, System.Collections.IEnumerator, System.IDisposable
+    {
+        public ReverseEnumerator(System.Collections.ObjectModel.ReadOnlyCollection<T> collection) { }
+        public T Current { get; }
+        public bool MoveNext() { }
+        public void Reset() { }
+    }
+    public class SafeList<T> : System.Collections.Generic.IEnumerable<T>, System.Collections.IEnumerable
+    {
+        [System.CLSCompliant(false)]
+        protected volatile System.Collections.ObjectModel.ReadOnlyCollection<> items;
+        protected object writeLock;
+        public SafeList() { }
+        public SafeList(System.Collections.Generic.IEnumerable<T> items) { }
+        public T First { get; }
+        public T Last { get; }
+        public System.Collections.Generic.IEnumerable<T> Reversed { get; }
+        public event ImageResizer.Collections.SafeList<T>.ChangedHandler Changed;
+        public void Add(T item) { }
+        public void AddFirst(T item) { }
+        public bool Contains(T item) { }
+        protected void FireChanged() { }
+        public System.Collections.ObjectModel.ReadOnlyCollection<T> GetCollection() { }
+        public System.Collections.Generic.IEnumerator<T> GetEnumerator() { }
+        public System.Collections.Generic.IList<T> GetList() { }
+        public void ModifyList(ImageResizer.Collections.SafeList<T>.ListEditor callback) { }
+        public bool Remove(T item) { }
+        public void SetList(System.Collections.Generic.IEnumerable<T> list) { }
+        public delegate void ChangedHandler<T>(ImageResizer.Collections.SafeList<T> sender);
+        public delegate System.Collections.Generic.IEnumerable<T> ListEditor<T>(System.Collections.Generic.IList<T> items);
+    }
+}
+namespace ImageResizer.Configuration
+{
+    public delegate void CacheSelectionHandler(object sender, ImageResizer.Configuration.ICacheSelectionEventArgs e);
+    public class Config
+    {
+        [System.CLSCompliant(false)]
+        protected volatile ImageResizer.ImageBuilder _imageBuilder;
+        [System.CLSCompliant(false)]
+        protected volatile object _imageBuilderSync;
+        protected ImageResizer.Configuration.PluginConfig plugins;
+        public Config() { }
+        public Config(ImageResizer.ResizerSection config) { }
+        public Config(ImageResizer.ResizerSection config, bool addAspNetPlugins) { }
+        public ImageResizer.Configuration.Issues.IIssueProvider AllIssues { get; }
+        public ImageResizer.ImageBuilder CurrentImageBuilder { get; }
+        public ImageResizer.Configuration.PipelineConfig Pipeline { get; }
+        public ImageResizer.Configuration.PluginConfig Plugins { get; }
+        public ImageResizer.Configuration.Issues.IssueSink configurationSectionIssues { get; }
+        protected ImageResizer.ResizerSection cs { get; }
+        public static ImageResizer.Configuration.Config Current { get; }
+        public ImageResizer.ImageJob Build(ImageResizer.ImageJob job) { }
+        public void BuildImage(object source, object dest, string settings) { }
+        public string GetDiagnosticsPage() { }
+        public string GetLicensesPage() { }
+        protected void InvalidateImageBuilder() { }
+        public void UpgradeImageBuilder(ImageResizer.ImageBuilder replacement) { }
+        public void WriteDiagnosticsTo(string path) { }
+        public bool get(string selector, bool defaultValue) { }
+        public int get(string selector, int defaultValue) { }
+        public string get(string selector, string defaultValue) { }
+        public T get<T>(string selector, T defaultValue)
+            where T :  struct, System.IConvertible { }
+        public ImageResizer.Configuration.Xml.Node getConfigXml() { }
+        public ImageResizer.Configuration.Xml.Node getNode(string selector) { }
+        public void setConfigXml(ImageResizer.Configuration.Xml.Node n) { }
+        public void setConfigXmlText(string xml) { }
+    }
+    public delegate void HeartbeatHandler(ImageResizer.Configuration.IPipelineConfig sender, ImageResizer.Configuration.Config c);
+    public class HttpModuleRequestAssistant
+    {
+        public HttpModuleRequestAssistant(System.Web.HttpContext context, ImageResizer.Configuration.IPipelineConfig config, System.Web.IHttpModule sender) { }
+        public bool CachingIndicated { get; }
+        public string EstimatedContentType { get; }
+        public string EstimatedFileExtension { get; }
+        public bool ProcessingIndicated { get; }
+        public ImageResizer.Instructions RewrittenInstructions { get; }
+        public string RewrittenMappedPath { get; }
+        public System.Collections.Specialized.NameValueCollection RewrittenQuery { get; }
+        public bool RewrittenQueryHasDirective { get; }
+        public string RewrittenVirtualPath { get; }
+        public bool RewrittenVirtualPathIsAcceptedImageType { get; }
+        public void ApplyRewrittenPath() { }
+        public void AssignSFH() { }
+        public void EstimateResponseInfo() { }
+        public void FireMissing() { }
+        public string GenerateRequestCachingKey(System.DateTime? modifiedData) { }
+        public ImageResizer.Configuration.HttpModuleRequestAssistant.PostAuthorizeResult PostAuthorize() { }
+        public enum PostAuthorizeResult
+        {
+            UnrelatedFileType = 0,
+            AccessDenied403 = 1,
+            Complete = 2,
+        }
+    }
+    public interface ICacheSelectionEventArgs
+    {
+        System.Web.HttpContext Context { get; }
+        ImageResizer.Caching.IResponseArgs ResponseArgs { get; }
+        ImageResizer.Caching.ICache SelectedCache { get; set; }
+    }
+    public interface IPipelineConfig : ImageResizer.Plugins.IVirtualImageProvider
+    {
+        bool AuthorizeAllImages { get; set; }
+        string DropQuerystringKeys { get; set; }
+        string ModifiedPathKey { get; }
+        System.Collections.Specialized.NameValueCollection ModifiedQueryString { get; set; }
+        string ModifiedQueryStringKey { get; }
+        bool ModuleInstalled { get; set; }
+        string PreRewritePath { get; }
+        string ResponseArgsKey { get; }
+        bool SkipFileTypeCheck { get; }
+        string SkipFileTypeCheckKey { get; }
+        string StopRoutingKey { get; }
+        bool? UsingAsyncMode { get; set; }
+        ImageResizer.Configuration.VppUsageOption VppUsage { get; }
+        new bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+        System.Threading.Tasks.Task<bool> FileExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+        void FireAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlAuthorizationEventArgs urlEventArgs);
+        void FireHeartbeat();
+        void FireImageMissing(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlEventArgs urlEventArgs);
+        void FirePostAuthorizeRequest(System.Web.IHttpModule sender, System.Web.HttpContext httpContext);
+        void FirePreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Caching.IResponseArgs e);
+        void FirePreHandleImageAsync(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Plugins.IAsyncResponsePlan e);
+        void FireRewritingEvents(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlEventArgs ue);
+        ImageResizer.Plugins.IAsyncTyrantCache GetAsyncCacheFor(System.Web.HttpContext context, ImageResizer.Plugins.IAsyncResponsePlan plan);
+        ImageResizer.Caching.ICacheProvider GetCacheProvider();
+        new ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+        System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+        ImageResizer.ImageBuilder GetImageBuilder();
+        bool HasPipelineDirective(System.Collections.Specialized.NameValueCollection q);
+        bool IsAcceptedImageType(string filePath);
+        bool IsAppDomainUnrestricted();
+        string TrimFakeExtensions(string path);
+    }
+    public interface IUrlAuthorizationEventArgs
+    {
+        bool AllowAccess { get; set; }
+        System.Collections.Specialized.NameValueCollection QueryString { get; }
+        string VirtualPath { get; }
+    }
+    public interface IUrlEventArgs
+    {
+        System.Collections.Specialized.NameValueCollection QueryString { get; set; }
+        string VirtualPath { get; set; }
+    }
+    [System.Flags]
+    public enum LicenseAccess
+    {
+        Local = 0,
+        ProcessReadonly = 1,
+        ProcessShareonly = 2,
+        Process = 3,
+    }
+    [System.Flags]
+    public enum LicenseErrorAction
+    {
+        Watermark = 0,
+        Exception = 1,
+    }
+    public class PipelineConfig : ImageResizer.Caching.ICacheProvider, ImageResizer.Configuration.IPipelineConfig, ImageResizer.Plugins.ISettingsModifier, ImageResizer.Plugins.IVirtualImageProvider
+    {
+        [System.CLSCompliant(false)]
+        protected volatile System.Collections.Generic.Dictionary<, > _cachedDirectives;
+        [System.CLSCompliant(false)]
+        protected volatile System.Collections.Generic.Dictionary<, > _cachedExtensions;
+        protected object _cachedUrlDataSync;
+        [System.CLSCompliant(false)]
+        protected volatile System.Collections.Generic.IList<> _fakeExtensions;
+        protected ImageResizer.Configuration.Config c;
+        [System.CLSCompliant(false)]
+        protected volatile bool firedFirstRequest;
+        protected object firedFirstRequestSync;
+        protected volatile bool firstRequestFinished;
+        protected long processedCount;
+        public PipelineConfig(ImageResizer.Configuration.Config c) { }
+        public System.Collections.Generic.ICollection<string> AcceptedImageExtensions { get; }
+        public bool AuthorizeAllImages { get; set; }
+        public string DropQuerystringKeys { get; set; }
+        public System.Collections.Generic.IList<string> FakeExtensions { get; }
+        public bool IsHandlingRequest { get; }
+        public int? MaxConcurrentJobs { get; }
+        public string ModifiedPathKey { get; }
+        public System.Collections.Specialized.NameValueCollection ModifiedQueryString { get; set; }
+        public string ModifiedQueryStringKey { get; }
+        public bool ModuleInstalled { get; set; }
+        public string PreRewritePath { get; set; }
+        public long ProcessedCount { get; }
+        public string ResponseArgsKey { get; }
+        public bool SkipFileTypeCheck { get; set; }
+        public string SkipFileTypeCheckKey { get; }
+        public string StopRoutingKey { get; }
+        public System.Collections.Generic.ICollection<string> SupportedQuerystringKeys { get; }
+        public bool? UsingAsyncMode { get; set; }
+        public ImageResizer.Configuration.VppUsageOption VppUsage { get; }
+        public event ImageResizer.Configuration.UrlAuthorizationEventHandler AuthorizeImage;
+        public event ImageResizer.Configuration.HeartbeatHandler Heartbeat;
+        public event ImageResizer.Configuration.UrlEventHandler ImageMissing;
+        public event ImageResizer.Configuration.RequestEventHandler OnFirstRequest;
+        public event ImageResizer.Configuration.RequestEventHandler PostAuthorizeRequestStart;
+        public event ImageResizer.Configuration.UrlRewritingEventHandler PostRewrite;
+        public event ImageResizer.Configuration.PreHandleImageEventHandler PreHandleImage;
+        public event ImageResizer.Configuration.PreHandleImageAsyncEventHandler PreHandleImageAsync;
+        public event ImageResizer.Configuration.UrlRewritingEventHandler Rewrite;
+        public event ImageResizer.Configuration.UrlRewritingEventHandler RewriteDefaults;
+        public event ImageResizer.Configuration.CacheSelectionHandler SelectCachingSystem;
+        public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<bool> FileExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public void FireAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlAuthorizationEventArgs e) { }
+        public void FireHeartbeat() { }
+        public void FireHeartbeatViaAspNetCache(int intervalSeconds) { }
+        public void FireImageMissing(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlEventArgs e) { }
+        public void FirePostAuthorizeRequest(System.Web.IHttpModule sender, System.Web.HttpContext httpContext) { }
+        public void FirePreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Caching.IResponseArgs e) { }
+        public void FirePreHandleImageAsync(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Plugins.IAsyncResponsePlan e) { }
+        public void FireRewritingEvents(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlEventArgs e) { }
+        public ImageResizer.Plugins.IAsyncTyrantCache GetAsyncCacheFor(System.Web.HttpContext context, ImageResizer.Plugins.IAsyncResponsePlan plan) { }
+        public ImageResizer.Caching.ICacheProvider GetCacheProvider() { }
+        public ImageResizer.Caching.ICache GetCachingSystem(System.Web.HttpContext context, ImageResizer.Caching.IResponseArgs args) { }
+        public ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public ImageResizer.ImageBuilder GetImageBuilder() { }
+        public bool HasPipelineDirective(System.Collections.Specialized.NameValueCollection q) { }
+        public bool IsAcceptedImageType(string path) { }
+        public bool IsAppDomainUnrestricted() { }
+        public ImageResizer.ResizeSettings Modify(ImageResizer.ResizeSettings settings) { }
+        public string TrimFakeExtensions(string path) { }
+        protected void _cacheUrlData() { }
+        protected System.Collections.Generic.Dictionary<string, bool> getCachedDirectives() { }
+        protected System.Collections.Generic.Dictionary<string, bool> getCachedExtensions() { }
+        protected string getExtension(string path) { }
+        protected void urlModifyingPlugins_Changed(ImageResizer.Collections.SafeList<ImageResizer.Plugins.IQuerystringPlugin> sender) { }
+    }
+    public class PluginConfig : ImageResizer.Configuration.Issues.IssueSink, ImageResizer.Encoding.IEncoderProvider
+    {
+        public ImageResizer.Configuration.PluginConfig.LoggingAvaialableEvent LoggingAvailable;
+        protected object _loadPluginsSync;
+        protected ImageResizer.Configuration.Logging.ILogManager _logManager;
+        [System.CLSCompliant(false)]
+        protected volatile bool _pluginsLoaded;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.IPlugin> allPlugins;
+        protected ImageResizer.Configuration.Config c;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Caching.ICache> cachingSystems;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.ICurrentConfigProvider> configProviders;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.IFileExtensionPlugin> fileExtensionPlugins;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Resizing.BuilderExtension> imageBuilderExtensions;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Encoding.IEncoder> imageEncoders;
+        protected ImageResizer.Configuration.Plugins.NativeDependencyManager ndeps;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.IQuerystringPlugin> querystringPlugins;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.ISettingsModifier> settingsModifierPlugins;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.IVirtualImageProvider> virtualProviderPlugins;
+        public PluginConfig(ImageResizer.Configuration.Config c) { }
+        public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IPlugin> AllPlugins { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Caching.ICache> CachingSystems { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Plugins.ICurrentConfigProvider> ConfigProviders { get; }
+        public ImageResizer.Encoding.IEncoderProvider EncoderProvider { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IFileExtensionPlugin> FileExtensionPlugins { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Resizing.BuilderExtension> ImageBuilderExtensions { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Encoding.IEncoder> ImageEncoders { get; }
+        public ImageResizer.Configuration.LicenseErrorAction LicenseError { get; set; }
+        public ImageResizer.Configuration.LicenseAccess LicenseScope { get; set; }
+        public ImageResizer.Configuration.Logging.ILogManager LogManager { get; set; }
+        public bool PluginsLoaded { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IQuerystringPlugin> QuerystringPlugins { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Plugins.ISettingsModifier> SettingsModifierPlugins { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IVirtualImageProvider> VirtualProviderPlugins { get; }
+        public event ImageResizer.Configuration.PluginConfig.LicensingChangeEvent LicensePluginsChange;
+        public void AddLicense(string license) { }
+        public void AddLicensedDomainMapping(string localHostname, string licensedDomain) { }
+        public ImageResizer.Plugins.IPlugin AddPluginByName(string name, System.Collections.Specialized.NameValueCollection pluginConfig = null) { }
+        protected ImageResizer.Plugins.IPlugin CreatePluginByName(string name, System.Collections.Specialized.NameValueCollection args) { }
+        protected ImageResizer.Plugins.IPlugin CreatePluginByType(System.Type t, System.Collections.Specialized.NameValueCollection args) { }
+        public System.Type FindPluginType(string searchNameString) { }
+        public void FireLicensePluginsChange() { }
+        public void ForceLoadPlugins() { }
+        public T Get<T>() { }
+        public System.Collections.Generic.IList<T> GetAll<T>() { }
+        public ImageResizer.Encoding.IEncoder GetEncoder(ImageResizer.ResizeSettings settings, object original) { }
+        public override System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+        public System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetLicensedDomainMappings() { }
+        protected System.Collections.Generic.List<string> GetOptimizedAssemblyList(string assemblyName, string pluginName) { }
+        public T GetOrInstall<T>()
+            where T : ImageResizer.Plugins.IPlugin, new () { }
+        public T GetOrInstall<T>(T newInstance)
+            where T : ImageResizer.Plugins.IPlugin { }
+        public System.Collections.Generic.IList<ImageResizer.Plugins.IPlugin> GetPlugins(System.Type type) { }
+        public bool Has<T>() { }
+        public bool HasPlugin(System.Type type) { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Plugins.IPlugin plugin) { }
+        public void LoadNativeDependenciesForType(System.Type t) { }
+        public void LoadPlugins() { }
+        public void RemoveAll() { }
+        public bool Uninstall(ImageResizer.Plugins.IPlugin plugin) { }
+        public void add_plugin(ImageResizer.Plugins.IPlugin plugin) { }
+        protected void add_plugin_by_name(string name, System.Collections.Specialized.NameValueCollection args) { }
+        protected void clear_plugins_by_type(string type) { }
+        protected void loadPluginsInternal() { }
+        public void remove_plugin(object plugin) { }
+        protected void remove_plugins_by_name(string name) { }
+        public delegate void LicensingChangeEvent(object sender, ImageResizer.Configuration.Config forConfig);
+        public delegate void LoggingAvaialableEvent(ImageResizer.Configuration.Logging.ILogManager logger);
+    }
+    public delegate void PreHandleImageAsyncEventHandler(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Plugins.IAsyncResponsePlan e);
+    public delegate void PreHandleImageEventHandler(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Caching.IResponseArgs e);
+    public delegate void RequestEventHandler(System.Web.IHttpModule sender, System.Web.HttpContext context);
+    public class UrlAuthorizationEventArgs : System.EventArgs, ImageResizer.Configuration.IUrlAuthorizationEventArgs
+    {
+        protected System.Collections.Specialized.NameValueCollection _queryString;
+        protected string _virtualPath;
+        public UrlAuthorizationEventArgs(string virtualPath, System.Collections.Specialized.NameValueCollection queryString, bool allowAccess) { }
+        public bool AllowAccess { get; set; }
+        public System.Collections.Specialized.NameValueCollection QueryString { get; }
+        public string VirtualPath { get; }
+    }
+    public delegate void UrlAuthorizationEventHandler(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlAuthorizationEventArgs e);
+    public class UrlEventArgs : System.EventArgs, ImageResizer.Configuration.IUrlEventArgs
+    {
+        protected System.Collections.Specialized.NameValueCollection _queryString;
+        protected string _virtualPath;
+        public UrlEventArgs(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Collections.Specialized.NameValueCollection QueryString { get; set; }
+        public string VirtualPath { get; set; }
+    }
+    public delegate void UrlEventHandler(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlEventArgs e);
+    public delegate void UrlRewritingEventHandler(System.Web.IHttpModule sender, System.Web.HttpContext context, ImageResizer.Configuration.IUrlEventArgs e);
+    public enum VppUsageOption
+    {
+        Fallback = 0,
+        Never = 1,
+        Always = 2,
+    }
+}
+namespace ImageResizer.Configuration.Issues
+{
+    public class ConfigChecker : ImageResizer.Configuration.Issues.IIssueProvider
+    {
+        public ConfigChecker(ImageResizer.Configuration.Config c) { }
+        public System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+    }
+    public interface IIssue
+    {
+        string Details { get; }
+        ImageResizer.Configuration.Issues.IssueSeverity Severity { get; }
+        string Source { get; }
+        string Summary { get; }
+    }
+    public interface IIssueProvider
+    {
+        System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues();
+    }
+    public interface IIssueReceiver
+    {
+        void AcceptIssue(ImageResizer.Configuration.Issues.IIssue i);
+    }
+    public class Issue : ImageResizer.Configuration.Issues.IIssue
+    {
+        public Issue() { }
+        public Issue(string message) { }
+        public Issue(string message, ImageResizer.Configuration.Issues.IssueSeverity severity) { }
+        public Issue(string message, string details, ImageResizer.Configuration.Issues.IssueSeverity severity) { }
+        public Issue(string source, string message, string details, ImageResizer.Configuration.Issues.IssueSeverity severity) { }
+        public string Details { get; set; }
+        public ImageResizer.Configuration.Issues.IssueSeverity Severity { get; set; }
+        public string Source { get; set; }
+        public string Summary { get; set; }
+        public override bool Equals(object obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+    }
+    public class IssueGatherer : ImageResizer.Configuration.Issues.IIssueProvider
+    {
+        public IssueGatherer(ImageResizer.Configuration.Config c) { }
+        public System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+    }
+    public enum IssueSeverity
+    {
+        Critical = 0,
+        Error = 1,
+        ConfigurationError = 2,
+        Warning = 3,
+    }
+    public class IssueSink : ImageResizer.Configuration.Issues.IIssueProvider, ImageResizer.Configuration.Issues.IIssueReceiver
+    {
+        protected string defaultSource;
+        public IssueSink(string defaultSource) { }
+        public virtual void AcceptIssue(ImageResizer.Configuration.Issues.IIssue i) { }
+        public virtual System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+    }
+}
+namespace ImageResizer.Configuration.Logging
+{
+    public interface ILogManager
+    {
+        ImageResizer.Configuration.Logging.ILogger GetLogger(string loggerName);
+        void LoadConfigFromFile(string fileName);
+    }
+    public interface ILogger
+    {
+        bool IsDebugEnabled { get; }
+        bool IsErrorEnabled { get; }
+        bool IsFatalEnabled { get; }
+        bool IsInfoEnabled { get; }
+        bool IsTraceEnabled { get; }
+        bool IsWarnEnabled { get; }
+        string LoggerName { get; set; }
+        void Debug(string message);
+        void Debug(string message, params object[] args);
+        void Error(string message);
+        void Error(string message, params object[] args);
+        void Fatal(string message);
+        void Fatal(string message, params object[] args);
+        void Info(string message);
+        void Info(string message, params object[] args);
+        bool IsEnabled(string level);
+        void Log(string level, string message);
+        void Trace(string message);
+        void Trace(string message, params object[] args);
+        void Warn(string message);
+        void Warn(string message, params object[] args);
+    }
+    public interface ILoggerProvider
+    {
+        ImageResizer.Configuration.Logging.ILogger Logger { get; }
+    }
+}
+namespace ImageResizer.Configuration.Performance
+{
+    public class GlobalPerf
+    {
+        public static ImageResizer.Configuration.Performance.GlobalPerf Singleton { get; }
+        public ImageResizer.Configuration.Performance.IInfoAccumulator GetReportPairs() { }
+        public void IncrementCounter(string key) { }
+        public void TrackRate(string eventCategoryKey, long count) { }
+        public static void BlobRead(ImageResizer.Configuration.Config c, long ticks, long bytes) { }
+    }
+    public interface IInfoAccumulator
+    {
+        void AddString(string key, string value);
+        System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetInfo();
+        ImageResizer.Configuration.Performance.IInfoAccumulator WithPrefix(string prefix);
+        ImageResizer.Configuration.Performance.IInfoAccumulator WithPrepend(bool prepend);
+    }
+    public static class InfoAccumulatorExtensions
+    {
+        public static void Add(this ImageResizer.Configuration.Performance.IInfoAccumulator a, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> items) { }
+        public static void Add(this ImageResizer.Configuration.Performance.IInfoAccumulator a, string key, System.Guid value) { }
+        public static void Add(this ImageResizer.Configuration.Performance.IInfoAccumulator a, string key, string value) { }
+        public static void Add(this ImageResizer.Configuration.Performance.IInfoAccumulator a, string key, bool? value) { }
+        public static void Add(this ImageResizer.Configuration.Performance.IInfoAccumulator a, string key, long? value) { }
+        public static string ToQueryString(this ImageResizer.Configuration.Performance.IInfoAccumulator a, int characterLimit) { }
+    }
+    public class SignificantDigitsClamping
+    {
+        public SignificantDigitsClamping() { }
+        public long MaxValue { get; set; }
+        public long MinValue { get; set; }
+        public int SignificantDigits { get; set; }
+        public long Clamp(long value) { }
+        public double RoundPositiveValueToDigits(double n, int count) { }
+    }
+    public class SignificantDigitsClampingFloat
+    {
+        public SignificantDigitsClampingFloat() { }
+        public float MaxValue { get; set; }
+        public float MinValue { get; set; }
+        public int SignificantDigits { get; set; }
+        public float Clamp(float value) { }
+        public double RoundPositiveValueToDigits(double n, int count) { }
+    }
+}
+namespace ImageResizer.Configuration.Plugins
+{
+    public class NativeDependencyManager : ImageResizer.Configuration.Issues.IssueSink
+    {
+        public NativeDependencyManager() { }
+        public void EnsureLoaded(System.Reflection.Assembly a) { }
+        public void EnsureLoaded(ImageResizer.Configuration.Xml.Node manifest, string assemblyName, System.Diagnostics.Stopwatch sw = null) { }
+    }
+}
+namespace ImageResizer.Configuration.Xml
+{
+    public class Node
+    {
+        protected System.Collections.Generic.Dictionary<string, System.Collections.Generic.ICollection<ImageResizer.Configuration.Xml.Node>> _cachedResults;
+        public Node(string localName) { }
+        public Node(System.Xml.XmlElement e, ImageResizer.Configuration.Issues.IIssueReceiver ir) { }
+        public System.Collections.Specialized.NameValueCollection Attrs { get; set; }
+        public System.Collections.Generic.List<ImageResizer.Configuration.Xml.Node> Children { get; set; }
+        public bool IsEmpty { get; }
+        public string this[string name] { get; set; }
+        public string Name { get; set; }
+        public string TextContents { get; set; }
+        public ImageResizer.Configuration.Xml.Node RedactAttributes(string elementSelector, string[] attributeNames, string replaceWith = "[redacted]") { }
+        public override string ToString() { }
+        public System.Xml.XmlElement ToXmlElement() { }
+        public System.Xml.XmlElement ToXmlElement(System.Xml.XmlDocument doc) { }
+        public System.Collections.Generic.IList<ImageResizer.Configuration.Xml.Node> childrenByName(string elementName) { }
+        public void clearQueryCache() { }
+        public ImageResizer.Configuration.Xml.Node deepCopy() { }
+        public ImageResizer.Configuration.Xml.Node makeNodeTree(string selector) { }
+        protected System.Collections.Generic.KeyValuePair<string, string> parseAttributeName(string selector) { }
+        public System.Collections.Generic.ICollection<ImageResizer.Configuration.Xml.Node> query(string selector) { }
+        public string queryAttr(string selector) { }
+        public string queryAttr(string nodeSelector, string attrName) { }
+        public ImageResizer.Configuration.Xml.Node queryFirst(string selector) { }
+        public System.Collections.Generic.ICollection<ImageResizer.Configuration.Xml.Node> queryUncached(string selector) { }
+        public void setAttr(string selector, string attrValue) { }
+        public void setAttr(string nodeSelector, string attrName, string attrValue) { }
+        public static ImageResizer.Configuration.Xml.Node FromXmlFragment(string xml, ImageResizer.Configuration.Issues.IssueSink sink) { }
+    }
+    public class Selector : System.Collections.Generic.List<string>
+    {
+        public Selector(System.Collections.Generic.List<string> items) { }
+        public Selector(string selector) { }
+        public string Last { get; }
+        public ImageResizer.Configuration.Xml.Selector GetAllExceptLast() { }
+        public ImageResizer.Configuration.Xml.Selector GetRemainder() { }
+        public ImageResizer.Configuration.Xml.Selector GetSublist(int startAt) { }
+        public override string ToString() { }
+    }
+}
+namespace ImageResizer.Encoding
+{
+    public interface IEncoder
+    {
+        string Extension { get; }
+        string MimeType { get; }
+        bool SupportsTransparency { get; }
+        ImageResizer.Encoding.IEncoder CreateIfSuitable(ImageResizer.ResizeSettings settings, object original);
+        void Write(System.Drawing.Image i, System.IO.Stream s);
+    }
+    public interface IEncoderProvider
+    {
+        ImageResizer.Encoding.IEncoder GetEncoder(ImageResizer.ResizeSettings settings, object original);
+    }
+}
+namespace ImageResizer.ExtensionMethods
+{
+    public static class EnumExtensions
+    {
+        public static T? Parse<T>(string value)
+            where T :  struct, System.IConvertible { }
+        public static T? Parse<T>(this T en, string value)
+            where T :  struct, System.IConvertible { }
+        public static T Parse<T>(this T en, string value, T defaultValue)
+            where T :  struct, System.IConvertible { }
+        public static string ToPreferredString(this System.Enum en, bool lowerCase) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Enum | System.AttributeTargets.Field, AllowMultiple=true)]
+    public sealed class EnumRemovePrefixAttribute : System.Attribute
+    {
+        public EnumRemovePrefixAttribute(string name) { }
+        public EnumRemovePrefixAttribute(string name, bool defaultForSerialization) { }
+        public bool Default { get; set; }
+        public string Name { get; set; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Enum | System.AttributeTargets.Field, AllowMultiple=true)]
+    public sealed class EnumStringAttribute : System.Attribute
+    {
+        public EnumStringAttribute(string name) { }
+        public EnumStringAttribute(string name, bool defaultForSerialization) { }
+        public bool Default { get; set; }
+        public string Name { get; set; }
+    }
+    public static class GenericExtensions
+    {
+        public static string Delimited(this string[] values, string separator) { }
+        public static string Delimited<T>(this System.Collections.Generic.IEnumerable<T> values, string separator) { }
+        public static TResult MapNonNull<T, TResult>(this T v, System.Func<T, TResult> mapNonNull)
+            where T :  class
+            where TResult :  class { }
+        public static TResult? MapNonNull<T, TResult>(this T v, System.Func<T, TResult?> mapNonNull)
+            where T :  class
+            where TResult :  struct { }
+        public static TResult MapNonNull<T, TResult>(this T? v, System.Func<T, TResult> mapNonNull)
+            where T :  struct
+            where TResult :  class { }
+        public static TResult? MapNonNull<T, TResult>(this T? v, System.Func<T, TResult?> mapNonNull)
+            where T :  struct
+            where TResult :  struct { }
+    }
+    public static class NameValueCollectionExtensions
+    {
+        public static System.Collections.Specialized.NameValueCollection Exclude(this System.Collections.Specialized.NameValueCollection q, params string[] keysToRemove) { }
+        public static T? Get<T>(this System.Collections.Specialized.NameValueCollection t, string name)
+            where T :  struct, System.IConvertible { }
+        public static T Get<T>(this System.Collections.Specialized.NameValueCollection q, string name, T defaultValue)
+            where T :  struct, System.IConvertible { }
+        public static T? Get<T>(this System.Collections.Specialized.NameValueCollection q, string name, T? defaultValue)
+            where T :  struct, System.IConvertible { }
+        public static string GetAsString(this System.Collections.Specialized.NameValueCollection t, string name, string defaultValue) { }
+        public static T[] GetList<T>(this System.Collections.Specialized.NameValueCollection q, string name, T? fallbackValue, params int[] allowedSizes)
+            where T :  struct, System.IConvertible { }
+        public static bool IsOneSpecified(this System.Collections.Specialized.NameValueCollection q, params string[] keys) { }
+        public static System.Collections.Specialized.NameValueCollection Keep(this System.Collections.Specialized.NameValueCollection q, params string[] keysToKeep) { }
+        public static System.Collections.Specialized.NameValueCollection MergeDefaults(this System.Collections.Specialized.NameValueCollection q, System.Collections.Specialized.NameValueCollection defaults) { }
+        public static System.Collections.Specialized.NameValueCollection Normalize(this System.Collections.Specialized.NameValueCollection q, string primary, string secondary) { }
+        public static T[] ParseList<T>(string text, T? fallbackValue, params int[] allowedSizes)
+            where T :  struct, System.IConvertible { }
+        public static T? ParsePrimitive<T>(string value, T? defaultValue)
+            where T :  struct, System.IConvertible { }
+        public static string SerializePrimitive<T>(T? val)
+            where T :  struct, System.IConvertible { }
+        public static System.Collections.Specialized.NameValueCollection Set<T>(this System.Collections.Specialized.NameValueCollection q, string name, T? val)
+            where T :  struct, System.IConvertible { }
+        public static System.Collections.Specialized.NameValueCollection SetAsString<T>(this System.Collections.Specialized.NameValueCollection q, string name, T val)
+            where T :  class { }
+        public static System.Collections.Specialized.NameValueCollection SetList<T>(this System.Collections.Specialized.NameValueCollection q, string name, T[] values, bool throwExceptions, params int[] allowedSizes)
+            where T :  struct, System.IConvertible { }
+    }
+    public static class StreamExtensions
+    {
+        public static byte[] CopyOrReturnBuffer(this System.IO.Stream src, out long length, bool entireStream, int chunkSize) { }
+        public static byte[] CopyToBytes(this System.IO.Stream s) { }
+        public static byte[] CopyToBytes(this System.IO.Stream s, bool entireStream) { }
+        public static byte[] CopyToBytes(this System.IO.Stream src, bool entireStream, int chunkSize) { }
+        public static System.Threading.Tasks.Task<byte[]> CopyToBytesAsync(this System.IO.Stream src, bool entireStream, int chunkSize) { }
+        public static System.IO.MemoryStream CopyToMemoryStream(this System.IO.Stream s) { }
+        public static System.IO.MemoryStream CopyToMemoryStream(this System.IO.Stream s, bool entireStream) { }
+        public static System.IO.MemoryStream CopyToMemoryStream(this System.IO.Stream s, bool entireStream, int chunkSize) { }
+        public static System.Threading.Tasks.Task<System.IO.MemoryStream> CopyToMemoryStreamAsync(this System.IO.Stream s, int bufferSize = 4096) { }
+        public static void CopyToStream(this System.IO.Stream s, System.IO.Stream other) { }
+        public static void CopyToStream(this System.IO.Stream s, System.IO.Stream other, bool entireStream) { }
+        public static void CopyToStream(this System.IO.Stream src, System.IO.Stream dest, bool entireStream, int chunkSize) { }
+    }
+}
+namespace ImageResizer.Plugins.Basic
+{
+    [System.Obsolete("This plugin does nothing; autorotate is now built-in.")]
+    public class AutoRotate : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IPlugin
+    {
+        public AutoRotate() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class ClientCache : ImageResizer.Plugins.IPlugin
+    {
+        public ClientCache() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class DefaultEncoder : ImageResizer.Encoding.IEncoder, ImageResizer.Plugins.IFileSignatureProvider, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
+    {
+        public DefaultEncoder() { }
+        public DefaultEncoder(System.Drawing.Imaging.ImageFormat outputFormat) { }
+        public DefaultEncoder(ImageResizer.ResizeSettings settings, object original) { }
+        public DefaultEncoder(System.Drawing.Imaging.ImageFormat outputFormat, int jpegQuality) { }
+        public string Extension { get; }
+        public string MimeType { get; }
+        public System.Drawing.Imaging.ImageFormat OutputFormat { get; set; }
+        public int Quality { get; set; }
+        public bool SupportsTransparency { get; }
+        public virtual ImageResizer.Encoding.IEncoder CreateIfSuitable(ImageResizer.ResizeSettings settings, object original) { }
+        public System.Collections.Generic.IEnumerable<ImageResizer.Plugins.FileSignature> GetSignatures() { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool IsValidOutputFormat(System.Drawing.Imaging.ImageFormat f) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public void Write(System.Drawing.Image image, System.IO.Stream s) { }
+        public static void AddImageExtension(string extension, System.Drawing.Imaging.ImageFormat matchingFormat) { }
+        public static string GetContentTypeFromImageFormat(System.Drawing.Imaging.ImageFormat format) { }
+        public static string GetExtensionFromImageFormat(System.Drawing.Imaging.ImageFormat format) { }
+        public static System.Drawing.Imaging.ImageCodecInfo GetImageCodeInfo(string mimeType) { }
+        public static System.Drawing.Imaging.ImageFormat GetImageFormatFromExtension(string ext) { }
+        public static System.Drawing.Imaging.ImageFormat GetImageFormatFromPhysicalPath(string path) { }
+        public static System.Drawing.Imaging.ImageFormat GetOriginalFormat(object original) { }
+        public static System.Drawing.Imaging.ImageFormat GetRequestedFormat(string format, System.Drawing.Imaging.ImageFormat defaultValue) { }
+        public static void SaveBmp(System.Drawing.Image img, System.IO.Stream target) { }
+        public static void SaveGif(System.Drawing.Image img, System.IO.Stream target) { }
+        public static void SaveJpeg(System.Drawing.Image b, System.IO.Stream target, int quality) { }
+        public static void SavePng(System.Drawing.Image img, System.IO.Stream target) { }
+    }
+    public class DefaultSettings : ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.ISettingsModifier
+    {
+        public DefaultSettings() { }
+        public ImageResizer.ScaleMode ExplicitSizeScaleMode { get; set; }
+        public ImageResizer.ScaleMode MaxSizeScaleMode { get; set; }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public void LoadSettings() { }
+        public ImageResizer.ResizeSettings Modify(ImageResizer.ResizeSettings settings) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class DiagnoseRequest : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
+    {
+        public DiagnoseRequest() { }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        protected override ImageResizer.Resizing.RequestedAction PostPrepareSourceBitmap(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction PreFlushChanges(ImageResizer.Resizing.ImageState s) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class Diagnostic : ImageResizer.Plugins.Basic.EndpointPlugin
+    {
+        public Diagnostic() { }
+        protected override string GenerateOutput(System.Web.HttpContext context, ImageResizer.Configuration.Config c) { }
+        public static bool AllowResponse(System.Web.HttpContext context, ImageResizer.Configuration.Config c) { }
+        public static string DisabledNotice(ImageResizer.Configuration.Config c) { }
+    }
+    public enum DiagnosticMode
+    {
+        None = 0,
+        Localhost = 1,
+        AllHosts = 2,
+    }
+    public class DropShadow : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
+    {
+        public DropShadow() { }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        protected override ImageResizer.Resizing.RequestedAction LayoutEffects(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction RenderEffects(ImageResizer.Resizing.ImageState s) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public static void DrawOuterGradient(System.Drawing.Graphics g, System.Drawing.PointF[] poly, System.Drawing.Color inner, System.Drawing.Color outer, float width) { }
+    }
+    public class EndpointPlugin : ImageResizer.Plugins.IPlugin
+    {
+        public EndpointPlugin() { }
+        protected ImageResizer.Plugins.Basic.EndpointPlugin.EndpointMatching EndpointMatchMethod { get; set; }
+        protected string[] Endpoints { get; set; }
+        protected virtual string GenerateOutput(System.Web.HttpContext context, ImageResizer.Configuration.Config c) { }
+        protected virtual bool HandlesRequest(System.Web.HttpContext context, ImageResizer.Configuration.Config c) { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        protected virtual void ProcessRequest(System.Web.HttpContext context) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        protected enum EndpointMatching
+        {
+            FilePathEndsWithOrdinalIgnoreCase = 0,
+            FilePathMatchesOrdinal = 1,
+        }
+    }
+    public class FolderResizeSyntax : ImageResizer.Plugins.IPlugin
+    {
+        protected System.Text.RegularExpressions.Regex resizeFolder;
+        public FolderResizeSyntax() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        protected string parseResizeFolderSyntax(string path, System.Collections.Specialized.NameValueCollection q) { }
+    }
+    public class Gradient : ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin, ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderAsync
+    {
+        public Gradient() { }
+        public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<bool> FileExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public class GradientVirtualFile : ImageResizer.Plugins.IVirtualBitmapFile, ImageResizer.Plugins.IVirtualFile, ImageResizer.Plugins.IVirtualFileAsync, ImageResizer.Plugins.IVirtualFileSourceCacheKey
+        {
+            protected ImageResizer.ResizeSettings query;
+            public GradientVirtualFile(System.Collections.Specialized.NameValueCollection query) { }
+            public string VirtualPath { get; }
+            public System.Drawing.Bitmap GetBitmap() { }
+            public string GetCacheKey(bool includeModifiedDate) { }
+            public System.IO.Stream Open() { }
+            public System.Threading.Tasks.Task<System.IO.Stream> OpenAsync() { }
+        }
+    }
+    public interface IDiagnosticsFooterProvider
+    {
+        string ProvideDiagnosticsFooter();
+    }
+    public interface IDiagnosticsHeaderProvider
+    {
+        string ProvideDiagnosticsHeader();
+    }
+    public interface IDiagnosticsProvider
+    {
+        string ProvideDiagnostics();
+    }
+    public interface IDiagnosticsProviderFactory
+    {
+        object GetDiagnosticsProvider();
+    }
+    public class IEPngFix : ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
+    {
+        public IEPngFix() { }
+        public IEPngFix(System.Collections.Specialized.NameValueCollection settings) { }
+        public bool CatchAll { get; set; }
+        public bool Redirect { get; set; }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public static bool NeedsPngFix(System.Web.HttpContext context) { }
+    }
+    public interface ILicenseDiagnosticsProvider
+    {
+        string ProvidePublicText();
+    }
+    public class Image404 : ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
+    {
+        public Image404() { }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        protected string resolve404Path(string path) { }
+        public enum FilterMode
+        {
+            IncludeUnknownCommands = 0,
+            ExcludeUnknownCommands = 1,
+            IncludeAllCommands = 2,
+            ExcludeAllCommands = 3,
+        }
+    }
+    public class ImageHandlerSyntax : ImageResizer.Plugins.IPlugin
+    {
+        public ImageHandlerSyntax() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class ImageInfoAPI : ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
+    {
+        public ImageInfoAPI() { }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class LicenseDisplay : ImageResizer.Plugins.Basic.EndpointPlugin
+    {
+        public LicenseDisplay() { }
+        protected override string GenerateOutput(System.Web.HttpContext context, ImageResizer.Configuration.Config c) { }
+        public static string GetPageText(ImageResizer.Configuration.Config c) { }
+    }
+    public class MvcRoutingShimPlugin : ImageResizer.Plugins.IPlugin
+    {
+        public MvcRoutingShimPlugin() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public class StopRoutingRoute : System.Web.Routing.RouteBase
+        {
+            public StopRoutingRoute(string contextItemsFlag) { }
+            public override System.Web.Routing.RouteData GetRouteData(System.Web.HttpContextBase httpContext) { }
+            public override System.Web.Routing.VirtualPathData GetVirtualPath(System.Web.Routing.RequestContext requestContext, System.Web.Routing.RouteValueDictionary values) { }
+        }
+    }
+    public class NoCache : ImageResizer.Caching.ICache, ImageResizer.Plugins.IAsyncTyrantCache, ImageResizer.Plugins.IPlugin
+    {
+        public NoCache() { }
+        public bool CanProcess(System.Web.HttpContext current, ImageResizer.Caching.IResponseArgs e) { }
+        public bool CanProcess(System.Web.HttpContext current, ImageResizer.Plugins.IAsyncResponsePlan e) { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public void Process(System.Web.HttpContext context, ImageResizer.Caching.IResponseArgs e) { }
+        public System.Threading.Tasks.Task ProcessAsync(System.Web.HttpContext context, ImageResizer.Plugins.IAsyncResponsePlan e) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class NoCacheAsyncHandler : ImageResizer.Util.AsyncUtils.AsyncHttpHandlerBase
+    {
+        public NoCacheAsyncHandler(ImageResizer.Plugins.IAsyncResponsePlan e) { }
+        public override System.Threading.Tasks.Task ProcessRequestAsync(System.Web.HttpContext context) { }
+    }
+    public class NoCacheHandler : System.Web.IHttpHandler
+    {
+        public NoCacheHandler(ImageResizer.Caching.IResponseArgs e) { }
+        public bool IsReusable { get; }
+        public void ProcessRequest(System.Web.HttpContext context) { }
+    }
+    public class Presets : ImageResizer.Configuration.Issues.IIssueProvider, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin, ImageResizer.Plugins.ISettingsModifier
+    {
+        public Presets() { }
+        public Presets(System.Collections.Generic.Dictionary<string, ImageResizer.ResizeSettings> defaults, System.Collections.Generic.Dictionary<string, ImageResizer.ResizeSettings> settings, bool onlyAllowPresets) { }
+        public bool OnlyAllowPresets { get; set; }
+        public System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public ImageResizer.ResizeSettings Modify(ImageResizer.ResizeSettings s) { }
+        protected void ParseXml(ImageResizer.Configuration.Xml.Node n, ImageResizer.Configuration.Config conf) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public static System.Collections.Specialized.NameValueCollection FilterQuerystring(System.Collections.Specialized.NameValueCollection s, bool keepHmacAndUrl64) { }
+    }
+    public class SizeLimiting : ImageResizer.Resizing.BuilderExtension, ImageResizer.Configuration.Issues.IIssueProvider, ImageResizer.Plugins.IPlugin
+    {
+        public SizeLimiting() { }
+        public ImageResizer.Plugins.Basic.SizeLimits Limits { get; set; }
+        public System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        protected override ImageResizer.Resizing.RequestedAction PostLayoutImage(ImageResizer.Resizing.ImageState s) { }
+        protected override ImageResizer.Resizing.RequestedAction PrepareDestinationBitmap(ImageResizer.Resizing.ImageState s) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class SizeLimits : ImageResizer.Configuration.Issues.IssueSink
+    {
+        protected System.Drawing.Size imageSize;
+        protected ImageResizer.Plugins.Basic.SizeLimits.TotalSizeBehavior totalBehavior;
+        protected System.Drawing.Size totalSize;
+        public SizeLimits() { }
+        public SizeLimits(ImageResizer.Configuration.Config c) { }
+        public bool HasImageSize { get; }
+        public System.Drawing.Size ImageSize { get; set; }
+        public ImageResizer.Plugins.Basic.SizeLimits.TotalSizeBehavior TotalBehavior { get; set; }
+        public System.Drawing.Size TotalSize { get; set; }
+        public bool FitsInsideTotalSize(System.Drawing.Size s) { }
+        public void ValidateTotalSize(System.Drawing.Size total) { }
+        public class SizeLimitException : ImageResizer.ImageProcessingException
+        {
+            public SizeLimitException(string message) { }
+        }
+        public enum TotalSizeBehavior
+        {
+            ThrowException = 0,
+            IgnoreLimits = 1,
+        }
+    }
+    public class SpeedOrQuality : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IPlugin
+    {
+        public SpeedOrQuality() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        protected override ImageResizer.Resizing.RequestedAction RenderImage(ImageResizer.Resizing.ImageState s) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public class StaticLicenseProvider : ImageResizer.Plugins.ILicenseProvider, ImageResizer.Plugins.IPlugin
+    {
+        public StaticLicenseProvider() { }
+        public StaticLicenseProvider(params string[] licenses) { }
+        public void AddLicense(string license) { }
+        public System.Collections.Generic.ICollection<string> GetLicenses() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public static string CleanupLicenseString(string license) { }
+        public static ImageResizer.Plugins.Basic.StaticLicenseProvider One(string license) { }
+    }
+    public class Trial : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IPlugin
+    {
+        public Trial() { }
+        public virtual void DrawString(System.Drawing.RectangleF area, System.Drawing.Graphics g, string text, System.Drawing.FontFamily ff, System.Drawing.Color c) { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        protected override ImageResizer.Resizing.RequestedAction PreFlushChanges(ImageResizer.Resizing.ImageState s) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public static void InstallPermanent() { }
+        public enum TrialWatermarkMode
+        {
+            After500 = 0,
+            Always = 1,
+            Randomly = 2,
+        }
+    }
+    public class VirtualFolder : System.Web.Hosting.VirtualPathProvider, ImageResizer.Configuration.Issues.IIssueProvider, ImageResizer.Plugins.IMultiInstancePlugin, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderAsync
+    {
+        public VirtualFolder(System.Collections.Specialized.NameValueCollection args) { }
+        public VirtualFolder(string virtualPath, string physicalPath) { }
+        public VirtualFolder(string virtualPath, string physicalPath, bool registerAsVpp) { }
+        public bool FailedToRegisterVpp { get; }
+        public bool NoIOPermission { get; }
+        public string PhysicalPath { get; set; }
+        public bool RegisterAsVpp { get; set; }
+        public string VirtualPath { get; set; }
+        public override bool FileExists(string virtualPath) { }
+        public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<bool> FileExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public override System.Web.Caching.CacheDependency GetCacheDependency(string virtualPath, System.Collections.IEnumerable virtualPathDependencies, System.DateTime utcStart) { }
+        public System.DateTime GetDateModifiedUtc(string virtualPath) { }
+        public override System.Web.Hosting.VirtualFile GetFile(string virtualPath) { }
+        public ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool IsVirtualPath(string virtualPath) { }
+        public string LocalMapPath(string virtualPath) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public string VirtualToPhysical(string virtualPath) { }
+        protected string collapseOneLevel(string path) { }
+        protected string collapsePath(string path) { }
+        protected System.IO.Stream getStream(string virtualPath) { }
+        protected string normalizeVirtualPath(string path) { }
+        protected string resolvePhysicalPath(string path) { }
+        public class VirtualFolderProviderVirtualFile : System.Web.Hosting.VirtualFile, ImageResizer.Plugins.IVirtualFile, ImageResizer.Plugins.IVirtualFileAsync, ImageResizer.Plugins.IVirtualFileSourceCacheKey, ImageResizer.Plugins.IVirtualFileWithModifiedDate
+        {
+            public VirtualFolderProviderVirtualFile(string virtualPath, ImageResizer.Plugins.Basic.VirtualFolder provider) { }
+            public bool Exists { get; }
+            public System.DateTime ModifiedDateUTC { get; }
+            public string GetCacheKey(bool includeModifiedDate) { }
+            public override System.IO.Stream Open() { }
+            public System.Threading.Tasks.Task<System.IO.Stream> OpenAsync() { }
+        }
+    }
+    public class WebConfigLicenseReader : ImageResizer.Plugins.ILicenseProvider, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IRedactDiagnostics
+    {
+        public WebConfigLicenseReader() { }
+        public System.Collections.Generic.ICollection<string> GetLicenses() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public ImageResizer.Configuration.Xml.Node RedactFrom(ImageResizer.Configuration.Xml.Node resizer) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public static string TryRedact(string license) { }
+    }
+}
+namespace ImageResizer.Plugins
+{
+    public class CommonStaticStorage
+    {
+        public CommonStaticStorage() { }
+        public static object AddOrUpdate(string key, System.Func<string, object> factory) { }
+        public static object GetOrAdd(string key, System.Func<string, object> factory) { }
+        public static bool TryGetValue(string key, out object value) { }
+    }
+    public class FileSignature
+    {
+        public FileSignature(byte[] signature, string ext, string mime) { }
+        public string MimeType { get; set; }
+        public string PrimaryFileExtension { get; set; }
+        public byte[] Signature { get; set; }
+    }
+    public interface IAsyncResponsePlan
+    {
+        ImageResizer.Plugins.WriteResultAsyncDelegate CreateAndWriteResultAsync { get; set; }
+        string EstimatedContentType { get; set; }
+        string EstimatedFileExtension { get; set; }
+        ImageResizer.Plugins.ReadStreamAsyncDelegate OpenSourceStreamAsync { get; set; }
+        string RequestCachingKey { get; }
+        System.Collections.Specialized.NameValueCollection RewrittenQuerystring { get; }
+    }
+    public interface IAsyncTyrantCache
+    {
+        bool CanProcess(System.Web.HttpContext current, ImageResizer.Plugins.IAsyncResponsePlan e);
+        System.Threading.Tasks.Task ProcessAsync(System.Web.HttpContext current, ImageResizer.Plugins.IAsyncResponsePlan e);
+    }
+    public interface ICurrentConfigProvider
+    {
+        ImageResizer.Configuration.Config GetCurrentConfig();
+    }
+    public interface IFileExtensionPlugin
+    {
+        System.Collections.Generic.IEnumerable<string> GetSupportedFileExtensions();
+    }
+    public interface IFileSignatureProvider
+    {
+        System.Collections.Generic.IEnumerable<ImageResizer.Plugins.FileSignature> GetSignatures();
+    }
+    public interface ILicenseProvider : ImageResizer.Plugins.IPlugin
+    {
+        System.Collections.Generic.ICollection<string> GetLicenses();
+    }
+    public interface ILicensedPlugin
+    {
+        System.Collections.Generic.IEnumerable<string> LicenseFeatureCodes { get; }
+    }
+    public interface IMultiInstancePlugin { }
+    public interface IPersistentStringCache
+    {
+        string Get(string key);
+        System.DateTime? GetWriteTimeUtc(string key);
+        ImageResizer.Plugins.StringCachePutResult TryPut(string key, string value);
+    }
+    public interface IPlugin
+    {
+        ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c);
+        bool Uninstall(ImageResizer.Configuration.Config c);
+    }
+    public interface IPluginInfo
+    {
+        System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetInfoPairs();
+    }
+    public interface IProfiler
+    {
+        bool Active { get; }
+        bool IsRunning(string segmentName);
+        void LogStart(long ticks, string segmentName, bool allowRecursion = false);
+        void LogStop(long ticks, string segmentName, bool assertRunning = true, bool stopChildren = false);
+        void Start(string segmentName, bool allowRecursion = false);
+        void Stop(string segmentName, bool assertRunning = true, bool stopChildren = false);
+    }
+    public interface IQuerystringPlugin
+    {
+        System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys();
+    }
+    public interface IRedactDiagnostics
+    {
+        ImageResizer.Configuration.Xml.Node RedactFrom(ImageResizer.Configuration.Xml.Node resizer);
+    }
+    public interface ISettingsModifier
+    {
+        ImageResizer.ResizeSettings Modify(ImageResizer.ResizeSettings settings);
+    }
+    public interface IVirtualBitmapFile : ImageResizer.Plugins.IVirtualFile
+    {
+        System.Drawing.Bitmap GetBitmap();
+    }
+    public interface IVirtualFile
+    {
+        string VirtualPath { get; }
+        System.IO.Stream Open();
+    }
+    public interface IVirtualFileAsync : ImageResizer.Plugins.IVirtualFile
+    {
+        System.Threading.Tasks.Task<System.IO.Stream> OpenAsync();
+    }
+    public interface IVirtualFileCache
+    {
+        ImageResizer.Plugins.IVirtualFile GetFileIfCached(string virtualPath, System.Collections.Specialized.NameValueCollection queryString, ImageResizer.Plugins.IVirtualFile original);
+    }
+    public interface IVirtualFileCacheAsync
+    {
+        System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileIfCachedAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString, ImageResizer.Plugins.IVirtualFileAsync original);
+    }
+    public interface IVirtualFileSourceCacheKey
+    {
+        string GetCacheKey(bool includeModifiedDate);
+    }
+    public interface IVirtualFileWithModifiedDate : ImageResizer.Plugins.IVirtualFile
+    {
+        System.DateTime ModifiedDateUTC { get; }
+    }
+    public interface IVirtualFileWithModifiedDateAsync : ImageResizer.Plugins.IVirtualFile
+    {
+        System.Threading.Tasks.Task<System.DateTime> GetModifiedDateUTCAsync();
+    }
+    public interface IVirtualImageProvider
+    {
+        bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+        ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+    }
+    public interface IVirtualImageProviderAsync
+    {
+        System.Threading.Tasks.Task<bool> FileExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+        System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+    }
+    public interface IVirtualImageProviderVpp : ImageResizer.Plugins.IVirtualImageProvider
+    {
+        bool VppExposeFile(string virtualPath);
+    }
+    public interface IVirtualImageProviderVppCaching : ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderVpp
+    {
+        System.Web.Caching.CacheDependency VppGetCacheDependency(string virtualPath, System.Collections.IEnumerable virtualPathDependencies, System.DateTime utcStart);
+        string VppGetFileHash(string virtualPath, System.Collections.IEnumerable virtualPathDependencies);
+    }
+    public class PersistentGlobalStringCache : ImageResizer.Configuration.Issues.IIssueProvider, ImageResizer.Plugins.IPersistentStringCache
+    {
+        public PersistentGlobalStringCache() { }
+        public string Get(string key) { }
+        public System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+        public System.DateTime? GetWriteTimeUtc(string key) { }
+        public ImageResizer.Plugins.StringCachePutResult TryPut(string key, string value) { }
+    }
+    public delegate System.Threading.Tasks.Task<System.IO.Stream> ReadStreamAsyncDelegate();
+    public enum StringCachePutResult
+    {
+        Duplicate = 0,
+        WriteComplete = 1,
+        WriteFailed = 2,
+    }
+    public class VirtualFileShim : System.Web.Hosting.VirtualFile
+    {
+        public VirtualFileShim(ImageResizer.Plugins.IVirtualFile f) { }
+        public override System.IO.Stream Open() { }
+    }
+    public class VirtualFileWrapper : ImageResizer.Plugins.IVirtualFile
+    {
+        public VirtualFileWrapper(System.Web.Hosting.VirtualFile fileToWrap) { }
+        public System.Web.Hosting.VirtualFile UnderlyingFile { get; set; }
+        public string VirtualPath { get; }
+        public System.IO.Stream Open() { }
+    }
+    public class VirtualPathProviderShim : System.Web.Hosting.VirtualPathProvider
+    {
+        public VirtualPathProviderShim(ImageResizer.Configuration.Config c) { }
+        public override bool FileExists(string virtualPath) { }
+        public override System.Web.Caching.CacheDependency GetCacheDependency(string virtualPath, System.Collections.IEnumerable virtualPathDependencies, System.DateTime utcStart) { }
+        public override System.Web.Hosting.VirtualFile GetFile(string virtualPath) { }
+        public override string GetFileHash(string virtualPath, System.Collections.IEnumerable virtualPathDependencies) { }
+        protected ImageResizer.Plugins.IVirtualImageProviderVpp GetVIP(string virtualPath) { }
+        protected override void Initialize() { }
+        protected string normalizeVirtualPath(string path) { }
+    }
+    public delegate System.Threading.Tasks.Task WriteResultAsyncDelegate(System.IO.Stream outputStream, ImageResizer.Plugins.IAsyncResponsePlan plan);
+}
+namespace ImageResizer.Plugins.Licensing
+{
+    public interface ILicenseBlob
+    {
+        byte[] Data { get; }
+        ImageResizer.Plugins.Licensing.ILicenseDetails Fields { get; }
+        string Original { get; }
+        byte[] Signature { get; }
+    }
+    public interface ILicenseChain
+    {
+        string Id { get; }
+        bool IsRemote { get; }
+        bool Shared { get; }
+        ImageResizer.Plugins.Licensing.ILicenseBlob CachedLicense();
+        ImageResizer.Plugins.Licensing.ILicenseBlob FetchedLicense();
+        string LastFetchUrl();
+        System.Collections.Generic.IEnumerable<ImageResizer.Plugins.Licensing.ILicenseBlob> Licenses();
+        string ToPublicString();
+    }
+    public interface ILicenseClock
+    {
+        long TicksPerSecond { get; }
+        System.DateTimeOffset? GetAssemblyWriteDate();
+        System.DateTimeOffset? GetBuildDate();
+        long GetTimestampTicks();
+        System.DateTimeOffset GetUtcNow();
+    }
+    public interface ILicenseDetails
+    {
+        System.DateTimeOffset? Expires { get; }
+        string Id { get; }
+        System.DateTimeOffset? Issued { get; }
+        System.Collections.Generic.IReadOnlyDictionary<string, string> Pairs { get; }
+        System.DateTimeOffset? SubscriptionExpirationDate { get; }
+        string Get(string key);
+    }
+    public interface ILicenseManager : ImageResizer.Configuration.Issues.IIssueProvider
+    {
+        ImageResizer.Plugins.IPersistentStringCache Cache { get; set; }
+        System.DateTimeOffset? FirstHeartbeat { get; }
+        ImageResizer.Plugins.Licensing.LicenseManagerEvent AddLicenseChangeHandler<TTarget>(TTarget target, System.Action<TTarget, ImageResizer.Plugins.Licensing.ILicenseManager> action);
+        System.Collections.Generic.IReadOnlyCollection<ImageResizer.Plugins.Licensing.ILicenseChain> GetAllLicenses();
+        ImageResizer.Plugins.Licensing.ILicenseChain GetOrAdd(string license, ImageResizer.Configuration.LicenseAccess access);
+        System.Collections.Generic.IReadOnlyCollection<ImageResizer.Plugins.Licensing.ILicenseChain> GetSharedLicenses();
+        void Heartbeat();
+        void MonitorHeartbeat(ImageResizer.Configuration.Config c);
+        void MonitorLicenses(ImageResizer.Configuration.Config c);
+        void RemoveLicenseChangeHandler(ImageResizer.Plugins.Licensing.LicenseManagerEvent handler);
+    }
+    public delegate void LicenseManagerEvent(ImageResizer.Plugins.Licensing.ILicenseManager mgr);
+}
+namespace ImageResizer.Resizing
+{
+    public class AbstractImageProcessor
+    {
+        [System.CLSCompliant(false)]
+        protected volatile System.Collections.Generic.IEnumerable<> exts;
+        public AbstractImageProcessor() { }
+        public AbstractImageProcessor(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions) { }
+        protected virtual ImageResizer.Resizing.RequestedAction BeforeEncode(ImageResizer.ImageJob job) { }
+        protected virtual ImageResizer.Resizing.RequestedAction BuildJob(ImageResizer.ImageJob job) { }
+        protected virtual ImageResizer.Resizing.RequestedAction BuildJobBitmapToStream(ImageResizer.ImageJob job, System.Drawing.Bitmap source, System.IO.Stream dest) { }
+        protected virtual ImageResizer.Resizing.RequestedAction CreateImageAttribues(ImageResizer.Resizing.ImageState s) { }
+        public virtual System.Drawing.Bitmap DecodeStream(System.IO.Stream s, ImageResizer.ResizeSettings settings, string optionalPath) { }
+        public virtual System.Drawing.Bitmap DecodeStreamFailed(System.IO.Stream s, ImageResizer.ResizeSettings settings, string optionalPath) { }
+        protected virtual ImageResizer.Resizing.RequestedAction EndBuildJob(ImageResizer.ImageJob job) { }
+        protected virtual ImageResizer.Resizing.RequestedAction EndLayout(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction EndProcess(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction FlipExistingPoints(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction FlushChanges(ImageResizer.Resizing.ImageState s) { }
+        protected virtual System.IO.Stream GetStream(object source, ImageResizer.ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) { }
+        protected virtual ImageResizer.Resizing.RequestedAction InternalGraphicsDrawImage(ImageResizer.Resizing.ImageState state, System.Drawing.Bitmap dest, System.Drawing.Bitmap source, System.Drawing.PointF[] targetArea, System.Drawing.RectangleF sourceArea, float[][] colorMatrix) { }
+        protected virtual ImageResizer.Resizing.RequestedAction Layout(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction LayoutBorder(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction LayoutEffects(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction LayoutImage(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction LayoutMargin(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction LayoutNormalize(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction LayoutPadding(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction LayoutRotate(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction LayoutRound(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction OnProcess(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostCreateImageAttributes(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostDecodeStream(ref System.Drawing.Bitmap img, ImageResizer.ResizeSettings settings) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostFlushChanges(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostLayoutBorder(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostLayoutEffects(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostLayoutImage(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostLayoutMargin(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostLayoutNormalize(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostLayoutPadding(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostLayoutRotate(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostLayoutRound(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostPrepareSourceBitmap(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostRenderBackground(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostRenderBorder(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostRenderEffects(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostRenderImage(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PostRenderPadding(ImageResizer.Resizing.ImageState s) { }
+        protected virtual void PreAcquireStream(ref object dest, ImageResizer.ResizeSettings settings) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PreFlushChanges(ImageResizer.Resizing.ImageState s) { }
+        protected virtual void PreLoadImage(ref object source, ref string path, ref bool disposeSource, ref ImageResizer.ResizeSettings settings) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PreRenderImage(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PreRenderOverlays(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PrepareDestinationBitmap(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction PrepareSourceBitmap(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction ProcessFinalBitmap(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction Render(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction RenderBackground(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction RenderBorder(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction RenderEffects(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction RenderImage(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction RenderOverlays(ImageResizer.Resizing.ImageState s) { }
+        protected virtual ImageResizer.Resizing.RequestedAction RenderPadding(ImageResizer.Resizing.ImageState s) { }
+    }
+    public class BitmapTag
+    {
+        public BitmapTag(object tag) { }
+        public BitmapTag(string path, System.IO.Stream source) { }
+        public string Path { get; set; }
+        public System.IO.Stream Source { get; set; }
+    }
+    public class BoxPadding
+    {
+        protected double bottom;
+        protected double left;
+        protected double right;
+        protected double top;
+        public BoxPadding(ImageResizer.Resizing.BoxPadding original) { }
+        public BoxPadding(double all) { }
+        public BoxPadding(double left, double top, double right, double bottom) { }
+        public double All { get; }
+        public double Bottom { get; }
+        public bool IsEmpty { get; }
+        public double Left { get; }
+        public double Right { get; }
+        public double Top { get; }
+        protected double all { get; set; }
+        public static ImageResizer.Resizing.BoxPadding Empty { get; }
+        public float[] GetEdgeOffsets() { }
+        public ImageResizer.Resizing.BoxPadding SetAll(double all) { }
+        public ImageResizer.Resizing.BoxPadding SetBottom(double bottom) { }
+        public ImageResizer.Resizing.BoxPadding SetLeft(double left) { }
+        public ImageResizer.Resizing.BoxPadding SetRight(double right) { }
+        public ImageResizer.Resizing.BoxPadding SetTop(double top) { }
+        public override string ToString() { }
+        public static ImageResizer.Resizing.BoxPadding Parse(string text, ImageResizer.Resizing.BoxPadding fallbackValue) { }
+    }
+    public class BuilderExtension : ImageResizer.Resizing.AbstractImageProcessor
+    {
+        public BuilderExtension() { }
+    }
+    public class ImageLayoutEngine
+    {
+        public ImageLayoutEngine(System.Drawing.Size originalSize, System.Drawing.RectangleF cropWindow) { }
+        public System.Drawing.SizeF CanvasSize { get; }
+        public System.Drawing.RectangleF CopyFrom { get; }
+        public System.Drawing.SizeF CopyToSize { get; }
+        public void ApplyInstructions(ImageResizer.Instructions i) { }
+        public void ApplySettings(ImageResizer.ResizeSettings settings) { }
+    }
+    public class ImageState : System.IDisposable
+    {
+        public float[][] colorMatrix;
+        public System.Drawing.RectangleF copyRect;
+        public System.Drawing.Bitmap destBitmap;
+        public System.Drawing.Graphics destGraphics;
+        public System.Drawing.Size destSize;
+        public System.Drawing.Size finalSize;
+        public ImageResizer.Resizing.LayoutBuilder layout;
+        public System.Drawing.Size originalSize;
+        public System.Drawing.Bitmap preRenderBitmap;
+        public ImageResizer.ResizeSettings settings;
+        public System.Drawing.Bitmap sourceBitmap;
+        public bool supportsTransparency;
+        public ImageState(ImageResizer.ResizeSettings settings, System.Drawing.Size originalSize, bool transparencySupported) { }
+        public System.Collections.Generic.Dictionary<string, object> Data { get; }
+        public ImageResizer.ImageJob Job { get; set; }
+        public System.Drawing.SizeF copySize { get; }
+        public void ApplyCropping() { }
+        public void ConvertIfCMYK() { }
+        public void Dispose() { }
+        public void EnsurePreRenderBitmap() { }
+        public void EnsureRGBA() { }
+        public void ValidateCropping() { }
+        public System.Collections.Specialized.NameValueCollection settingsAsCollection() { }
+    }
+    public class LayoutBuilder
+    {
+        protected System.Collections.Generic.Dictionary<string, ImageResizer.Resizing.LayoutBuilder.PointSet> ring;
+        protected System.Collections.Generic.List<ImageResizer.Resizing.LayoutBuilder.PointSet> ringList;
+        public LayoutBuilder() { }
+        public System.Drawing.PointF[] this[string key] { get; set; }
+        public ImageResizer.Resizing.LayoutBuilder.PointSet LastRing { get; }
+        public ImageResizer.Resizing.LayoutBuilder.PointSet AddIgnoredPoints(string name, System.Drawing.PointF[] points) { }
+        public ImageResizer.Resizing.LayoutBuilder.PointSet AddInvisiblePolygon(string name, System.Drawing.PointF[] points) { }
+        public ImageResizer.Resizing.LayoutBuilder.PointSet AddRing(string name, ImageResizer.Resizing.BoxPadding padding) { }
+        public ImageResizer.Resizing.LayoutBuilder.PointSet AddRing(string name, System.Drawing.PointF[] points) { }
+        public bool ContainsRing(string name) { }
+        public System.Drawing.RectangleF GetBoundingBox() { }
+        public System.Drawing.RectangleF? GetRingAsRectF(string name) { }
+        public void Normalize(System.Drawing.PointF origin) { }
+        public void Rotate(double degrees, System.Drawing.PointF origin) { }
+        public void Round() { }
+        public void Scale(double factor, System.Drawing.PointF origin) { }
+        public void Shift(System.Drawing.RectangleF from, System.Drawing.RectangleF to) { }
+        [System.Flags]
+        public enum PointFlags
+        {
+            Ring = 1,
+            Invisible = 2,
+            Ignored = 4,
+        }
+        public class PointSet
+        {
+            public ImageResizer.Resizing.LayoutBuilder.PointFlags flags;
+            protected ImageResizer.Resizing.LayoutBuilder.PointTranslationBehavior pointBehavior;
+            public System.Drawing.PointF[] points;
+            public PointSet(System.Drawing.PointF[] pts) { }
+            public PointSet(System.Drawing.PointF[] pts, ImageResizer.Resizing.LayoutBuilder.PointFlags settings) { }
+            public ImageResizer.Resizing.LayoutBuilder.PointTranslationBehavior PointBehavior { get; }
+        }
+        public enum PointTranslationBehavior
+        {
+            Exact = 0,
+            ClosestVisiblePoint = 1,
+            ClosestImagePoint = 2,
+            Empty = 3,
+        }
+    }
+    public enum RequestedAction
+    {
+        None = 0,
+        Cancel = 1,
+    }
+}
+namespace ImageResizer.Util
+{
+    public static class AsyncUtils
+    {
+        public static void RunSync(System.Func<System.Threading.Tasks.Task> func) { }
+        public static TResult RunSync<TResult>(System.Func<System.Threading.Tasks.Task<TResult>> func) { }
+        public abstract class AsyncHttpHandlerBase : System.Web.IHttpAsyncHandler, System.Web.IHttpHandler
+        {
+            protected AsyncHttpHandlerBase() { }
+            public virtual bool IsReusable { get; }
+            public System.IAsyncResult BeginProcessRequest(System.Web.HttpContext context, System.AsyncCallback cb, object extraData) { }
+            public void EndProcessRequest(System.IAsyncResult result) { }
+            public void ProcessRequest(System.Web.HttpContext context) { }
+            public abstract System.Threading.Tasks.Task ProcessRequestAsync(System.Web.HttpContext context);
+        }
+        public class TaskWrapperAsyncResult : System.IAsyncResult
+        {
+            public TaskWrapperAsyncResult(System.Threading.Tasks.Task task, object asyncState) { }
+            public object AsyncState { get; }
+            public System.Threading.WaitHandle AsyncWaitHandle { get; }
+            public bool CompletedSynchronously { get; }
+            public bool IsCompleted { get; }
+            public System.Threading.Tasks.Task Task { get; }
+        }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    public class BuildDateAttribute : System.Attribute
+    {
+        public BuildDateAttribute() { }
+        public BuildDateAttribute(string txt) { }
+        public string Value { get; }
+        public System.DateTimeOffset? ValueDate { get; }
+        public override string ToString() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    public class BuildTypeAttribute : System.Attribute
+    {
+        public BuildTypeAttribute() { }
+        public BuildTypeAttribute(string txt) { }
+        public string Value { get; }
+        public override string ToString() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    public class CommitAttribute : System.Attribute
+    {
+        public CommitAttribute() { }
+        public CommitAttribute(string txt) { }
+        public string Value { get; }
+        public override string ToString() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    public class EditionAttribute : System.Attribute
+    {
+        public EditionAttribute() { }
+        public EditionAttribute(string txt) { }
+        public string Value { get; }
+        public override string ToString() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    public class NativeDependenciesAttribute : System.Attribute
+    {
+        public NativeDependenciesAttribute() { }
+        public NativeDependenciesAttribute(string txt) { }
+        public string Value { get; }
+        public override string ToString() { }
+    }
+    public class ParseUtils
+    {
+        public const System.Globalization.NumberStyles FloatingPointStyle = 231;
+        public ParseUtils() { }
+        public static System.Drawing.Color? ParseColor(string value) { }
+        public static System.Drawing.Color ParseColor(string value, System.Drawing.Color defaultValue) { }
+        public static T[] ParseList<T>(string text, T? fallbackValue, params int[] allowedSizes)
+            where T :  struct, System.IConvertible { }
+        public static T? ParsePrimitive<T>(string value)
+            where T :  struct, System.IConvertible { }
+        public static T ParsePrimitive<T>(string value, T defaultValue)
+            where T :  struct, System.IConvertible { }
+        public static string SerializeColor(System.Drawing.Color value) { }
+        public static string SerializePrimitive<T>(T? val)
+            where T :  struct, System.IConvertible { }
+    }
+    public class PathUtils
+    {
+        public PathUtils() { }
+        public static string AppPhysicalPath { get; }
+        public static string AppVirtualPath { get; }
+        public static string AddExtension(string path, string newExtension) { }
+        public static string AddQueryString(string virtualPath, string querystring) { }
+        public static string BuildQueryString(System.Collections.Specialized.NameValueCollection QueryString) { }
+        public static string BuildQueryString(System.Collections.Specialized.NameValueCollection QueryString, bool urlEncode) { }
+        public static string BuildQueryString(System.Collections.Specialized.NameValueCollection QueryString, bool urlEncode, bool skipNullValues = true, char firstSeparator = ?, char laterSeparators = &, char equals = =) { }
+        public static string BuildSemicolonQueryString(System.Collections.Specialized.NameValueCollection QueryString, bool urlEncode) { }
+        public static System.Collections.Specialized.NameValueCollection FilterQueryString(ImageResizer.ResizeSettings query, params string[] keepKeys) { }
+        public static byte[] FromBase64UToBytes(string data) { }
+        public static string FromBase64UToString(string data) { }
+        public static string GenerateImageUrl(string path, System.Collections.Specialized.NameValueCollection query) { }
+        public static string GetExtension(string path) { }
+        public static string GetFullExtension(string path) { }
+        public static string GuessVirtualPath(string path) { }
+        public static bool HasIOPermission(string[] paths) { }
+        public static string MapPathIfAppRelative(string path) { }
+        public static string MergeOverwriteQueryString(string path, System.Collections.Specialized.NameValueCollection newQuerystring) { }
+        public static string MergeQueryString(string path, System.Collections.Specialized.NameValueCollection newQuerystring) { }
+        public static System.Collections.Specialized.NameValueCollection ParseQueryOnly(string query, bool allowSemicolons = true, bool urlDecode = true) { }
+        public static System.Collections.Specialized.NameValueCollection ParseQueryString(string path) { }
+        public static System.Collections.Specialized.NameValueCollection ParseQueryString(string path, bool allowSemicolons) { }
+        public static System.Collections.Specialized.NameValueCollection ParseQueryString(string path, bool allowSemicolons, out string beforeQuery, out string fragment) { }
+        public static System.Collections.Specialized.NameValueCollection ParseQueryStringFriendly(string path) { }
+        public static System.Collections.Specialized.NameValueCollection ParseQueryStringFriendlyAllowSemicolons(string path) { }
+        public static string RemoveExtension(string path) { }
+        public static string RemoveFullExtension(string path) { }
+        public static string RemoveNonMatchingChars(string text, string chars) { }
+        public static string RemoveQueryString(string path) { }
+        public static string ResolveAppRelative(string virtualPath) { }
+        public static string ResolveAppRelativeAssumeAppRelative(string virtualPath) { }
+        public static string ResolveVariablesInPath(string pathWithVars, ImageResizer.Util.PathUtils.VariableResolverCallback resolver) { }
+        public static string SetExtension(string path, string newExtension) { }
+        public static string ToBase64U(byte[] data) { }
+        public static string ToBase64U(string data) { }
+        public delegate string VariableResolverCallback(string variableName);
+    }
+    public class PolygonMath
+    {
+        public PolygonMath() { }
+        public static System.Drawing.PointF[] AlignWith(System.Drawing.PointF[] obj, System.Drawing.PointF[] container, System.Drawing.ContentAlignment align) { }
+        public static System.Drawing.RectangleF AlignWith(System.Drawing.RectangleF obj, System.Drawing.RectangleF container, System.Drawing.ContentAlignment align) { }
+        public static System.Drawing.RectangleF AlignWithin(System.Drawing.RectangleF obj, System.Drawing.RectangleF container, System.Drawing.PointF centerAt) { }
+        public static bool ArraysEqual(System.Drawing.PointF[] a1, System.Drawing.PointF[] a2) { }
+        public static System.Drawing.PointF Average(System.Drawing.PointF a, System.Drawing.PointF b) { }
+        public static System.Drawing.PointF[] CenterInside(System.Drawing.PointF[] inner, System.Drawing.PointF[] outer) { }
+        public static System.Drawing.RectangleF CenterInside(System.Drawing.SizeF size, System.Drawing.RectangleF bounds) { }
+        public static System.Drawing.PointF ChangeMagnitude(System.Drawing.PointF v, float length) { }
+        public static System.Drawing.RectangleF ClipRectangle(System.Drawing.RectangleF box, System.Drawing.RectangleF bounds) { }
+        public static System.Drawing.RotateFlipType CombineFlipAndRotate(ImageResizer.FlipMode flip, double angle) { }
+        public static System.Drawing.RotateFlipType CombineFlipAndRotate(System.Drawing.RotateFlipType flip, double angle) { }
+        public static double Dist(System.Drawing.PointF a, System.Drawing.PointF b) { }
+        public static System.Drawing.SizeF DownScaleInside(System.Drawing.SizeF inner, System.Drawing.SizeF bounding) { }
+        public static System.Drawing.RectangleF ExpandTo(System.Drawing.RectangleF box, System.Drawing.SizeF copySize) { }
+        public static bool FitsInside(System.Drawing.SizeF inner, System.Drawing.SizeF outer) { }
+        public static void ForEach(System.Array a, ImageResizer.Util.PolygonMath.ForEachFunction func) { }
+        public static System.Drawing.Brush GenerateRadialBrush(System.Drawing.Color inner, System.Drawing.Color outer, System.Drawing.PointF pt, float width) { }
+        public static System.Drawing.RectangleF GetBoundingBox(double[] flattenedPoints) { }
+        public static System.Drawing.RectangleF GetBoundingBox(System.Drawing.PointF[] points) { }
+        public static System.Drawing.PointF[] GetCorners(System.Drawing.PointF[] poly, float width) { }
+        public static System.Drawing.PointF[] GetCorners(System.Drawing.PointF[] poly, float[] widths) { }
+        public static System.Drawing.RectangleF GetCroppingRectangle(double[] cropValues, double xunits, double yunits, System.Drawing.SizeF imageSize) { }
+        public static double GetShortestPair(System.Drawing.PointF[] poly) { }
+        public static System.Drawing.PointF[] GetSides(System.Drawing.PointF[] poly, float width) { }
+        public static System.Drawing.PointF[] GetSubArray(System.Drawing.PointF[] array, int index) { }
+        public static System.Drawing.PointF[] InflatePoly(System.Drawing.PointF[] poly, float offset) { }
+        public static System.Drawing.PointF[] InflatePoly(System.Drawing.PointF[] poly, float[] offsets) { }
+        public static bool IsUnrotated(System.Drawing.PointF[] a) { }
+        public static System.Drawing.PointF Midpoint(System.Drawing.RectangleF obj) { }
+        public static System.Drawing.RectangleF MoveInBounds(System.Drawing.RectangleF obj, System.Drawing.RectangleF container) { }
+        public static System.Drawing.PointF[] MovePoly(System.Drawing.PointF[] points, System.Drawing.PointF offset) { }
+        public static System.Drawing.PointF[] NormalizePoly(System.Drawing.PointF[] poly) { }
+        public static double NormalizeTo90Intervals(double d) { }
+        public static System.Drawing.PointF[] RotatePoly(System.Drawing.PointF[] poly, double degrees) { }
+        public static System.Drawing.PointF[] RotatePoly(System.Drawing.PointF[] poly, double degrees, System.Drawing.PointF origin) { }
+        public static System.Drawing.PointF RotateVector(System.Drawing.PointF v, double radians) { }
+        public static System.Drawing.PointF RotateVector(System.Drawing.PointF v, double radians, System.Drawing.PointF origin) { }
+        public static System.Drawing.PointF[] RoundPoints(System.Drawing.PointF[] a) { }
+        [System.CLSCompliant(false)]
+        public static System.Drawing.PointF[] RoundPoints(System.Drawing.PointF[] a) { }
+        public static System.Drawing.Size RoundPoints(System.Drawing.SizeF sizeF) { }
+        public static System.Drawing.SizeF ScaleInside(System.Drawing.SizeF inner, System.Drawing.SizeF bounding) { }
+        public static System.Drawing.SizeF ScaleOutside(System.Drawing.SizeF innerBounds, System.Drawing.SizeF outer) { }
+        public static System.Drawing.PointF ScalePoint(System.Drawing.PointF point, double xfactor, double yfactor, System.Drawing.PointF origin) { }
+        public static System.Drawing.PointF[] ScalePoints(System.Drawing.PointF[] poly, double xfactor, double yfactor, System.Drawing.PointF origin) { }
+        public static System.Drawing.RectangleF ScaleRect(System.Drawing.RectangleF rect, double ExpandX, double ExpandY) { }
+        public static System.Drawing.PointF[] ToPoly(System.Drawing.RectangleF rect) { }
+        public static System.Drawing.Rectangle ToRectangle(System.Drawing.RectangleF r) { }
+        public static System.Drawing.Rectangle ToRectangleShrinkRound(System.Drawing.RectangleF r) { }
+        public static System.Drawing.PointF[] getParallelogram(System.Drawing.PointF[] quad) { }
+        public static System.Drawing.SizeF getParallelogramSize(System.Drawing.PointF[] p) { }
+        public delegate object ForEachFunction(object o);
+    }
+    public class SeekableStreamWrapper : System.IO.MemoryStream
+    {
+        public override bool CanWrite { get; }
+        protected override void Dispose(bool disposing) { }
+        public static System.IO.Stream FromStream(System.IO.Stream sourceStream) { }
+        public static System.IO.Stream FromStream(System.IO.Stream sourceStream, ref bool disposeStream) { }
+    }
+    [System.Obsolete("All methods of this class have been deprecated. Use ParseUtils or ImageResizer.Ex" +
+        "tensionMethods instead.  Will be removed in V3.5 or V4.")]
+    public class Utils
+    {
+        public const System.Globalization.NumberStyles floatingPointStyle = 231;
+        public Utils() { }
+        [System.Obsolete("This method will be removed in V3.3. Use DropShadow.DrawOuterGradient instead")]
+        public static void DrawOuterGradient(System.Drawing.Graphics g, System.Drawing.PointF[] poly, System.Drawing.Color inner, System.Drawing.Color outer, float width) { }
+        public static System.Drawing.RotateFlipType combineFlipAndRotate(System.Drawing.RotateFlipType flip, double angle) { }
+        [System.Obsolete("Use ImageResizer.ExtensionMethods instead.")]
+        public static void copyStream(System.IO.Stream source, System.IO.Stream dest) { }
+        public static bool getBool(System.Collections.Specialized.NameValueCollection q, string name, bool defaultValue) { }
+        public static double getDouble(System.Collections.Specialized.NameValueCollection q, string name, double defaultValue) { }
+        public static float getFloat(System.Collections.Specialized.NameValueCollection q, string name, float defaultValue) { }
+        public static int getInt(System.Collections.Specialized.NameValueCollection q, string name, int defaultValue) { }
+        public static double normalizeTo90Intervals(double d) { }
+        public static System.Drawing.Color parseColor(string value, System.Drawing.Color defaultValue) { }
+        public static System.Collections.Generic.KeyValuePair<ImageResizer.CropMode, double[]> parseCrop(string value) { }
+        public static System.Collections.Generic.KeyValuePair<ImageResizer.CropUnits, double> parseCropUnits(string value) { }
+        public static T parseEnum<T>(string value, T defaultValue)
+            where T :  struct, System.IConvertible { }
+        public static System.Drawing.RotateFlipType parseFlip(string sFlip) { }
+        public static double[] parseList(string text, double defaultValue) { }
+        public static ImageResizer.Resizing.BoxPadding parsePadding(string value) { }
+        public static System.Drawing.PointF parsePointF(string value, System.Drawing.PointF defaultValue) { }
+        public static double parseRotate(string s) { }
+        public static ImageResizer.ScaleMode parseScale(string value) { }
+        public static ImageResizer.StretchMode parseStretch(string value) { }
+        public static string writeColor(System.Drawing.Color value) { }
+        public static string writeCrop(ImageResizer.CropMode mode, double[] coords) { }
+        public static string writeCropUnits(System.Collections.Generic.KeyValuePair<ImageResizer.CropUnits, double> value) { }
+        public static string writeFlip(System.Drawing.RotateFlipType flip) { }
+        public static string writePadding(ImageResizer.Resizing.BoxPadding p) { }
+        public static string writeScale(ImageResizer.ScaleMode value) { }
+        public static string writeStretch(ImageResizer.StretchMode value) { }
+    }
+}
