@@ -38,12 +38,13 @@
 
 
     <PropertyGroup>
+        <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
     </PropertyGroup>
 
 
-<PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
+    <PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
     </PropertyGroup>    
     <PropertyGroup>
