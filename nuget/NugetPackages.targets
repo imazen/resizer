@@ -25,6 +25,8 @@
         <VersionSuffix>-notset</VersionSuffix>
       <!--  <PackageIcon>icon.png</PackageIcon> -->
 
+        
+        
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(CI)' == 'True'">
@@ -33,7 +35,15 @@
     <PropertyGroup Condition="'$(CI)' == 'true'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
-    <PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
+
+
+    <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+    </PropertyGroup>
+
+
+<PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
     </PropertyGroup>    
     <PropertyGroup>
