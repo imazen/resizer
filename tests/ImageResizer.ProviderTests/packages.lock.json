@@ -164,8 +164,8 @@
       },
       "Imazen.Common": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "3MFTpT0ch81Vs4rYf/AIej3F2Zh//9yNu/41VgEDLd3DNO/gywM325GE6marXtLWPsbxRd6QAmJ/Y5bKVpclRw==",
+        "resolved": "0.7.1",
+        "contentHash": "5nEfMN+KFEa+oGktIgk2BNcONimHagC8HTyp1vET5kRisOTjfmiIEAzcAS+Bg/kINp9r5QagtCOoxZRbHTf6DQ==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
@@ -451,7 +451,7 @@
         "type": "Project",
         "dependencies": {
           "Imageflow.Net": "0.8.4",
-          "Imazen.Common": "0.7.0",
+          "Imazen.Common": "0.7.1",
           "System.Buffers": "4.5.1"
         }
       },

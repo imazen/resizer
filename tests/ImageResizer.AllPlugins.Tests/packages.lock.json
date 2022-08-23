@@ -129,18 +129,18 @@
       },
       "Imazen.Common": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "3MFTpT0ch81Vs4rYf/AIej3F2Zh//9yNu/41VgEDLd3DNO/gywM325GE6marXtLWPsbxRd6QAmJ/Y5bKVpclRw==",
+        "resolved": "0.7.1",
+        "contentHash": "5nEfMN+KFEa+oGktIgk2BNcONimHagC8HTyp1vET5kRisOTjfmiIEAzcAS+Bg/kINp9r5QagtCOoxZRbHTf6DQ==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
       },
       "Imazen.HybridCache": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "qxLlAmA1HLqogaBCFBNYsX4PZYHT6p7sp7/e8Rp4hxHLXgNC0y6ZwoL1mCCGqsVxLnVT6uF8VSSCsBzP+4YX6g==",
+        "resolved": "0.7.1",
+        "contentHash": "iVpTuVzFX/vhFpcTBUQclfZHJk+NsLg1zIwzsLlFRhwzokgp/dt8AnnzPh2Ffv1UJmE8mlAKN0xz+cgWVQCLjw==",
         "dependencies": {
-          "Imazen.Common": "0.7.0"
+          "Imazen.Common": "0.7.1"
         }
       },
       "Microsoft.Azure.ConfigurationManager": {
@@ -415,7 +415,7 @@
         "type": "Project",
         "dependencies": {
           "Imageflow.Net": "0.8.4",
-          "Imazen.Common": "0.7.0",
+          "Imazen.Common": "0.7.1",
           "System.Buffers": "4.5.1"
         }
       },
@@ -434,8 +434,8 @@
           "ImageResizer": "0.1.0--notset",
           "Imageflow.AllPlatforms": "0.8.4",
           "Imageflow.Net": "0.8.4",
-          "Imazen.Common": "0.7.0",
-          "Imazen.HybridCache": "0.7.0",
+          "Imazen.Common": "0.7.1",
+          "Imazen.HybridCache": "0.7.1",
           "Microsoft.Extensions.Configuration.Abstractions": "2.2.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "2.2.0",
           "Microsoft.Extensions.FileProviders.Abstractions": "2.2.0",
