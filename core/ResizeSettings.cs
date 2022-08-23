@@ -325,7 +325,7 @@ namespace ImageResizer
         public PointF CropTopLeft
         {
             get => new PointF((float)CropValues[0], (float)CropValues[1]);
-            set { CropValues = new double[] { value.X, value.Y, CropValues[2], CropValues[3] }; }
+            set { CropValues = new[] { value.X, value.Y, CropValues[2], CropValues[3] }; }
         }
 
         /// <summary>
@@ -339,7 +339,7 @@ namespace ImageResizer
         public PointF CropBottomRight
         {
             get => new PointF((float)CropValues[2], (float)CropValues[3]);
-            set { CropValues = new double[] { CropValues[0], CropValues[1], value.X, value.Y }; }
+            set { CropValues = new[] { CropValues[0], CropValues[1], value.X, value.Y }; }
         }
 
         /// <summary>

@@ -88,7 +88,7 @@ namespace ImageResizer
             Source = source;
             Dest = typeof(IDictionary<string, object>);
             RequestedInfo = new List<string>(requestedImageInfo == null
-                ? new string[] { "source.width", "source.height", "result.ext", "result.mime" }
+                ? new[] { "source.width", "source.height", "result.ext", "result.mime" }
                 : requestedImageInfo);
             Instructions = new Instructions();
         }

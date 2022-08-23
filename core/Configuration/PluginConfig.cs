@@ -687,7 +687,7 @@ namespace ImageResizer.Configuration
 
 
             var hasConstructor = true;
-            if (args != null && t.GetConstructor(new Type[] { typeof(NameValueCollection) }) == null)
+            if (args != null && t.GetConstructor(new[] { typeof(NameValueCollection) }) == null)
             {
                 args = null; //The plugin doesn't accept arguments
                 AcceptIssue(new Issue("Plugins",
@@ -697,7 +697,7 @@ namespace ImageResizer.Configuration
             }
             else if (args == null && t.GetConstructor(Type.EmptyTypes) == null)
             {
-                var acceptsArgs = t.GetConstructor(new Type[] { typeof(NameValueCollection) }) == null;
+                var acceptsArgs = t.GetConstructor(new[] { typeof(NameValueCollection) }) == null;
 
                 if (acceptsArgs)
                 {

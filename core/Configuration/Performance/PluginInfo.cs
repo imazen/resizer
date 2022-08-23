@@ -23,7 +23,7 @@ namespace ImageResizer.Configuration.Performance
             var shorthandPlugins = pluginUsage.GetPluginsInstalled().Select(t => t.FullName)
                 .Select(s => pluginShorthand.Value.ContainsKey(s) ? pluginShorthand.Value[s] : s)
                 .Where(s => !s.Contains("LicenseEnforcer")).Distinct();
-            var ignorePlugins = new string[]
+            var ignorePlugins = new[]
             {
                 "LicenseDisplay", "DefaultEncoder", "NoCache", "ClientCache", "Diagnostic", "WebConfigLicenseReader",
                 "MvcRoutingShim"

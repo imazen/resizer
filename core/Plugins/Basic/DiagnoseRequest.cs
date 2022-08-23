@@ -208,7 +208,7 @@ namespace ImageResizer.Plugins.Basic
         /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new string[] { "resizer.debug" };
+            return new[] { "resizer.debug" };
         }
     }
 }

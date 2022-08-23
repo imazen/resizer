@@ -347,7 +347,7 @@ namespace Bench
 
         public static string[] GetStats(string label, SegmentStats stats)
         {
-            return new string[]
+            return new[]
             {
                 label + " - " + stats.SegmentName,
                 stats.SequentialMs.ToString(), stats.ParallelMs.ToString(),
@@ -385,7 +385,7 @@ namespace Bench
             var settings = new BenchmarkingSettings();
             settings.Images = new ImageProvider().AddLocalImages(imageDir, "quality-original.jpg", "fountain-small.jpg",
                 "sample.tif", "private\\98613_17.tif");
-            settings.SharedInstructions = new Instructions[]
+            settings.SharedInstructions = new[]
             {
                 new Instructions(
                     "maxwidth=200&maxheight=200"),
@@ -393,7 +393,7 @@ namespace Bench
             };
 
 
-            var configs = new Tuple<Config, Instructions, string>[]
+            var configs = new[]
             {
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins(), null, "Default"),
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins("FreeImageBuilder"),
@@ -411,7 +411,7 @@ namespace Bench
 
         public static void CheckGdMemoryUse()
         {
-            var imageSrc = new ImageProvider().AddBlankImages(new Tuple<int, int, string>[]
+            var imageSrc = new ImageProvider().AddBlankImages(new[]
                 { new Tuple<int, int, string>(4000, 4000, "jpg") });
             imageSrc.PrepareImagesAsync().Wait();
             var runner = Benchmark.BenchmarkInMemory(ConfigWithPlugins("GdBuilder"), imageSrc.GetImages().First(),
@@ -450,7 +450,7 @@ namespace Bench
             settings.Images.AddLocalImages(imageDir, "fountain-small.jpg");
             //.AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(2200, 2200, "jpg") });
             //.AddLocalImages(imageDir, "quality-original.jpg", "fountain-small.jpg");
-            settings.SharedInstructions = new Instructions[]
+            settings.SharedInstructions = new[]
             {
                 new Instructions(
                     "width=800&scale=both")
@@ -467,7 +467,7 @@ namespace Bench
             settings.ThrowawayThreads = parallelThreads;
             settings.UseBarrierAroundSegment = true;
 
-            var configs = new Tuple<Config, Instructions, string>[]
+            var configs = new[]
             {
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins(), null, "Default"),
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins("GdBuilder"), new Instructions("builder=gd"),
@@ -498,9 +498,9 @@ namespace Bench
         public static BenchmarkingSettings ScalingComparisonDefault()
         {
             var settings = BenchmarkingDefaults();
-            settings.Images.AddBlankImages(new Tuple<int, int, string>[]
+            settings.Images.AddBlankImages(new[]
                 { new Tuple<int, int, string>(3264, 2448, "jpg"), new Tuple<int, int, string>(1200, 900, "png") });
-            settings.SharedInstructions = new Instructions[]
+            settings.SharedInstructions = new[]
             {
                 new Instructions(
                     "width=800&scale=both"),
@@ -511,7 +511,7 @@ namespace Bench
 
         public static void CheckFastScalingMemoryUse()
         {
-            var imageSrc = new ImageProvider().AddBlankImages(new Tuple<int, int, string>[]
+            var imageSrc = new ImageProvider().AddBlankImages(new[]
                 { new Tuple<int, int, string>(4000, 4000, "jpg") });
             imageSrc.PrepareImagesAsync().Wait();
             var runner = Benchmark.BenchmarkInMemory(
@@ -528,9 +528,9 @@ namespace Bench
         {
             var settings = BenchmarkingDefaults();
             settings.Images.AddBlankImages(
-                new Tuple<int, int, string>[]
+                new[]
                     { new Tuple<int, int, string>(4000, 3000, "jpg"), new Tuple<int, int, string>(1600, 800, "jpg") });
-            settings.SharedInstructions = new Instructions[]
+            settings.SharedInstructions = new[]
             {
                 new Instructions(
                     "width=800&scale=both"),
@@ -539,7 +539,7 @@ namespace Bench
 
             settings.SegmentNameFilter = segment;
             settings.ExclusiveTimeSignificantMs = 1;
-            var configs = new Tuple<Config, Instructions, string>[]
+            var configs = new[]
             {
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins(), null, "System.Drawing"),
                 new Tuple<Config, Instructions, string>(
@@ -557,8 +557,8 @@ namespace Bench
         {
             var settings = BenchmarkingDefaults();
             settings.Images.AddBlankImages(
-                new Tuple<int, int, string>[] { new Tuple<int, int, string>(4000, 4000, "jpg") });
-            settings.SharedInstructions = new Instructions[]
+                new[] { new Tuple<int, int, string>(4000, 4000, "jpg") });
+            settings.SharedInstructions = new[]
             {
                 new Instructions(
                     "width=800&scale=both")
@@ -569,7 +569,7 @@ namespace Bench
             settings.ParallelRuns = 2;
             settings.SegmentNameFilter = segment;
             settings.ExclusiveTimeSignificantMs = 1;
-            var configs = new Tuple<Config, Instructions, string>[]
+            var configs = new[]
             {
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins(), null, "System.Drawing"),
                 new Tuple<Config, Instructions, string>(
@@ -591,9 +591,9 @@ namespace Bench
         {
             var settings = BenchmarkingDefaults();
             settings.Images.AddBlankImages(
-                new Tuple<int, int, string>[]
+                new[]
                     { new Tuple<int, int, string>(4000, 3000, "jpg"), new Tuple<int, int, string>(1600, 800, "png") });
-            settings.SharedInstructions = new Instructions[]
+            settings.SharedInstructions = new[]
             {
                 new Instructions(
                     "width=800&scale=both"),
@@ -602,7 +602,7 @@ namespace Bench
 
             settings.SegmentNameFilter = segment;
             settings.ExclusiveTimeSignificantMs = 1;
-            var configs = new Tuple<Config, Instructions, string>[]
+            var configs = new[]
             {
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins(), null, "System.Drawing"),
                 new Tuple<Config, Instructions, string>(
@@ -626,12 +626,12 @@ namespace Bench
             //settings.SequentialRuns = 1;
             //settings.ThrowawayRuns = 0;
             settings.Images.AddBlankImages(
-                new Tuple<int, int, string>[] { new Tuple<int, int, string>(1600, 800, "png") });
-            settings.SharedInstructions = new Instructions[] { new Instructions("width=200&scale=both") };
+                new[] { new Tuple<int, int, string>(1600, 800, "png") });
+            settings.SharedInstructions = new[] { new Instructions("width=200&scale=both") };
 
             settings.SegmentNameFilter = segment;
             settings.ExclusiveTimeSignificantMs = 1;
-            var configs = new Tuple<Config, Instructions, string>[]
+            var configs = new[]
             {
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins(), null, "System.Drawing"),
                 new Tuple<Config, Instructions, string>(
@@ -646,9 +646,9 @@ namespace Bench
         {
             var settings = BenchmarkingDefaults();
             settings.Images.AddBlankImages(
-                new Tuple<int, int, string>[]
+                new[]
                     { new Tuple<int, int, string>(4800, 2400, "jpg"), new Tuple<int, int, string>(1600, 800, "png") });
-            settings.SharedInstructions = new Instructions[]
+            settings.SharedInstructions = new[]
             {
                 new Instructions(
                     "width=800&scale=both"),
@@ -658,7 +658,7 @@ namespace Bench
             settings.SegmentNameFilter = segment;
             settings.ExclusiveTimeSignificantMs = 1;
             //settings.ParallelThreads = 2;
-            var configs = new Tuple<Config, Instructions, string>[]
+            var configs = new[]
             {
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins(), null, "System.Drawing"),
                 new Tuple<Config, Instructions, string>(
@@ -683,16 +683,16 @@ namespace Bench
         {
             var settings = BenchmarkingDefaults();
             settings.Images.AddBlankImages(
-                new Tuple<int, int, string>[]
+                new[]
                     { new Tuple<int, int, string>(4800, 4800, "jpg"), new Tuple<int, int, string>(2400, 2400, "png") });
-            settings.SharedInstructions = new Instructions[]
+            settings.SharedInstructions = new[]
                 { new Instructions("width=720"), new Instructions("width=133") };
 
 
             settings.SegmentNameFilter = segment;
             var c = ConfigWithPlugins(
                 "ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling");
-            var configs = new Tuple<Config, Instructions, string>[]
+            var configs = new[]
             {
                 //      new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"System.Drawing"),
 
@@ -728,7 +728,7 @@ namespace Bench
 
         public static void CompareFreeImageEncoderToDefault()
         {
-            var images = new string[]
+            var images = new[]
             {
                 imageDir + "quality-original.jpg", imageDir + "fountain-small.jpg",
                 imageDir + "\\extra\\cherry-blossoms.jpg",
@@ -748,7 +748,7 @@ namespace Bench
                 throw new ArgumentOutOfRangeException("Failed to load FreeImageEncoder plugin");
 
 
-            var queries = new Instructions[]
+            var queries = new[]
                 { new Instructions("format=jpg"), new Instructions("format=png"), new Instructions("format=gif") };
 
 

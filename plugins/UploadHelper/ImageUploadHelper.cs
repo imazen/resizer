@@ -35,7 +35,7 @@ namespace ImageResizer
         /// <returns></returns>
         public string GetExtension(string path)
         {
-            var lastDot = path.LastIndexOfAny(new char[] { '.', '/', ' ', '\\', '?', '&', ':' });
+            var lastDot = path.LastIndexOfAny(new[] { '.', '/', ' ', '\\', '?', '&', ':' });
             if (lastDot > -1 && path[lastDot] == '.') return path.Substring(lastDot + 1);
             else return null;
         }
@@ -166,7 +166,7 @@ namespace ImageResizer
             j.ResetSourceStream = true;
             j.DisposeSourceObject = false;
             c.CurrentImageBuilder.Build(j);
-            return new int[] { j.SourceWidth.Value, j.SourceHeight.Value };
+            return new[] { j.SourceWidth.Value, j.SourceHeight.Value };
         }
 
         /// <summary>

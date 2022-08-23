@@ -33,7 +33,7 @@ namespace ImageResizer.Plugins.Basic
 
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new string[] { "shadowColor", "shadowOffset", "shadowWidth" };
+            return new[] { "shadowColor", "shadowOffset", "shadowWidth" };
         }
 
 
@@ -50,7 +50,7 @@ namespace ImageResizer.Plugins.Basic
                     PolygonMath.MovePoly(s.layout.LastRing.points, shadowOffset));
 
                 //Determine the outer bound of the shadow
-                s.layout.AddRing("shadow", PolygonMath.InflatePoly(s.layout.LastRing.points, new float[]
+                s.layout.AddRing("shadow", PolygonMath.InflatePoly(s.layout.LastRing.points, new[]
                 {
                     Math.Max(0, shadowWidth - shadowOffset.Y),
                     Math.Max(0, shadowWidth + shadowOffset.X),

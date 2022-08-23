@@ -357,7 +357,7 @@ namespace ImageResizer.Storage
 
         public IEnumerable<KeyValuePair<string, string>> GetInfoPairs()
         {
-            return new KeyValuePair<string, string>[]
+            return new[]
             {
                 new KeyValuePair<string, string>("provider_prefix", VirtualFilesystemPrefix),
                 new KeyValuePair<string, string>("provider_flags",

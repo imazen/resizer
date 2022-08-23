@@ -437,7 +437,7 @@ namespace ImageResizer.Plugins.Basic
         /// <returns></returns>
         public virtual IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new string[] { "quality", "format", "thumbnail" };
+            return new[] { "quality", "format", "thumbnail" };
         }
 
         public IPlugin Install(Config c)
@@ -459,7 +459,7 @@ namespace ImageResizer.Plugins.Basic
         public IEnumerable<FileSignature> GetSignatures()
         {
             //Source http://www.filesignatures.net/
-            return new FileSignature[]
+            return new[]
             {
                 new FileSignature(new byte[] { 0xFF, 0xD8, 0xFF }, "jpg", "image/jpeg"),
                 new FileSignature(new byte[] { 0x42, 0x4D }, "bmp", "image/x-ms-bmp"), //Can be a BMP or DIB

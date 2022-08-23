@@ -130,7 +130,7 @@ namespace ImageResizer.Plugins.Basic
 
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new string[] { "getinfo" };
+            return new[] { "getinfo" };
         }
     }
 }

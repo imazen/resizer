@@ -39,7 +39,7 @@ namespace ImageResizer.Plugins.S3Reader2
             Region = args.GetAsString("region", "us-east-1");
 
             SetAllowedBuckets(args.GetAsString("buckets", "")
-                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
 
             if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"]))
                 S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], s3config);

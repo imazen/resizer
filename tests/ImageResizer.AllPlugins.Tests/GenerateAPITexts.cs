@@ -27,7 +27,7 @@ namespace ImageResizer.TestAPISurface
             }
             catch { }
 
-            var searchLocations = new string[] { Assembly.GetExecutingAssembly().Location, typeof(ImageResizer.BoxEdges).Assembly.Location, codeBase };
+            var searchLocations = new[] { Assembly.GetExecutingAssembly().Location, typeof(ImageResizer.BoxEdges).Assembly.Location, codeBase };
             foreach(var location in searchLocations)
             {
                 var attempt = location != null ? FindSolutionDir(Path.GetDirectoryName(location), "ImageResizer.sln") : null;
@@ -59,7 +59,7 @@ namespace ImageResizer.TestAPISurface
             if (dir == null) return; // We can do nothing
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-            var types = new Type[]
+            var types = new[]
             {
                 typeof(ImageResizer.ImageBuilder),
                 typeof(Imazen.Common.Issues.Issue),

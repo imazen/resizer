@@ -879,7 +879,7 @@ namespace ImageResizer.Util
                 var x = (imageSize.Width - c[0]) / 2;
                 var y = (imageSize.Height - c[1]) / 2;
 
-                c = new double[] { x, y, x + c[0], y + c[1] };
+                c = new[] { x, y, x + c[0], y + c[1] };
             }
 
             double x1 = c[0], y1 = c[1], x2 = c[2], y2 = c[3];

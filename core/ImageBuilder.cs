@@ -1247,7 +1247,7 @@ namespace ImageResizer
 
             if (double.IsNaN(s.settings.Border.All))
             {
-                var widths = new float[]
+                var widths = new[]
                 {
                     (float)s.settings.Border.Top * -1, (float)s.settings.Border.Right * -1,
                     (float)s.settings.Border.Bottom * -1, (float)s.settings.Border.Left * -1
@@ -1400,7 +1400,7 @@ namespace ImageResizer
         }
 
         //TODO: these aren't accurate for Imageflow backend
-        private readonly string[] _supportedFileExtensions = new string[]
+        private readonly string[] _supportedFileExtensions = new[]
             { "bmp", "gif", "exif", "png", "tif", "tiff", "tff", "jpg", "jpeg", "jpe", "jif", "jfif", "jfi" };
 
         /// <summary>
@@ -1414,7 +1414,7 @@ namespace ImageResizer
         }
 
         //TODO: these keys are outdated and need updating I think
-        private readonly string[] _supportedQuerystringKeys = new string[]
+        private readonly string[] _supportedQuerystringKeys = new[]
         {
             "format", "thumbnail", "maxwidth", "maxheight",
             "width", "height", "w", "h",

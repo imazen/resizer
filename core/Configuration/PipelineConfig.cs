@@ -37,7 +37,7 @@ namespace ImageResizer.Configuration
                 new SafeList<IQuerystringPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
 
             new List<string>(c.get("pipeline.fakeExtensions", ".ashx")
-                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
 
             pipelineDefaults = new Instructions(c.get("pipeline.defaultCommands", ""));
 
@@ -160,7 +160,7 @@ namespace ImageResizer.Configuration
         protected string getExtension(string path)
         {
             //Trim off the extension
-            var lastDot = path.LastIndexOfAny(new char[] { '.', '/', ' ', '\\', '?', '&', ':' });
+            var lastDot = path.LastIndexOfAny(new[] { '.', '/', ' ', '\\', '?', '&', ':' });
             if (lastDot > -1 && path[lastDot] == '.') return path.Substring(lastDot + 1);
             else return null;
         }
@@ -223,7 +223,7 @@ namespace ImageResizer.Configuration
                 if (temp != null) return temp;
                 else
                     temp = new List<string>(c.get("pipeline.fakeExtensions", ".ashx")
-                        .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
                 for (var i = 0; i < temp.Count; i++)
                     if (!temp[i].StartsWith(".", StringComparison.OrdinalIgnoreCase))
                         temp[i] = "." + temp[i];

@@ -52,7 +52,7 @@ namespace ImageResizer.ProviderTests
             }
             catch (StorageException)
             {
-                var azuritePaths = new string[]
+                var azuritePaths = new[]
                 {
                     @"C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator\azurite.exe",
                     @"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator\azurite.exe"
@@ -80,7 +80,7 @@ namespace ImageResizer.ProviderTests
 
                     var path = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator";
                     var filenames =
-                        new string[] { "AzureStorageEmulator.exe", "WAStorageEmulator.exe" }.Select(name =>
+                        new[] { "AzureStorageEmulator.exe", "WAStorageEmulator.exe" }.Select(name =>
                             Path.Combine(path, name)).ToArray();
 
                     var filename = filenames.FirstOrDefault(File.Exists);

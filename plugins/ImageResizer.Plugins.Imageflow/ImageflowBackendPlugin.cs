@@ -26,7 +26,7 @@ namespace ImageResizer.Plugins.Imageflow
         {
             _defaultBuilder = args.Get<bool>("defaultBuilder", true);
             _supportedBuilderStrings = args.GetAsString("builderStrings", "imageflow,wic,freeimage")
-                .Split(new char[] { ',' }, StringSplitOptions.None);
+                .Split(new[] { ',' }, StringSplitOptions.None);
         }
 
         private Config c;
@@ -194,7 +194,7 @@ namespace ImageResizer.Plugins.Imageflow
         
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new string[] {"mode", "anchor", "flip", "sflip",
+            return new[] {"mode", "anchor", "flip", "sflip",
                 "quality", "zoom", "dpr", "crop", "cropxunits", "cropyunits",
                 "w", "h", "width", "height", "maxwidth", "maxheight", "format",
                 "srotate", "rotate", "stretch", "webp.lossless", "webp.quality",

@@ -36,8 +36,8 @@ namespace ImageResizer.Util
             ? HostingEnvironment.ApplicationPhysicalPath
             : Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
 
-        private static readonly char[] QueryOrFragment = new char[] { '?', '#' };
-        private static readonly char[] SpaceOrSlash = new char[] { ' ', '/', '\\' };
+        private static readonly char[] QueryOrFragment = new[] { '?', '#' };
+        private static readonly char[] SpaceOrSlash = new[] { ' ', '/', '\\' };
 
         /// <summary>
         ///     Should be called SetFullExtension.
@@ -476,12 +476,12 @@ namespace ImageResizer.Util
         public static NameValueCollection ParseQueryOnly(string query, bool allowSemicolons = true,
             bool urlDecode = true)
         {
-            var pairs = query.Split(allowSemicolons ? new char[] { '?', '&', ';' } : new char[] { '?', '&' },
+            var pairs = query.Split(allowSemicolons ? new[] { '?', '&', ';' } : new[] { '?', '&' },
                 StringSplitOptions.RemoveEmptyEntries);
             var c = new NameValueCollection();
             foreach (var s in pairs)
             {
-                var namevalue = s.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                var namevalue = s.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
                 if (namevalue.Length > 2)
                 {
                     //Handle &key=value=value and &key===value=value -> key : "value=value"
@@ -596,7 +596,7 @@ namespace ImageResizer.Util
             if (path.StartsWith(appPath, StringComparison.OrdinalIgnoreCase))
             {
                 //Convert to app-relative path missing the ~/
-                path = path.Remove(0, appPath.Length).TrimStart(new char[] { '/', '\\', '~' }).Replace('\\', '/');
+                path = path.Remove(0, appPath.Length).TrimStart(new[] { '/', '\\', '~' }).Replace('\\', '/');
                 return ResolveAppRelativeAssumeAppRelative(path);
             }
 

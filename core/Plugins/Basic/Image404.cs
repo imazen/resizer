@@ -283,7 +283,7 @@ namespace ImageResizer.Plugins.Basic
 
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new string[] { "404" };
+            return new[] { "404" };
         }
 
         private class MatcherCollection
@@ -296,7 +296,7 @@ namespace ImageResizer.Plugins.Basic
             {
                 if (string.IsNullOrEmpty(commandList)) return Empty;
 
-                var commands = commandList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var commands = commandList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 var matchers = new Matcher[commands.Length];
 
                 for (var i = 0; i < commands.Length; i++) matchers[i] = new Matcher(commands[i]);

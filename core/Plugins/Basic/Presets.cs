@@ -91,7 +91,7 @@ namespace ImageResizer.Plugins.Basic
         {
             if (!string.IsNullOrEmpty(e.QueryString["preset"]))
             {
-                var presets = e.QueryString["preset"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var presets = e.QueryString["preset"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var p in presets)
                 {
                     if (!dict.ContainsKey(p)) continue;
@@ -105,7 +105,7 @@ namespace ImageResizer.Plugins.Basic
         {
             if (!string.IsNullOrEmpty(s["preset"]))
             {
-                var presets = s["preset"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var presets = s["preset"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var p in presets)
                 {
                     //Apply defaults
@@ -186,7 +186,7 @@ namespace ImageResizer.Plugins.Basic
 
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new string[] { "preset" };
+            return new[] { "preset" };
         }
 
         public IEnumerable<IIssue> GetIssues()

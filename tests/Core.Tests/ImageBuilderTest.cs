@@ -26,7 +26,7 @@ namespace ImageResizer.Tests
 
         public static IEnumerable<Config> GetConfigurations()
         {
-            return new Config[]
+            return new[]
                 { new Config(new ResizerSection()) }; //TODO - add a variety of configuration options in here.
         }
 
@@ -190,7 +190,7 @@ namespace ImageResizer.Tests
         public void TranslatePoints(int imgWidth, int imgHeight, float x, float y, float expectedX, float expectedY,
             string query)
         {
-            var result = c.CurrentImageBuilder.TranslatePoints(new PointF[] { new PointF(x, y) },
+            var result = c.CurrentImageBuilder.TranslatePoints(new[] { new PointF(x, y) },
                 new Size(imgWidth, imgHeight), new ResizeSettings(query))[0];
             Assert.Equal<PointF>(new PointF(expectedX, expectedY), result);
         }

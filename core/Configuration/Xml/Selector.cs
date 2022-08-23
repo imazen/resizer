@@ -20,7 +20,7 @@ namespace ImageResizer.Configuration.Xml
         }
 
         public Selector(string selector) : base(selector.Trim('.')
-            .Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries))
+            .Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries))
         {
         }
 

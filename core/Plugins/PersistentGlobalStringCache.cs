@@ -43,12 +43,12 @@ namespace ImageResizer.Plugins
 
             var appPath = HostingEnvironment.ApplicationPhysicalPath;
             var candidates = (appPath != null
-                ? new string[]
+                ? new[]
                 {
                     Path.Combine(appPath, "imagecache"),
                     Path.Combine(appPath, "App_Data"), Path.GetTempPath()
                 }
-                : new string[] { Path.GetTempPath() }).ToArray();
+                : new[] { Path.GetTempPath() }).ToArray();
 
             store = new MultiFolderStorage(sinkSource, dataKind, sink, candidates, FolderOptions.Default);
         }

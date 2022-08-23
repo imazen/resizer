@@ -351,7 +351,7 @@ namespace ImageResizer.Plugins.Basic
             foreach (string s in virtualPathDependencies) deps.Add(s);
 
 
-            return new CacheDependency(new string[] { LocalMapPath(virtualPath) }, deps.ToArray(), utcStart);
+            return new CacheDependency(new[] { LocalMapPath(virtualPath) }, deps.ToArray(), utcStart);
         }
 
         public class VirtualFolderProviderVirtualFile : VirtualFile, IVirtualFileAsync, IVirtualFileWithModifiedDate,

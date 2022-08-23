@@ -193,7 +193,7 @@ namespace ImageResizer.ExtensionMethods
             text = text.Trim(' ', '(', ')', ','); //Trim parenthesis, commas, and spaces
             if (text.Length == 0) return null;
 
-            var parts = text.Split(new char[] { ',' }, StringSplitOptions.None);
+            var parts = text.Split(new[] { ',' }, StringSplitOptions.None);
 
             //Verify the array is of an accepted size if any are specified
             var foundCount = allowedSizes.Length == 0;

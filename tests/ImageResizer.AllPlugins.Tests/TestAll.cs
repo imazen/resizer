@@ -57,54 +57,54 @@ namespace ImageResizer.AllPlugins.Tests
         private static Dictionary<string, string[]> GetData()
         {
             var data = new Dictionary<string, string[]>();
-            data.Add("width", new string[] { "-100", ".,,.,,", "40", "100", "800", "2" });
-            data.Add("height", new string[] { "-100", ".,,.,,", "40", "100", "800", "2" });
-            data.Add("maxwidth", new string[] { "-100", ".,,.,,", "100", "3300", "2" });
-            data.Add("maxheight", new string[] { "-100", ".,,.,,", "100", "3300", "2" });
+            data.Add("width", new[] { "-100", ".,,.,,", "40", "100", "800", "2" });
+            data.Add("height", new[] { "-100", ".,,.,,", "40", "100", "800", "2" });
+            data.Add("maxwidth", new[] { "-100", ".,,.,,", "100", "3300", "2" });
+            data.Add("maxheight", new[] { "-100", ".,,.,,", "100", "3300", "2" });
             data.Add("crop",
-                new string[]
+                new[]
                     { "auto", "none", "(0,0,0,0)", "100,100,-100,100", "1000,1000,-1000,-1000", "10,10,50,50" });
-            data.Add("stretch", new string[] { "fill", "proportionally", "huh" });
-            data.Add("format", new string[] { "jpg", "png", "gif" });
-            data.Add("quality", new string[] { "1", "80", "100" });
-            data.Add("dither", new string[] { "true", "4pass", "none" });
-            data.Add("colors", new string[] { "2", "128", "256" });
-            data.Add("shadowWidth", new string[] { "0", "2", "100" });
-            data.Add("shadowColor", new string[] { "black", "green", "gray" });
-            data.Add("shadowOffset", new string[] { "-3,-1", "-10,-10", "0,0", "30,30" });
-            data.Add("trim.threshold", new string[] { "0", "255", "80" });
-            data.Add("trim.percentpadding", new string[] { "0", "1", "51", "100" });
-            data.Add("carve", new string[] { "false", "true" });
+            data.Add("stretch", new[] { "fill", "proportionally", "huh" });
+            data.Add("format", new[] { "jpg", "png", "gif" });
+            data.Add("quality", new[] { "1", "80", "100" });
+            data.Add("dither", new[] { "true", "4pass", "none" });
+            data.Add("colors", new[] { "2", "128", "256" });
+            data.Add("shadowWidth", new[] { "0", "2", "100" });
+            data.Add("shadowColor", new[] { "black", "green", "gray" });
+            data.Add("shadowOffset", new[] { "-3,-1", "-10,-10", "0,0", "30,30" });
+            data.Add("trim.threshold", new[] { "0", "255", "80" });
+            data.Add("trim.percentpadding", new[] { "0", "1", "51", "100" });
+            data.Add("carve", new[] { "false", "true" });
             data.Add("filter",
-                new string[]
+                new[]
                 {
                     "grayscale", "sepia", "alpha(0)", "alpha(.5)", "alpha(abcef)", "brightness(-1)", "brightness(1)",
                     "brightness(-.01)"
                 });
-            data.Add("scale", new string[] { "downscaleonly", "upscaleonly", "upscalecanvas", "both" });
-            data.Add("ignoreicc", new string[] { "true", "false" });
-            data.Add("angle", new string[] { "0", "361", "15", "180" });
-            data.Add("rotate", new string[] { "0", "90", "270", "400", "15", "45" });
-            var colors = new string[]
+            data.Add("scale", new[] { "downscaleonly", "upscaleonly", "upscalecanvas", "both" });
+            data.Add("ignoreicc", new[] { "true", "false" });
+            data.Add("angle", new[] { "0", "361", "15", "180" });
+            data.Add("rotate", new[] { "0", "90", "270", "400", "15", "45" });
+            var colors = new[]
             {
                 "", "black", "white", ParseUtils.SerializeColor(Color.FromArgb(25, Color.Green)),
                 ParseUtils.SerializeColor(Color.Transparent)
             };
             data.Add("color1", colors);
             data.Add("color2", colors);
-            data.Add("page", new string[] { "-10", "1", "5" });
-            data.Add("frame", new string[] { "-10", "1", "5" });
-            data.Add("margin", new string[] { "-10", "1", "5", "100" });
-            data.Add("borderWidth", new string[] { "-10", "1", "5", "100" });
-            data.Add("paddingWidth", new string[] { "-10", "1", "5", "100" });
+            data.Add("page", new[] { "-10", "1", "5" });
+            data.Add("frame", new[] { "-10", "1", "5" });
+            data.Add("margin", new[] { "-10", "1", "5", "100" });
+            data.Add("borderWidth", new[] { "-10", "1", "5", "100" });
+            data.Add("paddingWidth", new[] { "-10", "1", "5", "100" });
             data.Add("paddingColor", colors);
             data.Add("borderColor", colors);
             data.Add("bgcolor", colors);
-            data.Add("flip", new string[] { "h", "v", "hv", "both", "none" });
-            data.Add("sourceflip", new string[] { "h", "v", "hv", "both", "none" });
-            data.Add("blur", new string[] { "0", "1", "5" });
-            data.Add("sharpen", new string[] { "0", "1", "5" });
-            data.Add("builder", new string[] { "default", "imageflow" });
+            data.Add("flip", new[] { "h", "v", "hv", "both", "none" });
+            data.Add("sourceflip", new[] { "h", "v", "hv", "both", "none" });
+            data.Add("blur", new[] { "0", "1", "5" });
+            data.Add("sharpen", new[] { "0", "1", "5" });
+            data.Add("builder", new[] { "default", "imageflow" });
             //TODO: add watermark, advanced filter, S3reader, sqlreader, remotereader
             //gradient.png: "color1","color2", "angle", "width", "height" 
             return data;
@@ -133,7 +133,7 @@ namespace ImageResizer.AllPlugins.Tests
                         if (r.Next(10) > 5)
                             settings[key] = data[key][r.Next(data[key].Length)];
                     //if (DateTime.Now.Subtract(startedAt).TotalMilliseconds > 2000) break;
-                    yield return new object[] { sources[r.Next(sources.Count)], settings.ToString() };
+                    yield return new[] { sources[r.Next(sources.Count)], settings.ToString() };
                 }
             }
         }
@@ -168,6 +168,7 @@ namespace ImageResizer.AllPlugins.Tests
         public void TestCombinationsFast(object source, string query)
         {
             var c = GetConfig();
+            var o = source;
             c.CurrentImageBuilder.GetFinalSize(new Size(r.Next(10000), r.Next(10000)), new ResizeSettings(query));
         }
     }

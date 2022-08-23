@@ -134,7 +134,7 @@ namespace Imazen.Profiling
 
         public ProfilingResultNode ToProfilingResultNode()
         {
-            return CollapseInvocations(new ProfilingNode[] { this });
+            return CollapseInvocations(new[] { this });
         }
 
         public override string ToString()

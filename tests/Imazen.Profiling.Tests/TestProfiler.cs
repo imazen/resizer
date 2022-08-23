@@ -44,7 +44,7 @@ namespace Imazen.Profiling.Tests
             a.Stop("op");
 
             var result = a.RootNode.ToProfilingResultNode();
-            var r = new ProfilingResultNode[] { result };
+            var r = new[] { result };
 
             var depthList = string.Join(",", r.Traverse(false).Select(n => n.First().SegmentName));
             Assert.Equal("op,a,b,wrapper,a,b,c,a,d,d", depthList);
