@@ -65,7 +65,7 @@ jobs:
       - name: Publish nuget packages to MyGet if a prerelease
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable != 'true'
         run: |
-          dotnet nuget push bin/Release/*.nupkg --skip-duplicate --api-key ${{ secrets.MYGET_KEY }}  --source "mygetimazen"
+          dotnet nuget push bin\Release\*.nupkg --skip-duplicate --api-key ${{ secrets.MYGET_KEY }}  --source "mygetimazen"
 
 #
 #      - name: Publish nuget packages to Azure if a prerelease
@@ -76,4 +76,4 @@ jobs:
       - name: Publish nuget packages to Nuget.org if a stable release
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable == 'true'
         run: |
-          dotnet nuget push bin/Release/*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} 
+          dotnet nuget push bin\Release\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} 
