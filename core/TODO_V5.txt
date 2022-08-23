@@ -12,10 +12,13 @@
 
 IResponseArgs ?
 
+Set up example project
+Optimize file serving with and without cache.
 
 
 * Make old CommitAttribute crash with informative message that V4 plugins need to be removed.
 
+Figure out why imageflow.dll ends up in project roots sometimes?
 
 TODO: expose jpeg.progressive in Instructions class- Supported by Imageflow, but not GDI, WIC, or WPF
 TODO: maybe implement `dpi` - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
