@@ -1,0 +1,79 @@
+[assembly: ImageResizer.Util.BuildDate("2017-05-05T12:13:13.1434691+00:00")]
+[assembly: ImageResizer.Util.Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
+[assembly: ImageResizer.Util.Edition("R_Performance")]
+[assembly: System.Runtime.InteropServices.Guid("f32ee366-d3d7-4015-abb0-f4bb675b6242")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
+namespace ImageResizer.Storage
+{
+    public class Blob : ImageResizer.Plugins.IVirtualFile, ImageResizer.Plugins.IVirtualFileAsync, ImageResizer.Plugins.IVirtualFileSourceCacheKey, ImageResizer.Plugins.IVirtualFileWithModifiedDate, ImageResizer.Plugins.IVirtualFileWithModifiedDateAsync
+    {
+        public Blob(ImageResizer.Storage.BlobProviderBase provider, string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.DateTime ModifiedDateUTC { get; }
+        public ImageResizer.Storage.BlobProviderBase Provider { get; }
+        public System.Collections.Specialized.NameValueCollection Query { get; set; }
+        public string VirtualPath { get; set; }
+        public System.Threading.Tasks.Task<ImageResizer.Storage.IBlobMetadata> FetchMetadataAsync() { }
+        public string GetCacheKey(bool includeModifiedDate) { }
+        public System.Threading.Tasks.Task<System.DateTime> GetModifiedDateUTCAsync() { }
+        public System.IO.Stream Open() { }
+        public System.Threading.Tasks.Task<System.IO.Stream> OpenAsync() { }
+    }
+    public class BlobMetadata : ImageResizer.Storage.IBlobMetadata
+    {
+        public BlobMetadata() { }
+        public bool? Exists { get; set; }
+        public System.DateTime? LastModifiedDateUtc { get; set; }
+    }
+    public abstract class BlobProviderBase : ImageResizer.Plugins.ILicensedPlugin, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IPluginInfo, ImageResizer.Plugins.IRedactDiagnostics, ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderAsync, ImageResizer.Plugins.IVirtualImageProviderVpp
+    {
+        protected ImageResizer.Configuration.Config c;
+        public BlobProviderBase() { }
+        public bool CacheMetadata { get; set; }
+        public bool CacheUnmodifiedFiles { get; set; }
+        public bool CheckForModifiedFiles { get; set; }
+        public bool ExposeAsVpp { get; set; }
+        public bool LazyExistenceCheck { get; set; }
+        public System.Collections.Generic.IEnumerable<string> LicenseFeatureCodes { get; }
+        public ImageResizer.Storage.IMetadataCache MetadataCache { get; set; }
+        public bool RequireImageExtension { get; set; }
+        public bool UntrustedData { get; set; }
+        public string VirtualFilesystemPrefix { get; set; }
+        public virtual bool Belongs(string virtualPath) { }
+        public System.Threading.Tasks.Task<bool> BlobExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        protected virtual string DeriveMetadataCacheKey(string virtualPath, System.Collections.Specialized.NameValueCollection q) { }
+        public abstract System.Threading.Tasks.Task<ImageResizer.Storage.IBlobMetadata> FetchMetadataAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+        public System.Threading.Tasks.Task<ImageResizer.Storage.IBlobMetadata> FetchMetadataCachedAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<bool> FileExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetInfoPairs() { }
+        public System.Threading.Tasks.Task<System.DateTime?> GetModifiedDateUtcAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public virtual ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public virtual void LoadConfiguration(System.Collections.Specialized.NameValueCollection args) { }
+        public abstract System.Threading.Tasks.Task<System.IO.Stream> OpenAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+        public ImageResizer.Configuration.Xml.Node RedactFrom(ImageResizer.Configuration.Xml.Node resizer) { }
+        protected void ReportReadTicks(long ticks, long bytes) { }
+        protected string StripPrefix(string virtualPath) { }
+        public virtual bool Uninstall(ImageResizer.Configuration.Config c) { }
+        public bool VppExposeFile(string virtualPath) { }
+    }
+    public interface IBlobMetadata
+    {
+        bool? Exists { get; set; }
+        System.DateTime? LastModifiedDateUtc { get; set; }
+    }
+    public interface IMetadataCache
+    {
+        object Get(string key);
+        void Put(string key, object data);
+    }
+    public class StandardMetadataCache : ImageResizer.Storage.IMetadataCache
+    {
+        public StandardMetadataCache() { }
+        public System.TimeSpan MetadataAbsoluteExpiration { get; set; }
+        public System.TimeSpan MetadataSlidingExpiration { get; set; }
+        public object Get(string key) { }
+        public void Put(string key, object data) { }
+    }
+}

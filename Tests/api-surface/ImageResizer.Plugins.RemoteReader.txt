@@ -1,0 +1,57 @@
+[assembly: ImageResizer.Util.BuildDate("2017-05-05T12:13:13.1434691+00:00")]
+[assembly: ImageResizer.Util.Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
+[assembly: ImageResizer.Util.Edition("R4Performance")]
+[assembly: System.Runtime.InteropServices.Guid("18c798fe-096c-4af5-8992-d2304f24c9f4")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
+namespace ImageResizer.Plugins.RemoteReader
+{
+    public class RemoteReaderPlugin : ImageResizer.Resizing.BuilderExtension, ImageResizer.Configuration.Issues.IIssueProvider, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IRedactDiagnostics, ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderAsync
+    {
+        protected string remotePrefix;
+        public RemoteReaderPlugin() { }
+        public int AllowedRedirects { get; set; }
+        public bool SkipUriValidation { get; set; }
+        public string UserAgent { get; set; }
+        public static string Base64UrlKey { get; }
+        public static ImageResizer.Plugins.RemoteReader.RemoteReaderPlugin Current { get; }
+        public static string HmacKey { get; }
+        public event ImageResizer.Plugins.RemoteReader.RemoteRequest AllowRemoteRequest;
+        public string CreateSignedUrl(string remoteUrl, System.Collections.Specialized.NameValueCollection settings) { }
+        public string CreateSignedUrl(string remoteUrl, string settings) { }
+        public string CreateSignedUrlWithKey(string remoteUrl, string settings, string key) { }
+        public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<bool> FileExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public System.Collections.Generic.IEnumerable<ImageResizer.Configuration.Issues.IIssue> GetIssues() { }
+        protected override System.IO.Stream GetStream(object source, ImageResizer.ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) { }
+        public System.IO.Stream GetUriStream(System.Uri uri, int maxRedirects = -1) { }
+        public System.Threading.Tasks.Task<System.IO.Stream> GetUriStreamAsync(System.Uri uri, int maxRedirects = -1) { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool IsRemotePath(string virtualPath) { }
+        public ImageResizer.Plugins.RemoteReader.RemoteRequestEventArgs ParseRequest(string virtualPath, System.Collections.Specialized.NameValueCollection query) { }
+        public ImageResizer.Configuration.Xml.Node RedactFrom(ImageResizer.Configuration.Xml.Node resizer) { }
+        public string SignData(string data) { }
+        public string SignDataWithKey(string data, string key) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+    public delegate void RemoteRequest(object sender, ImageResizer.Plugins.RemoteReader.RemoteRequestEventArgs args);
+    public class RemoteRequestEventArgs
+    {
+        public RemoteRequestEventArgs() { }
+        public bool DenyRequest { get; set; }
+        public System.Collections.Specialized.NameValueCollection QueryString { get; set; }
+        public string RemoteUrl { get; set; }
+        public bool SignedRequest { get; set; }
+    }
+    public class RemoteSiteFile : ImageResizer.Plugins.IVirtualFile, ImageResizer.Plugins.IVirtualFileAsync, ImageResizer.Plugins.IVirtualFileSourceCacheKey
+    {
+        protected ImageResizer.Plugins.RemoteReader.RemoteReaderPlugin parent;
+        protected string virtualPath;
+        public RemoteSiteFile(string virtualPath, ImageResizer.Plugins.RemoteReader.RemoteRequestEventArgs request, ImageResizer.Plugins.RemoteReader.RemoteReaderPlugin parent) { }
+        public string VirtualPath { get; }
+        public string GetCacheKey(bool includeModifiedDate) { }
+        public System.IO.Stream Open() { }
+        public System.Threading.Tasks.Task<System.IO.Stream> OpenAsync() { }
+    }
+}

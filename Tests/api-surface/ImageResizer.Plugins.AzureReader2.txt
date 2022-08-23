@@ -1,0 +1,20 @@
+[assembly: ImageResizer.Util.BuildDate("2017-05-05T12:13:13.1434691+00:00")]
+[assembly: ImageResizer.Util.Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
+[assembly: ImageResizer.Util.Edition("R4Performance")]
+[assembly: System.Runtime.InteropServices.Guid("67630875-4d13-4b9f-a367-0f764b7fe838")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
+namespace ImageResizer.Plugins.AzureReader2
+{
+    public class AzureReader2Plugin : ImageResizer.Storage.BlobProviderBase, ImageResizer.Plugins.IMultiInstancePlugin
+    {
+        public AzureReader2Plugin() { }
+        public AzureReader2Plugin(System.Collections.Specialized.NameValueCollection args) { }
+        public Microsoft.WindowsAzure.Storage.Blob.CloudBlobClient CloudBlobClient { get; set; }
+        public bool RedirectToBlobIfUnmodified { get; set; }
+        public override System.Threading.Tasks.Task<ImageResizer.Storage.IBlobMetadata> FetchMetadataAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        protected System.Threading.Tasks.Task<Microsoft.WindowsAzure.Storage.Blob.ICloudBlob> GetBlobRefAsync(string virtualPath) { }
+        public override ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public override System.Threading.Tasks.Task<System.IO.Stream> OpenAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public override bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+}
