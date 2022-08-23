@@ -2,7 +2,7 @@
 
 ## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
 [![Build status for develop branch](https://github.com/imazen/resizer/actions/workflows/dotnet.yml/badge.svg?branch=develop)](https://github.com/imazen/resizer/actions/workflows/dotnet.yml)
- View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [stable (master)](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
+ View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
 
 ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) 
 

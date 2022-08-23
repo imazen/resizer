@@ -1,10 +1,31 @@
 ﻿
+## Todo for V5
+
+* Create example projects and getting started tutorials
+* Update /resizer.debug to guide removal of old plugins and migration to new
+* Create migration guide in readme
+* Create watermark system.
+
 * Create HybridCache plugin
 
 
 
 IResponseArgs ?
 
+
+
+* Make old CommitAttribute crash with informative message that V4 plugins need to be removed.
+
+
+TODO: expose jpeg.progressive in Instructions class- Supported by Imageflow, but not GDI, WIC, or WPF
+TODO: maybe implement `dpi` - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
+ 
+
+
+V5 C# API:
+
+REVISIT: private readonly string[] _supportedFileExtensions = new string[]
+            { "bmp", "gif", "exif", "png", "tif", "tiff", "tff", "jpg", "jpeg", "jpe", "jif", "jfif", "jfi" };
 
 
 LATER
@@ -25,6 +46,10 @@ LATER
 * Integrate licensing from Imazen.Common and migrate just the enforcer tests
 
 * Write script to update package description and status for everything that is deprecated
+
+* We need to add build edition metadata for licensing  [assembly: ImageResizer.Util.Edition("R4Performance")]
+
+* And maybe GUID for COM? Check V4 API texts for old values [assembly: System.Runtime.InteropServices.Guid("8edaeb47-7067-4c77-aa1b-ffbeeab5e81d")]
 
 IN V6:
 

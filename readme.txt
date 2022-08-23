@@ -1,8 +1,13 @@
 Visit http://imageresizing.net/ for installation instructions, upgrade notes, licensing details, and example code.
 
-The website contains the most up-to-date installation instructions, but here's the short version
+The website contains the most up-to-date installation instructions, but here's the short version: 
 
-* For a Visual Studio project
+### For a ASP.NET Project
+
+Install the nuget packages 
+- ImageResizer
+- ImageResizer.Plugins.HybridCache
+- ImageResizer.Plugins.Imageflow
 
 1) Use Project->Add Reference to add ImageResizer.dll to the project. 
 2) Change the Project's web.config file to match the settings in the included Web.Config file.
