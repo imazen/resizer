@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using ImageResizer.Configuration.Xml;
 using Imazen.Common.Issues;
 using PublicApiGenerator;
@@ -76,7 +77,11 @@ namespace ImageResizer.TestAPISurface
                 var assembly = t.Assembly;
                 var assemblyName = assembly.GetName().Name;
                 var apiText = assembly.GeneratePublicApi(new ApiGeneratorOptions());
+
+                apiText = new Regex("Imazen.Common.Licensing.BuildDate\\(\"[^\"]*\"\\)").Replace(apiText,
+                    "Imazen.Common.Licensing.BuildDate(\"[removed]\")");
                 
+    
                 var fileName = Path.Combine(dir, assemblyName + ".txt");
                 File.WriteAllText(fileName, apiText);
             }

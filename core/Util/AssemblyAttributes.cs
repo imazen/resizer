@@ -9,6 +9,7 @@ using System.Globalization;
 namespace ImageResizer.Util
 {
     [AttributeUsage(AttributeTargets.Assembly)]
+    [Obsolete("Use Imazen.Common.Licesning.CommitAttribute instead, this will not be recognized")]
     public class CommitAttribute : Attribute
     {
         private string guid;
@@ -31,6 +32,7 @@ namespace ImageResizer.Util
         }
     }
 
+    [Obsolete("Use Imazen.Common.Licesning.BuildDateAttribute instead, this will not be recognized")]
     [AttributeUsage(AttributeTargets.Assembly)]
     public class BuildDateAttribute : Attribute
     {
@@ -68,6 +70,7 @@ namespace ImageResizer.Util
 
 
     [AttributeUsage(AttributeTargets.Assembly)]
+    [Obsolete("Native dependencies are no longer supported due to misuse and startup delays")]
     public class NativeDependenciesAttribute : Attribute
     {
         private string type;
@@ -92,6 +95,7 @@ namespace ImageResizer.Util
 
 
     [AttributeUsage(AttributeTargets.Assembly)]
+    [Obsolete("Use Imazen.Common.Licesning.EditionAttribute instead, this will not be recognized")]
     public class EditionAttribute : Attribute
     {
         private string type;
@@ -116,6 +120,7 @@ namespace ImageResizer.Util
 
 
     [AttributeUsage(AttributeTargets.Assembly)]
+    [Obsolete("No longer used.")]
     public class BuildTypeAttribute : Attribute
     {
         private string type;

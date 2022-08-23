@@ -1,3 +1,4 @@
+[assembly: Imazen.Common.Licensing.BuildDate("[removed]")]
 [assembly: System.CLSCompliant(false)]
 [assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ImageResizer.Plugins.HybridCache")]
@@ -1908,6 +1909,8 @@ namespace ImageResizer.Util
         }
     }
     [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    [System.Obsolete("Use Imazen.Common.Licesning.BuildDateAttribute instead, this will not be recogniz" +
+        "ed")]
     public class BuildDateAttribute : System.Attribute
     {
         public BuildDateAttribute() { }
@@ -1917,6 +1920,7 @@ namespace ImageResizer.Util
         public override string ToString() { }
     }
     [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    [System.Obsolete("No longer used.")]
     public class BuildTypeAttribute : System.Attribute
     {
         public BuildTypeAttribute() { }
@@ -1925,6 +1929,7 @@ namespace ImageResizer.Util
         public override string ToString() { }
     }
     [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    [System.Obsolete("Use Imazen.Common.Licesning.CommitAttribute instead, this will not be recognized")]
     public class CommitAttribute : System.Attribute
     {
         public CommitAttribute() { }
@@ -1933,6 +1938,8 @@ namespace ImageResizer.Util
         public override string ToString() { }
     }
     [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    [System.Obsolete("Use Imazen.Common.Licesning.EditionAttribute instead, this will not be recognized" +
+        "")]
     public class EditionAttribute : System.Attribute
     {
         public EditionAttribute() { }
@@ -1941,6 +1948,7 @@ namespace ImageResizer.Util
         public override string ToString() { }
     }
     [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    [System.Obsolete("Native dependencies are no longer supported due to misuse and startup delays")]
     public class NativeDependenciesAttribute : System.Attribute
     {
         public NativeDependenciesAttribute() { }
