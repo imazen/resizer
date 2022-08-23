@@ -25,10 +25,10 @@ namespace ImageResizer.Core.Tests
             var ms = new MemoryStream();
             var j = new ImageJob(ImageBuilderTest.GetBitmap(100, 200), ms, new Instructions("width=50;format=jpg"));
             c.CurrentImageBuilder.Build(j);
-            Assert.Equal(j.SourceWidth, 100);
-            Assert.Equal(j.SourceHeight, 200);
-            Assert.Equal(j.ResultFileExtension, "jpg");
-            Assert.Equal(j.ResultMimeType, "image/jpeg");
+            Assert.Equal(100, j.SourceWidth);
+            Assert.Equal(200, j.SourceHeight);
+            Assert.Equal("jpg", j.ResultFileExtension);
+            Assert.Equal("image/jpeg", j.ResultMimeType);
         }
 
         [Fact]
@@ -36,10 +36,10 @@ namespace ImageResizer.Core.Tests
         {
             var j = new ImageJob(ImageBuilderTest.GetBitmap(100, 200), null);
             c.CurrentImageBuilder.Build(j);
-            Assert.Equal(j.SourceWidth, 100);
-            Assert.Equal(j.SourceHeight, 200);
-            Assert.Equal(j.ResultFileExtension, "jpg");
-            Assert.Equal(j.ResultMimeType, "image/jpeg");
+            Assert.Equal(100, j.SourceWidth);
+            Assert.Equal(200, j.SourceHeight);
+            Assert.Equal("jpg", j.ResultFileExtension);
+            Assert.Equal("image/jpeg", j.ResultMimeType);
         }
 
 

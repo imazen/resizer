@@ -35,7 +35,7 @@ namespace ImageResizer.Tests
             foreach (string k in e.QueryString.Keys)
                 dict[k] = e.QueryString[k];
 
-            EqualIgnoreOrder<KeyValuePair<string, string>>(expectedDict, dict,
+            EqualIgnoreOrder(expectedDict, dict,
                 (pair) => (pair.Key == null ? "null" : pair.Key) + "|" + (pair.Value == null ? "null" : pair.Value));
         }
 
@@ -59,11 +59,11 @@ namespace ImageResizer.Tests
             foreach (string k in result.Keys)
                 dict[k] = result[k];
 
-            EqualIgnoreOrder<KeyValuePair<string, string>>(expectedDict, dict,
+            EqualIgnoreOrder(expectedDict, dict,
                 (pair) => (pair.Key == null ? "null" : pair.Key) + "|" + (pair.Value == null ? "null" : pair.Value));
         }
 
-        public void EqualIgnoreOrder<T>(IEnumerable<T> a, IEnumerable<T> b, Func<T, string> stringify)
+        internal static void EqualIgnoreOrder<T>(IEnumerable<T> a, IEnumerable<T> b, Func<T, string> stringify)
         {
             var la = a.OrderBy(stringify).ToList();
             var lb = b.OrderBy(stringify).ToList();

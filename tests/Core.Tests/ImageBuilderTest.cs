@@ -170,7 +170,7 @@ namespace ImageResizer.Tests
         /// <param name="original"></param>
         /// <param name="query"></param>
         [Theory]
-        [MemberData("Combine3", new object[] { 100, 20 }, new object[] { 1, 100 },
+        [MemberData(nameof(Combine3), new object[] { 100, 20 }, new object[] { 1, 100 },
             new object[] { "?width=20", "?height=30" })]
         public void GetFinalSize(int originalWidth, int originalHeight, string query)
         {
@@ -228,7 +228,7 @@ namespace ImageResizer.Tests
 
 
         [Theory]
-        [MemberData("Combine5", new object[] { true, false }, new object[] { true, false },
+        [MemberData(nameof(Combine5), new object[] { true, false }, new object[] { true, false },
             new object[] { true, false }, new object[] { true, false }, new object[] { true, false })]
         public void TestSourceBitmapDisposed(bool dispose,
             bool useDestinationStream,

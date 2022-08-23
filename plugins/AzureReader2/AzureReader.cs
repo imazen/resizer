@@ -108,7 +108,7 @@ namespace ImageResizer.Plugins.AzureReader2
             {
                 return (IBlobMetadata) await GetBlobRefAsync(virtualPath);
             }
-            catch (BlobMissingException e)
+            catch (BlobMissingException)
             {
                 return new BlobMetadata() { Exists = false };
             }

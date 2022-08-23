@@ -176,7 +176,7 @@ namespace ImageResizer.ProviderTests
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
-            Assert.Equal<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace ImageResizer.ProviderTests
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
-            Assert.Equal<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace ImageResizer.ProviderTests
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
-            Assert.Equal<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -339,7 +339,7 @@ namespace ImageResizer.ProviderTests
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<Stream>(actual);
-            Assert.Equal<string>(virtualPath, target.VirtualPath);
+            Assert.Equal(virtualPath, target.VirtualPath);
         }
 
         /// <summary>
@@ -423,7 +423,7 @@ namespace ImageResizer.ProviderTests
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<Stream>(actual);
-            Assert.Equal<string>(virtualPath, target.VirtualPath);
+            Assert.Equal(virtualPath, target.VirtualPath);
         }
     }
 }

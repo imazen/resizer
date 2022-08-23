@@ -29,7 +29,7 @@ namespace ImageResizer.Core.Tests
             using (var actual = SeekableStreamWrapper.FromStream(s))
             {
                 Assert.NotSame(s, actual);
-                Assert.IsAssignableFrom(typeof(SeekableStreamWrapper), actual);
+                Assert.IsAssignableFrom<SeekableStreamWrapper>(actual);
                 Assert.True(actual.CanSeek);
                 Assert.False(actual.CanWrite);
             }
@@ -37,15 +37,13 @@ namespace ImageResizer.Core.Tests
 
         private class TestStream : MemoryStream
         {
-            private bool seekable;
-
             public TestStream(bool seekable, string data)
                 : base(System.Text.Encoding.UTF8.GetBytes(data), false)
             {
-                this.seekable = seekable;
+                this.CanSeek = seekable;
             }
 
-            public override bool CanSeek => seekable;
+            public override bool CanSeek { get; }
         }
     }
 }

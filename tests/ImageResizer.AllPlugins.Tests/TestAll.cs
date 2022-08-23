@@ -144,7 +144,7 @@ namespace ImageResizer.AllPlugins.Tests
         private int counter = 0;
 
         [Theory(Skip = "Skip on CI")]
-        [MemberData("RandomCombinations")]
+        [MemberData(nameof(RandomCombinations))]
         public void RandomTest(object source, string query)
         {
             var c = GetConfig();
@@ -164,8 +164,8 @@ namespace ImageResizer.AllPlugins.Tests
         private Random r = new Random();
 
         [Theory]
-        [MemberData("RandomCombinations")]
-        public void TestCombinationsFast(object source, string query)
+        [MemberData(nameof(RandomCombinations))]
+        public void TestCombinationsFast(string query)
         {
             var c = GetConfig();
             c.CurrentImageBuilder.GetFinalSize(new Size(r.Next(10000), r.Next(10000)), new ResizeSettings(query));

@@ -62,7 +62,6 @@ namespace ImageResizer.Tests
         [InlineData("ImageResizer.Plugins.Basic.DefaultEncoder", typeof(DefaultEncoder))]
         [InlineData("DefaultEncoder234", null)]
         [InlineData("ImageResizer.Plugins.PluginA", typeof(PluginA))]
-        [InlineData("ImageResizer.Plugins.PluginA", typeof(PluginA))]
         [InlineData("PluginB", typeof(PluginB))]
         [InlineData("ImageResizer.Plugins.PluginB.PluginB", typeof(PluginB))]
         [InlineData("PluginC", typeof(PluginCPlugin))]
