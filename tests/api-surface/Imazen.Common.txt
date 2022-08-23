@@ -193,9 +193,25 @@ namespace Imazen.Common.Licensing
     public class BuildDateAttribute : System.Attribute
     {
         public BuildDateAttribute() { }
-        public BuildDateAttribute(string txt) { }
+        public BuildDateAttribute(string buildDateStringRoundTrip) { }
         public string Value { get; }
         public System.DateTimeOffset? ValueDate { get; }
+        public override string ToString() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    public class CommitAttribute : System.Attribute
+    {
+        public CommitAttribute() { }
+        public CommitAttribute(string commitId) { }
+        public string Value { get; }
+        public override string ToString() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    public class EditionAttribute : System.Attribute
+    {
+        public EditionAttribute() { }
+        public EditionAttribute(string editionString) { }
+        public string Value { get; }
         public override string ToString() { }
     }
     public interface ILicenseBlob

@@ -53,7 +53,7 @@ namespace ImageResizer.TestAPISurface
         }
         
         [Fact]
-        public void GenerateAPISurfaceText()
+        public void GenerateApiSurfaceText()
         {
             var dir = GetApiTextDir();
             if (dir == null) return; // We can do nothing
@@ -81,6 +81,9 @@ namespace ImageResizer.TestAPISurface
                 apiText = new Regex("Imazen.Common.Licensing.BuildDate\\(\"[^\"]*\"\\)").Replace(apiText,
                     "Imazen.Common.Licensing.BuildDate(\"[removed]\")");
                 
+                apiText = new Regex("Imazen.Common.Licensing.Commit\\(\"[^\"]*\"\\)").Replace(apiText,
+                    "Imazen.Common.Licensing.Commit(\"[removed]\")");
+          
     
                 var fileName = Path.Combine(dir, assemblyName + ".txt");
                 File.WriteAllText(fileName, apiText);

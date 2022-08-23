@@ -16,11 +16,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AssemblyAttribute Include="Imazen.Common.Licensing.BuildDateAttribute">
+        <AssemblyAttribute Include="Imazen.Common.Licensing.BuildDate">
             <_Parameter1>$([System.DateTime]::UtcNow.ToString("o"))</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-
+    <ItemGroup Condition="'$(SourceRevisionId)' == ''">
+        <AssemblyAttribute Include="Imazen.Common.Licensing.Commit">
+            <_Parameter1>$(GITHUB_SHA)</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+    
+    
 <!--    <ItemGroup>
         <None Include="..\icon.png" Pack="true" PackagePath=""/>
     </ItemGroup>-->
