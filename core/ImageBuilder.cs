@@ -677,7 +677,7 @@ namespace ImageResizer
                 job.ResultInfo["source.height"] = b.Height;
 
                 //Calculate the appropriate file extension and mime type
-                if (job.Dest != typeof(Bitmap))
+                if (!ReferenceEquals(job.Dest, typeof(Bitmap)))
                 {
                     var e = EncoderProvider.GetEncoder(s, b);
                     if (e != null)
@@ -687,7 +687,7 @@ namespace ImageResizer
                     }
                 }
 
-                if (job.Dest == typeof(IDictionary<string, object>))
+                if (ReferenceEquals(job.Dest, typeof(IDictionary<string, object>)))
                 {
                     //They only want information/attributes
                     job.Result = job.ResultInfo;
@@ -699,7 +699,7 @@ namespace ImageResizer
                 PreAcquireStream(ref dest, s);
                 job.Dest = dest;
 
-                if (dest == typeof(Bitmap))
+                if (ReferenceEquals(dest, typeof(Bitmap)))
                 {
                     job.Result = BuildJobBitmapToBitmap(job, b, true);
 
