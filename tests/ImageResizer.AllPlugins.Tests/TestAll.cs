@@ -165,7 +165,7 @@ namespace ImageResizer.AllPlugins.Tests
 
         [Theory]
         [MemberData(nameof(RandomCombinations))]
-        public void TestCombinationsFast(string query)
+        public void TestCombinationsFast(object source, string query)
         {
             var c = GetConfig();
             c.CurrentImageBuilder.GetFinalSize(new Size(r.Next(10000), r.Next(10000)), new ResizeSettings(query));
