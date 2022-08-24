@@ -1,4 +1,8 @@
 ﻿<Project>
+    <ItemGroup>
+        <SourceRoot Include="$(MSBuildThisFileDirectory)/"/>
+    </ItemGroup>
+    
     <PropertyGroup>
         <Copyright>Copyright © 2022 Imazen LLC</Copyright>
         <PackageProjectUrl>https://github.com/imazen/resizer</PackageProjectUrl>
@@ -41,7 +45,7 @@
         <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     </PropertyGroup>
     <PropertyGroup>
-        <IntermediateOutputPath>$(SolutionDir)/obj/$(Configuration)</IntermediateOutputPath>
-        <OutputPath>$(SolutionDir)/bin/$(Configuration)</OutputPath>
+        <IntermediateOutputPath>$(SolutionDir)\obj\$(Configuration)</IntermediateOutputPath>
+        <OutputPath>$(SolutionDir)\bin\$(Configuration)</OutputPath>
     </PropertyGroup>
 </Project>
