@@ -133,7 +133,6 @@
     </ItemGroup>
     <ItemGroup>
         <Folder Include="App_Data" />
-        <Folder Include="fonts" />
         <Folder Include="Models" />
         <Folder Include="Scripts" />
     </ItemGroup>
