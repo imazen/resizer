@@ -73,7 +73,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\examples\Images\rose-leaf.jpg">
+    <EmbeddedResource Include="..\..\examples\images\rose-leaf.jpg">
       <Link>rose-leaf.jpg</Link>
     </EmbeddedResource>
   </ItemGroup>
