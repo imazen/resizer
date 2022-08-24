@@ -41,7 +41,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 		LICENSE.md = LICENSE.md
 		.github\workflows\outdated-dotnet-sweep.yml = .github\workflows\outdated-dotnet-sweep.yml
-		readme.md = readme.md
 		nuget\NugetPackages.targets = nuget\NugetPackages.targets
 		.editorconfig = .editorconfig
 		tests\api-surface\ImageResizer.Plugins.AzureReader2.txt = tests\api-surface\ImageResizer.Plugins.AzureReader2.txt
@@ -56,6 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		core\BREAKING.txt = core\BREAKING.txt
 		core\exceptions.txt = core\exceptions.txt
 		core\TODO_V5.txt = core\TODO_V5.txt
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.HybridCache", "Plugins\ImageResizer.Plugins.HybridCache\ImageResizer.Plugins.HybridCache.csproj", "{E4BFB25C-19E3-458D-BA5D-56029D681A5D}"
