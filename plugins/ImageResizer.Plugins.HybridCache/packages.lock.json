@@ -183,7 +183,6 @@
       "imageresizer": {
         "type": "Project",
         "dependencies": {
-          "Imageflow.Net": "0.8.4",
           "Imazen.Common": "0.7.6",
           "System.Buffers": "4.5.1"
         }

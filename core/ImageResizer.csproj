@@ -13,9 +13,6 @@
   <Import Project="..\nuget\NugetPackages.targets" />
 
   <ItemGroup>
-    <PackageReference Include="Imageflow.Net">
-      <Version>0.8.4</Version>
-    </PackageReference>
     <PackageReference Include="Imazen.Common">
       <Version>0.7.6</Version>
     </PackageReference>

@@ -33,7 +33,7 @@ namespace ImageResizer
                 return "application/octet-stream";
             }
             //TODO: Extract this API so ImageResizer.dll doesn't depend on Imageflow.Net.dll
-            return Imageflow.Fluent.ImageJob.GetContentTypeForBytes(data) ?? "application/octet-stream";
+            return new Imazen.Common.FileTypeDetection.FileTypeDetector().GuessMimeType(data) ?? "application/octet-stream";
         }
         
         
