@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\nuget\NugetPackages.targets" />
+
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework>
@@ -8,10 +10,12 @@
     <AssemblyTitle>Fast disk caching system for ImageResizer</AssemblyTitle>
     <Description>Fast disk caching for the ImageResizer HttpModule.</Description>
       <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README_HYBRIDCACHE.md</PackageReadmeFile>
   </PropertyGroup>
-
-  <Import Project="..\..\nuget\NugetPackages.targets" />
-
+  
+  <ItemGroup>
+    <None Include="README_HYBRIDCACHE.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Configuration" />

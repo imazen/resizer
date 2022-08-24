@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\nuget\NugetPackages.targets" />
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -8,9 +9,12 @@
     <AssemblyTitle>ImageResizer plugin for resizing remote images</AssemblyTitle>
     <Description>ImageResizer plugin for resizing images located on remote servers</Description>
       <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README_REMOTEREADER.md</PackageReadmeFile>
   </PropertyGroup>
 
-  <Import Project="..\..\nuget\NugetPackages.targets" />
+  <ItemGroup>
+    <None Include="README_REMOTEREADER.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 
   <ItemGroup>

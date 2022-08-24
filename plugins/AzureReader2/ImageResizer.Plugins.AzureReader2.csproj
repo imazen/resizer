@@ -1,17 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\nuget\NugetPackages.targets" />
+  
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework>
     <PackageId>ImageResizer.Plugins.AzureReader2</PackageId>
     <AssemblyTitle>ImageResizer plugin for resizing images from Azure Blob Storage</AssemblyTitle>
     <Description>ImageResizer plugin for resizing images from Azure Blob Storage</Description>
-      <IsPackable>true</IsPackable>
+    <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README_AZURE.md</PackageReadmeFile>
   </PropertyGroup>
 
-  <Import Project="..\..\nuget\NugetPackages.targets" />
-
+  
+  <ItemGroup>
+    <None Include="README_AZURE.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Configuration" />

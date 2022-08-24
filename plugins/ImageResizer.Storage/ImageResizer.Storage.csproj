@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\nuget\NugetPackages.targets" />
+
+  
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework>
@@ -8,9 +11,13 @@
     <AssemblyTitle>Alternate storage backend framework for ImageResizer</AssemblyTitle>
     <Description>Alternate storage backend framework for ImageResizer</Description>
       <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README_STORAGE.md</PackageReadmeFile>
   </PropertyGroup>
 
-  <Import Project="..\..\nuget\NugetPackages.targets" />
+  <ItemGroup>
+    <None Include="README_STORAGE.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 
 
   <ItemGroup>

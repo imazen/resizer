@@ -1,16 +1,13 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
     <PropertyGroup>
-
-
-        <!-- We're grabbing the TAGGED_VERSION env var -->
-
-      <!--  <PackageIcon>icon.png</PackageIcon> -->
-
-        
-        
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
-
     <ItemGroup>
+        <None Include="$(SolutionDir)\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
+    <ItemGroup Condition="!$(MSBuildProjectName.EndsWith('WebConfig'))">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
     </ItemGroup>
     
@@ -18,19 +15,22 @@
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
     </PropertyGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="!$(MSBuildProjectName.EndsWith('WebConfig'))">
         <!-- Breaks determinism, but needed for licensing -->
         <AssemblyAttribute Include="Imazen.Common.Licensing.BuildDate">
             <_Parameter1>$([System.DateTime]::UtcNow.ToString("o"))</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-    <ItemGroup Condition="'$(SourceRevisionId)' == ''">
+    <ItemGroup Condition="'$(SourceRevisionId)' == '' AND !$(MSBuildProjectName.EndsWith('WebConfig'))">
         <AssemblyAttribute Include="Imazen.Common.Licensing.Commit">
             <_Parameter1>$(GITHUB_SHA)</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-    
-    
+
+    <PropertyGroup>
+        <PackageIcon>icon.png</PackageIcon>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Include="$(SolutionDir)\nuget\icon.png" Pack="true" PackagePath=""/>
     </ItemGroup>

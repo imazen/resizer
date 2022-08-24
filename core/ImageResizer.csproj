@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\nuget\NugetPackages.targets" />
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework>
     <PackageId>ImageResizer</PackageId>
-    <AssemblyTitle>The core HttpModule for ImageResizer</AssemblyTitle>
+    <AssemblyTitle>HttpModule to allow optimizing and modifying images from the querystring or code</AssemblyTitle>
     <Description>Lightweight HttpModule, REST API, and managed API for *safe* and highly-optimized server-side image processing.</Description>
-      <IsPackable>true</IsPackable>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
-  
-  <Import Project="..\nuget\NugetPackages.targets" />
 
+  
   <ItemGroup>
     <PackageReference Include="Imazen.Common">
       <Version>0.7.6</Version>
@@ -25,4 +25,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
   </ItemGroup>
+
+
+
 </Project>

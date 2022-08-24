@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\nuget\NugetPackages.targets" />
+  
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework>
@@ -8,11 +10,13 @@
     <AssemblyTitle>ImageResizer plugin for resizing images from S3</AssemblyTitle>
     <Description>ImageResizer plugin for resizing images from S3</Description>
       <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README_S3.md</PackageReadmeFile>
   </PropertyGroup>
 
-  <Import Project="..\..\nuget\NugetPackages.targets" />
-
-
+  <ItemGroup>
+    <None Include="README_S3.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
   <ItemGroup>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
