@@ -44,8 +44,5 @@
         <NoWarn>NU1603</NoWarn>
         <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     </PropertyGroup>
-    <PropertyGroup>
-        <IntermediateOutputPath>$(SolutionDir)\obj\$(Configuration)</IntermediateOutputPath>
-        <OutputPath>$(SolutionDir)\bin\$(Configuration)</OutputPath>
-    </PropertyGroup>
+ 
 </Project>

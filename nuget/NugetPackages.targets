@@ -34,5 +34,8 @@
 <!--    <ItemGroup>
         <None Include="..\icon.png" Pack="true" PackagePath=""/>
     </ItemGroup>-->
-    
+    <PropertyGroup>
+        <IntermediateOutputPath>$(SolutionDir)\obj\$(Configuration)</IntermediateOutputPath>
+        <OutputPath>$(SolutionDir)\bin\$(Configuration)</OutputPath>
+    </PropertyGroup>
 </Project>
