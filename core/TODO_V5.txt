@@ -1,7 +1,7 @@
 ﻿
 ## Todo for V5
 
-* Switch back to packages.config for example (ProjectReference doesn't work in ASP.NET full projects)
+* Switch back to packages.config for examples (ProjectReference doesn't work in ASP.NET full projects)
 * Create example projects and getting started tutorials
 * Update /resizer.debug to guide removal of old plugins and migration to new
 * Create migration guide in readme
@@ -54,6 +54,19 @@ LATER
 * We need to add build edition metadata for licensing  [assembly: ImageResizer.Util.Edition("R4Performance")]
 
 * And maybe GUID for COM? Check V4 API texts for old values [assembly: System.Runtime.InteropServices.Guid("8edaeb47-7067-4c77-aa1b-ffbeeab5e81d")]
+
+Put samples in a separate solution.
+
+
+Later: add a unified API for configuring both IDNS and IR. And a unified async blob provider api with support for arbitrary files, relay, source caching, etc.
+
+Document cache control
+
+Imageflow needs to be able to shrink watermarks to pixel widths/heights?
+
+Add WIC support in Imageflow
+https://docs.rs/native-windows-gui/1.0.1/native_windows_gui/struct.ImageDecoder.html
+
 
 IN V6:
 
