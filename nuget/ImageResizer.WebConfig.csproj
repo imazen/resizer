@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <PackageId>ImageResizer.WebConfig</PackageId>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        
+        <NuspecProperties>version=$(PackageVersion)</NuspecProperties>
+        <Description>Installs ImageResizer module by (carefully) modifying Web.Config.
+        
+        Docs: http://imageresizing.net/</Description>
+        <PackageTags>ImageResizer Imazen Resizer MVC Routing MvcRoutingShim WebConfig  imaging</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+    <PackageReference Include="ImageResizer" Version="[$(Version),]" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="Web.config.transform" >
+        </Content>
+        <Content Include="ImageResizer5_Readme.txt">
+        </Content>
+        <None Include="_._" Pack="True" PackagePath="lib\net472" />
+            
+    </ItemGroup>
+
+</Project>

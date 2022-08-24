@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<configuration>
+  <configSections>
+    <section name="resizer" type="ImageResizer.ResizerSection" requirePermission="false"/>
+  </configSections>
+  <system.web>
+    <httpModules>
+      <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+    </httpModules>
+  </system.web>
+  <system.webServer>
+    <validation validateIntegratedModeConfiguration="false"/>
+    <modules>
+      <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+    </modules>
+  </system.webServer>
+</configuration>

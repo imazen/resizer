@@ -1,0 +1,32 @@
+<svg version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" viewBox="0 0 512 512">
+    <title>photo landscape icon</title>
+    <desc>photo landscape icon from the IconExperience.com G-Collection. Copyright by INCORS GmbH (www.incors.com).</desc>
+    <defs>
+        <linearGradient x1="0" y1="64" x2="512" y2="436.364" gradientUnits="userSpaceOnUse" id="color-1">
+            <stop offset="0" stop-color="#f6f7f9"/>
+            <stop offset="0.23137" stop-color="#e8ecf1"/>
+            <stop offset="1" stop-color="#d9e1e9"/>
+        </linearGradient>
+        <linearGradient x1="16" y1="80" x2="16.0006" y2="368.001" gradientUnits="userSpaceOnUse" id="color-2">
+            <stop offset="0" stop-color="#19a1ee"/>
+            <stop offset="1" stop-color="#4eb6f2"/>
+        </linearGradient>
+        <linearGradient x1="16" y1="256" x2="82.04" y2="366.068" gradientUnits="userSpaceOnUse" id="color-3">
+            <stop offset="0" stop-color="#77da26"/>
+            <stop offset="1" stop-color="#59a31d"/>
+        </linearGradient>
+        <linearGradient x1="496.00545" y1="217" x2="458.51945" y2="416.9245" gradientUnits="userSpaceOnUse" id="color-4">
+            <stop offset="0" stop-color="#77da26"/>
+            <stop offset="1" stop-color="#64b620"/>
+        </linearGradient>
+    </defs>
+    <g fill="none" fill-rule="evenodd" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal">
+        <path d="M0,64l512,0l0,384l-512,0z" id="curve4" fill="url(#color-1)"/>
+        <path d="M16,80l480,0l0,352l-480,0z" id="curve3" fill="url(#color-2)"/>
+        <path d="M208,112c35.5,0 64,28.5 64,64c0,35.5 -28.5,64 -64,64c-35.5,0 -64,-28.5 -64,-64c0,-35.5 28.5,-64 64,-64z" id="curve2" fill="#ffc001"/>
+        <path d="M496,380l0,52l-480,0l0,-143c29,-20 65,-33 109,-33c83,0 207,75.5 371,124z" id="curve1" fill="url(#color-3)"/>
+        <path d="M496,275.5l0,156.5l-480,0l0,-101.5c223.5,104.5 326,-113.5 414.5,-113.5c32,0 66,46.5 65.5,58.5z" id="curve0" fill="url(#color-4)"/>
+    </g>
+</svg>

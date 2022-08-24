@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETFramework,Version=v4.7.2": {
+      "ImageResizer": {
+        "type": "Direct",
+        "requested": "[0.1.0--notset, )",
+        "resolved": "3.0.9",
+        "contentHash": "qN4AfT1OhoRHM+1gK58Ysa/KPm09BBm0HuQljjbVQNgvN6gl5szDB6kqavuXtfRrZeSxZFg0fkI1uU7JVduadQ=="
+      }
+    }
+  }
+}

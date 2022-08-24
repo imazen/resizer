@@ -31,9 +31,10 @@
     </ItemGroup>
     
     
-<!--    <ItemGroup>
-        <None Include="..\icon.png" Pack="true" PackagePath=""/>
-    </ItemGroup>-->
+    <ItemGroup>
+        <None Include="$(SolutionDir)\nuget\icon.png" Pack="true" PackagePath=""/>
+    </ItemGroup>
+    
     <PropertyGroup>
         <IntermediateOutputPath>$(SolutionDir)\obj\$(Configuration)</IntermediateOutputPath>
         <OutputPath>$(SolutionDir)\bin\$(Configuration)</OutputPath>
