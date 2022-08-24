@@ -23,13 +23,11 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: actions/cache@v3
+        id: cache
         with:
           path: ~/.nuget/packages
-          # Look to see if there is a cache hit for the corresponding requirements file
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget
-
+          key: ${{ runner.os }}-nuget-breaker1-${{ hashFiles('**/packages.lock.json') }}
+          
       - uses: nowsprinting/check-version-format-action@v3
         id: version
         with:
@@ -41,12 +39,32 @@ jobs:
           echo Set version to ${{ steps.version.outputs.full_without_prefix }}
         shell: bash
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
+        
+      - name: Upload planned for Nuget.org?
+        run: echo "This runner will upload to Nuget.org if tests pass"
+        if: matrix.uploader && github.event_name == 'release' &&  steps.version.outputs.is_valid == 'true'
+          
 
+      - name: Clear & clean on release or cache miss
+        run: |
+          dotnet clean --configuration Release
+          dotnet nuget locals all --clear
+        if: steps.cache.outputs.cache-hit != 'true' || github.event_name == 'release'
+
+      - name: Restore packages
+        run: dotnet restore
+          
       - name: Build Solution
         run:  dotnet build -c Release ImageResizer.sln
       
       - name: Test Solution (except azure)
-        run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln
+        run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln  --blame --no-build
+        
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: TestResults-${{matrix.os}}
+          path: TestResults/
 
       - name: Pack
         run: dotnet pack ImageResizer.sln -c Release --include-source
@@ -54,26 +72,16 @@ jobs:
       - name: Add Azure & Myget Nuget feed
         run: |
           dotnet nuget add source --name azureimazen "https://pkgs.dev.azure.com/imazenio/_packaging/imazenio/nuget/v3/index.json"
-          dotnet nuget add source --name mygetimazen "https://www.myget.org/F/imazen-nightlies/api/v2/package" 
-# dotnet nuget add source --name mygetresizerelite "https://www.myget.org/F/imageresizer-agpl-or-elite-license/api/v2/package" 
+          dotnet nuget add source --name mygetimazen "https://www.myget.org/F/imazen-nightlies/api/v2/package"
 
-
-# NOT pushing to myget AGPL feed, that's deprecated
-# NOT uploading stuff to S3 buckets
-# NOT uploading .zip to github... yet
+      # NOT uploading .zip to github... yet
 
       - name: Publish nuget packages to MyGet if a prerelease
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable != 'true'
         run: |
           dotnet nuget push bin\Release\*.nupkg --skip-duplicate --api-key ${{ secrets.MYGET_KEY }}  --source "mygetimazen"
 
-#
-#      - name: Publish nuget packages to Azure if a prerelease
-#        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable != 'true'
-#        run: |
-#          dotnet nuget push bin/Release/*.nupkg --skip-duplicate --api-key ${{ secrets.AZURE_NUGET_KEY }}  --source "azureimazen"
-#          
       - name: Publish nuget packages to Nuget.org if a stable release
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable == 'true'
         run: |
-          dotnet nuget push bin\Release\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} 
+          dotnet nuget push bin\Release\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}  --source nuget.org
