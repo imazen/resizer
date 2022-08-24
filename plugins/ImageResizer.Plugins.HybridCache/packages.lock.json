@@ -28,20 +28,20 @@
       },
       "Imazen.Common": {
         "type": "Direct",
-        "requested": "[0.7.1, )",
-        "resolved": "0.7.1",
-        "contentHash": "5nEfMN+KFEa+oGktIgk2BNcONimHagC8HTyp1vET5kRisOTjfmiIEAzcAS+Bg/kINp9r5QagtCOoxZRbHTf6DQ==",
+        "requested": "[0.7.6, )",
+        "resolved": "0.7.6",
+        "contentHash": "2iAcHnuz3lIadnM1b5XZeaI+XmQ9AyfIqT38ArbKdbPr0ngXWfpJWDFpNv4ZmqnH0ATpsSLms93n+FCV4eg2Ig==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
       },
       "Imazen.HybridCache": {
         "type": "Direct",
-        "requested": "[0.7.1, )",
-        "resolved": "0.7.1",
-        "contentHash": "iVpTuVzFX/vhFpcTBUQclfZHJk+NsLg1zIwzsLlFRhwzokgp/dt8AnnzPh2Ffv1UJmE8mlAKN0xz+cgWVQCLjw==",
+        "requested": "[0.7.6, )",
+        "resolved": "0.7.6",
+        "contentHash": "X2mwVBR4ibJvET/sWuoZhn/6LR/jMW508Chtr4h7HA42HJPZADtmyjoViKH9JJHN58quv7Tz2O1NK8HUhHi+hw==",
         "dependencies": {
-          "Imazen.Common": "0.7.1"
+          "Imazen.Common": "0.7.6"
         }
       },
       "Microsoft.Extensions.Configuration.Abstractions": {
@@ -96,6 +96,16 @@
           "System.Runtime.CompilerServices.Unsafe": "4.5.1"
         }
       },
+      "Microsoft.SourceLink.GitHub": {
+        "type": "Direct",
+        "requested": "[1.1.1, )",
+        "resolved": "1.1.1",
+        "contentHash": "IaJGnOv/M7UQjRJks7B6p7pbPnOwisYGOIzqCz5ilGFTApZ3ktOR+6zJ12ZRPInulBmdAf1SrGdDG2MU8g6XTw==",
+        "dependencies": {
+          "Microsoft.Build.Tasks.Git": "1.1.1",
+          "Microsoft.SourceLink.Common": "1.1.1"
+        }
+      },
       "System.Buffers": {
         "type": "Direct",
         "requested": "[4.5.1, )",
@@ -145,6 +155,11 @@
         "resolved": "1.7.3-rc67",
         "contentHash": "70f1jodgmbiWHxd3KxR8fo+8CK55oMD/f/5OYYSnBCSdTxzec8ks4bhXASzmx7bgCujipCa4E1s0uQt3PCf8+w=="
       },
+      "Microsoft.Build.Tasks.Git": {
+        "type": "Transitive",
+        "resolved": "1.1.1",
+        "contentHash": "AT3HlgTjsqHnWpBHSNeR0KxbLZD7bztlZVj7I8vgeYG9SYqbeFGh0TM/KVtC6fg53nrWHl3VfZFvb5BiQFcY6Q=="
+      },
       "Microsoft.CSharp": {
         "type": "Transitive",
         "resolved": "4.7.0",
@@ -155,6 +170,11 @@
         "resolved": "1.2.2",
         "contentHash": "LA4RBTStohA0hAAs6oKchmIC5M5Mjd5MwfB7vbbl+312N5kXj8abTGOgwZy6ASJYLCiqiiK5kHS0hDGEgfkB8g=="
       },
+      "Microsoft.SourceLink.Common": {
+        "type": "Transitive",
+        "resolved": "1.1.1",
+        "contentHash": "WMcGpWKrmJmzrNeuaEb23bEMnbtR/vLmvZtkAP5qWu7vQsY59GqfRJd65sFpBszbd2k/bQ8cs8eWawQKAabkVg=="
+      },
       "Newtonsoft.Json": {
         "type": "Transitive",
         "resolved": "10.0.3",
@@ -164,7 +184,7 @@
         "type": "Project",
         "dependencies": {
           "Imageflow.Net": "0.8.4",
-          "Imazen.Common": "0.7.1",
+          "Imazen.Common": "0.7.6",
           "System.Buffers": "4.5.1"
         }
       }

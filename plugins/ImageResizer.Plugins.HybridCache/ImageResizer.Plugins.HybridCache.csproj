@@ -33,10 +33,10 @@
 
   <ItemGroup>
     <PackageReference Include="Imazen.Common">
-      <Version>0.7.1</Version>
+      <Version>0.7.6</Version>
     </PackageReference>
     <PackageReference Include="Imazen.HybridCache">
-      <Version>0.7.1</Version>
+      <Version>0.7.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions">
       <Version>2.2.0</Version>
