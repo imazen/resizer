@@ -1,4 +1,5 @@
-[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/imazen/imageflow-dotnet-server.git")]
+[assembly: Imazen.Common.Licensing.BuildDate("[removed]")]
+[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/imazen/imageflow-dotnet-server")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ImageResizer")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ImageResizer.LicensingTests")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Imageflow.Server")]
@@ -88,6 +89,14 @@ namespace Imazen.Common.ExtensionMethods
     {
         public static long ToUnixTimeUtc(this System.DateTime dateTime) { }
         public static System.DateTime UnixTimeUtcIntoDateTime(this long unixValue) { }
+    }
+}
+namespace Imazen.Common.FileTypeDetection
+{
+    public class FileTypeDetector
+    {
+        public FileTypeDetector() { }
+        public string GuessMimeType(byte[] first12Bytes) { }
     }
 }
 namespace Imazen.Common.Helpers
