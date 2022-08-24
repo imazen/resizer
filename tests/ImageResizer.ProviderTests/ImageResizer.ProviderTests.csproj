@@ -36,11 +36,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\Samples\Images\rose-leaf.jpg">
-      <Link>rose-leaf.jpg</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="xunit">
       <Version>2.4.2</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -76,5 +71,10 @@
     <PackageReference Include="WindowsAzure.Storage">
       <Version>6.0.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\examples\Images\rose-leaf.jpg">
+      <Link>rose-leaf.jpg</Link>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
