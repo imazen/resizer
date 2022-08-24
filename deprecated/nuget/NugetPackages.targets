@@ -1,0 +1,42 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+
+
+        <!-- We're grabbing the TAGGED_VERSION env var -->
+
+      <!--  <PackageIcon>icon.png</PackageIcon> -->
+
+        
+        
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+    </ItemGroup>
+    
+    <PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
+        <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Breaks determinism, but needed for licensing -->
+        <AssemblyAttribute Include="Imazen.Common.Licensing.BuildDate">
+            <_Parameter1>$([System.DateTime]::UtcNow.ToString("o"))</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+    <ItemGroup Condition="'$(SourceRevisionId)' == ''">
+        <AssemblyAttribute Include="Imazen.Common.Licensing.Commit">
+            <_Parameter1>$(GITHUB_SHA)</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+    
+    
+    <ItemGroup>
+        <None Include="$(SolutionDir)\core\nuget\icon.png" Pack="true" PackagePath=""/>
+    </ItemGroup>
+    
+    <PropertyGroup>
+        <IntermediateOutputPath>$(SolutionDir)\obj\$(Configuration)</IntermediateOutputPath>
+        <OutputPath>$(SolutionDir)\bin\$(Configuration)</OutputPath>
+    </PropertyGroup>
+</Project>
