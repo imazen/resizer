@@ -1,7 +1,7 @@
 ﻿
 ## Todo for V5
 
-* Switch back to packages.config (ProjectReference doesn't work in ASP.NET full projects)
+* Switch back to packages.config for example (ProjectReference doesn't work in ASP.NET full projects)
 * Create example projects and getting started tutorials
 * Update /resizer.debug to guide removal of old plugins and migration to new
 * Create migration guide in readme
@@ -57,7 +57,64 @@ LATER
 
 IN V6:
 
-* Add direct support for Imazen.Common.Storage.IBlobProvider
+* Add direct support for Imazen.Common.Storage.IBlobProvider, unify provider APIs
 * Fix response headers system under async
 * Unify RemoteReader and encrypted/signed URL system.
 * Unify SizeLimiting and JobSecurity 
+
+Add fatal error if HybridCache folder is inside the web root.
+
+Add instructions to add
+https://www.nuget.org/packages/Imageflow.NativeRuntime.win-x86_64 and 
+https://www.nuget.org/packages/Imageflow.NativeRuntime.win-x86 directly to the output project
+
+
+## Nuget.Org manual package updates
+
+Deprecate ImageResizer.WebConfigAsync in favor of ImageResizer.WebConfig, note that it now uses the async module anyway.
+Deprecate ImageResizer.MvcWebConfig in favor of ImageResizer.WebConfig, note that it has been an empty redirect package since v4.
+Deprecate ImageResizer.Mvc in favor of ImageResizer, note that it has been an empty redirect package since v4 since MVC support is included in ImageResizer.dll
+Deprecate ImageResizer.Plugins.DiskCache in favor of ImageResizer.Plugins.HybridCache, as HybridCache has better performance, excellent cache size limiting, and the cache is located outside of the project and web root.
+Deprecate ImageResizer.Plugins.PrettyGifs in favor of ImageResizer.Plugins.Imageflow, as it is vastly superior in terms of image quality, compression size, and runtime performance.
+Deprecate ImageResizer.Plugins.AnimatedGifs in favor of ImageResizer.Plugins.Imageflow, as it is vastly superior in terms of image quality, compression size, and runtime performance.
+Deprecate ImageResizer.Plugins.Watermark in favor of ImageResizer.Plugins.Imageflow, as it offers better runtime performance.
+Deprecate ImageResizer.Plugins.SimpleFilters in favor of ImageResizer.Plugins.Imageflow, as it offers better runtime performance. 
+Deprecate ImageResizer.Plugins.WhitespaceTrimmer in favor of ImageResizer.Plugins.Imageflow, as it offers better accuracy and runtime performance.
+Deprecate ImageResizer.Plugins.FreeImage as the underlying FreeImage library does not release updates often enough to provide good security against untrusted input files. Mark as insecure?
+Deprecate ImageResizer.Plugins.PdfRenderer as it is no longer maintained; PDF rendering is inherently extremely difficult to keep secure due to the regular pace of security vulnerabilities in all PDF libraries and viewers. Mark as insecure?
+Deprecate ImageResizer.Plugins.PdfiumRenderer as it is no longer maintained; PDF rendering is inherently extremely difficult to keep secure due to the regular pace of security vulnerabilities in all PDF libraries and viewers. Mark as insecure?
+Deprecate ImageResizer.Plugins.WebP in favor of ImageResizer.Plugins.Imageflow (which has built-in support), as it works and deploys reliably. ImageResizer.Plugins.WebP is a nightmare to deploy due to webp.dll issues.
+Deprecate ImageResizer.Plugins.AdvancedFilters in favor of ImageResizer.Plugins.Imageflow. Imageflow offers better sharpening (f.sharpen command) and auto-white balance (still a.balancewhite). Rarely used alpha features a.oilpainting, a.sobel,  a.threshold, a.canny, a.equalize, a.posterize. have been removed.
+Deprecate ImageResizer.Plugins.TinyCache in favor of ImageResizer.Plugins.HybridCache, as HybridCache offers vastly superior performance and perfect cache size limiting.
+Deprecate ImageResizer.Plugins.WicRenderer in favor of ImageResizer.Plugins.Imageflow, note that TIFF support is not included in Imageflow.
+Deprecate ImageResizer.Plugins.FastScaling.x64 in favor of ImageResizer.Plugins.Imageflow as it offers superior performance and easier deployment.
+Deprecate ImageResizer.Plugins.FastScaling.x86 in favor of ImageResizer.Plugins.Imageflow as it offers superior performance and easier deployment. 
+Deprecate ImageResizer.Plugins.SeamCarving as it is rarely used and no longer maintained.
+
+Deprecate ImageResizer.Samples.Jcrop as it is rarely used and no longer maintained.
+Deprecate ImageResizer.Plugins.Logging as it is rarely used and no longer maintained.
+Deprecate ImageResizer.Plugins.PsdReader as it is rarely used and no longer maintained.
+Deprecate ImageResizer.Plugins.PsdComposer as it is rarely used and no longer maintained.
+Deprecate ImageResizer.Plugins.CloudFront as it is rarely used and no longer maintained. Consider making a config setting?
+Deprecate ImageResizer.Plugins.BatchZipper as it is rarely used and no longer maintained.
+Deprecate ImageResizer.Plugins.CopyMetadata as it is rarely used and no longer maintained. Consider adding to Imageflow?
+Deprecate ImageResizer.Plugins.MongoReader as it is rarely used and no longer maintained.
+Deprecate ImageResizer.Plugins.Faces as it is rarely used and no longer maintained. If you depend on this feature, open or vote on Github [issue]
+Deprecate ImageResizer.Plugins.FFmpeg as it is rarely used and no longer maintained. [vote]
+Deprecate ImageResizer.Plugins.SqlReader as it is no longer maintained.
+
+
+ImageResizer.Plugins.DiagnosticJson
+
+Deprecate ImageResizer.Plugins.AzureReader as it has been deprecated since v3
+Deprecate ImageResizer.Plugins.FriendlyUrls as it has been deprecated since v3
+
+Help with Forte.ImageResizer.AzureBlobCache
+Help with ImageResizer.Plugins.PdfiumRenderer.Pdfium.Dll
+Help with ImageResizer.Plugins.PngOptimizer 
+Help with ImageResizer.Plugins.GradientOverlay
+Help with ImageResizer.Plugins.ScalePercentage since it duplicates zoom feature
+Help with TNX.ImageResizer
+Help with ImageResizer.Plugins.Tint
+Help with ImageResizer.Plugins.AzureReader3
+Help with ImageResizer.Plugins.AzureBlobStorageCache
