@@ -1,6 +1,7 @@
 ﻿
 ## Todo for V5
 
+* Switch back to packages.config (ProjectReference doesn't work in ASP.NET full projects)
 * Create example projects and getting started tutorials
 * Update /resizer.debug to guide removal of old plugins and migration to new
 * Create migration guide in readme
