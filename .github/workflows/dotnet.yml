@@ -67,21 +67,21 @@ jobs:
           path: TestResults/
 
       - name: Pack
-        run: dotnet pack ImageResizer.sln -c Release --include-source
+        run: dotnet pack ImageResizer.sln -c Release --include-source --output uploading
       
       - name: Add Azure & Myget Nuget feed
         run: |
           dotnet nuget add source --name azureimazen "https://pkgs.dev.azure.com/imazenio/_packaging/imazenio/nuget/v3/index.json"
           dotnet nuget add source --name mygetimazen "https://www.myget.org/F/imazen-nightlies/api/v2/package"
-
+          
       # NOT uploading .zip to github... yet
 
       - name: Publish nuget packages to MyGet if a prerelease
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable != 'true'
         run: |
-          dotnet nuget push bin\Release\*.nupkg --skip-duplicate --api-key ${{ secrets.MYGET_KEY }}  --source "mygetimazen"
+          dotnet nuget push uploading\*.nupkg --skip-duplicate --api-key ${{ secrets.MYGET_KEY }}  --source "mygetimazen"
 
       - name: Publish nuget packages to Nuget.org if a stable release
         if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable == 'true'
         run: |
-          dotnet nuget push bin\Release\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}  --source nuget.org
+          dotnet nuget push uploading\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}  --source nuget.org
