@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3ReaderSample", "S3ReaderS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlReaderSample", "SqlReaderSample\SqlReaderSample.csproj", "{1CED61F7-E4DA-4D45-A937-5F268C60697A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageResizer", "..\core\ImageResizer.csproj", "{62B9BA08-10F2-47FF-972F-48E811506996}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,6 +104,24 @@ Global
 		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Trial|x86.ActiveCfg = Release|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Debug|x86.Build.0 = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Release|x86.ActiveCfg = Release|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Release|x86.Build.0 = Release|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Trial|Any CPU.ActiveCfg = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Trial|Any CPU.Build.0 = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Trial|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Trial|Mixed Platforms.Build.0 = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Trial|x86.ActiveCfg = Debug|Any CPU
+		{62B9BA08-10F2-47FF-972F-48E811506996}.Trial|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
