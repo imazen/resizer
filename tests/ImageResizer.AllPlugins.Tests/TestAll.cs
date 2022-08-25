@@ -33,8 +33,7 @@ namespace ImageResizer.AllPlugins.Tests
               w.watermarkSize = new System.Drawing.SizeF(1, 1); //The desired size of the watermark, maximum dimensions (aspect ratio maintained if keepAspectRatio = true)
               //Install the plugin
               w.Install(c);*/
-
-            new Gradient().Install(c);
+            
             var rrp = new RemoteReaderPlugin();
             rrp.Install(c);
             rrp.AllowRemoteRequest += delegate(object sender, RemoteRequestEventArgs args)
@@ -44,7 +43,6 @@ namespace ImageResizer.AllPlugins.Tests
 
 
             new ImageflowBackendPlugin().Install(c);
-            new DropShadow().Install(c);
             new VirtualFolder("/images", "..\\..\\..\\Samples\\Images", false).Install(c);
 
 

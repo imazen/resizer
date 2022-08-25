@@ -30,7 +30,6 @@ namespace ImageResizer
          * fi.scale - Specific to two very infrequently used plugins: FreeImageBuilder and FreeImageResizer
          * preservePalette - Specific to the PrettyGifs plugin, and not well tested. *TODO*
          * jpeg.progressive - Supported by Imageflow, but not GDI, WIC, or WPF
-         * shadow* - I'm hoping to retire/replace the DropShadow plugin sometime. I think it is very infrequently used.
          * memcache - This feature is pre-alpha
          * dpi - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
          * 

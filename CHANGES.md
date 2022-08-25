@@ -1,4 +1,4 @@
-# v5-0-0
+`# v5-0-0
 
 ## ImageResizer 5.0 has breaking changes
 
@@ -42,6 +42,8 @@ NOTE: Images are now auto-rotated to match the EXIF orientation tag. We've sugge
 ## Your packages.config and Web.config will need to be updated
 
 Check `/resizer.debug` on your website and fix all warnings.
+
+Imageflow does not use `<sizelimits imageWidth="" and imageHeight="" />`, but has its own default limits for decode and encode.
 
 
 ## V5 URL API Breaking changes

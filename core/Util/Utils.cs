@@ -293,19 +293,6 @@ namespace ImageResizer.Util
                    p.Right.ToString(NumberFormatInfo.InvariantInfo) + "," +
                    p.Bottom.ToString(NumberFormatInfo.InvariantInfo) + ")";
         }
-
-        /// <summary>
-        ///     Draws a gradient around the specified polygon. Fades from 'inner' to 'outer' over a distance of 'width' pixels.
-        /// </summary>
-        /// <param name="g"></param>
-        /// <param name="poly"></param>
-        /// <param name="inner"></param>
-        /// <param name="outer"></param>
-        /// <param name="width"></param>
-        [Obsolete("This method will be removed in V3.3. Use DropShadow.DrawOuterGradient instead")]
-        public static void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width)
-        {
-            DropShadow.DrawOuterGradient(g, poly, inner, outer, width);
-        }
+        
     }
 }
