@@ -41,11 +41,23 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="Imageflow.AllPlatforms, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>packages\Imageflow.AllPlatforms.0.8.4\lib\netstandard2.0\Imageflow.AllPlatforms.dll</HintPath>
+        </Reference>
+        <Reference Include="Imageflow.Net, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>packages\Imageflow.Net.0.8.4\lib\netstandard2.0\Imageflow.Net.dll</HintPath>
+        </Reference>
         <Reference Include="ImageResizer, Version=5.0.1.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>packages\ImageResizer.5.0.1-preview02\lib\net472\ImageResizer.dll</HintPath>
         </Reference>
+        <Reference Include="ImageResizer.Plugins.HybridCache, Version=5.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>packages\ImageResizer.Plugins.HybridCache.5.0.1-preview02\lib\net472\ImageResizer.Plugins.HybridCache.dll</HintPath>
+        </Reference>
         <Reference Include="Imazen.Common, Version=0.7.6.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>packages\Imazen.Common.0.7.6\lib\netstandard2.0\Imazen.Common.dll</HintPath>
+        </Reference>
+        <Reference Include="Imazen.HybridCache, Version=0.7.6.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>packages\Imazen.HybridCache.0.7.6\lib\netstandard2.0\Imazen.HybridCache.dll</HintPath>
         </Reference>
         <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
           <HintPath>packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
@@ -68,6 +80,9 @@
         </Reference>
         <Reference Include="Microsoft.Extensions.Primitives, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
           <HintPath>packages\Microsoft.Extensions.Primitives.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+          <HintPath>packages\Microsoft.IO.RecyclableMemoryStream.1.2.2\lib\net45\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
         </Reference>
         <Reference Include="Microsoft.Web.Infrastructure, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
           <HintPath>packages\Microsoft.Web.Infrastructure.2.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -156,6 +171,7 @@
         </Content>
         <Content Include="Global.asax" />
         <Content Include="Content\Site.css" />
+        <Content Include="imageflow.dll" />
         <Content Include="ImageResizer5_Readme.txt" />
         <Content Include="Scripts\jquery-3.6.0.js" />
         <Content Include="Web.config" />
@@ -213,7 +229,11 @@
         <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
       </PropertyGroup>
       <Error Condition="!Exists('packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets'))" />
+      <Error Condition="!Exists('packages\Imageflow.NativeRuntime.win-x86.1.7.3-rc67\build\net45\Imageflow.NativeRuntime.win-x86.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Imageflow.NativeRuntime.win-x86.1.7.3-rc67\build\net45\Imageflow.NativeRuntime.win-x86.targets'))" />
+      <Error Condition="!Exists('packages\Imageflow.NativeRuntime.win-x86_64.1.7.3-rc67\build\net45\Imageflow.NativeRuntime.win-x86_64.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Imageflow.NativeRuntime.win-x86_64.1.7.3-rc67\build\net45\Imageflow.NativeRuntime.win-x86_64.targets'))" />
     </Target>
+    <Import Project="packages\Imageflow.NativeRuntime.win-x86.1.7.3-rc67\build\net45\Imageflow.NativeRuntime.win-x86.targets" Condition="Exists('packages\Imageflow.NativeRuntime.win-x86.1.7.3-rc67\build\net45\Imageflow.NativeRuntime.win-x86.targets')" />
+    <Import Project="packages\Imageflow.NativeRuntime.win-x86_64.1.7.3-rc67\build\net45\Imageflow.NativeRuntime.win-x86_64.targets" Condition="Exists('packages\Imageflow.NativeRuntime.win-x86_64.1.7.3-rc67\build\net45\Imageflow.NativeRuntime.win-x86_64.targets')" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
