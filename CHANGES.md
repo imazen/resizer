@@ -81,6 +81,43 @@ These are not likely to impact you.
 * ImageResizer.Configuration.Performance has been refactored to use Imazen.Common, and thus some classes and interfaces are missing.
 * ImageResizer.Util.BuildDateAttribute has moved to Imazen.Common.Licensing.BuildDateAttribute
 
+## V5 Nuget Package Deprecations
+
+
+* Deprecate ImageResizer.WebConfigAsync in favor of ImageResizer.WebConfig, note that it now uses the async module anyway.
+* Deprecate ImageResizer.MvcWebConfig in favor of ImageResizer.WebConfig, note that it has been an empty redirect package since v4.
+* Deprecate ImageResizer.Mvc in favor of ImageResizer, note that it has been an empty redirect package since v4 since MVC support is included in ImageResizer.dll
+* Deprecate ImageResizer.Plugins.DiskCache in favor of ImageResizer.Plugins.HybridCache, as HybridCache has better performance, excellent cache size limiting, and the cache is located outside of the project and web root.
+* Deprecate ImageResizer.Plugins.PrettyGifs in favor of ImageResizer.Plugins.Imageflow, as it is vastly superior in terms of image quality, compression size, and runtime performance.
+* Deprecate ImageResizer.Plugins.AnimatedGifs in favor of ImageResizer.Plugins.Imageflow, as it is vastly superior in terms of image quality, compression size, and runtime performance.
+* Deprecate ImageResizer.Plugins.Watermark in favor of ImageResizer.Plugins.Imageflow, as it offers better runtime performance.
+* Deprecate ImageResizer.Plugins.SimpleFilters in favor of ImageResizer.Plugins.Imageflow, as it offers better runtime performance.
+* Deprecate ImageResizer.Plugins.WhitespaceTrimmer in favor of ImageResizer.Plugins.Imageflow, as it offers better accuracy and runtime performance.
+* Deprecate ImageResizer.Plugins.FreeImage as the underlying FreeImage library does not release updates often enough to provide good security against untrusted input files. Mark as insecure?
+* Deprecate ImageResizer.Plugins.PdfRenderer as it is no longer maintained; PDF rendering is inherently extremely difficult to keep secure due to the regular pace of security vulnerabilities in all PDF libraries and viewers. Mark as insecure?
+* Deprecate ImageResizer.Plugins.PdfiumRenderer as it is no longer maintained; PDF rendering is inherently extremely difficult to keep secure due to the regular pace of security vulnerabilities in all PDF libraries and viewers. Mark as insecure?
+* Deprecate ImageResizer.Plugins.WebP in favor of ImageResizer.Plugins.Imageflow (which has built-in support), as it works and deploys reliably. ImageResizer.Plugins.WebP is a nightmare to deploy due to webp.dll issues.
+* Deprecate ImageResizer.Plugins.AdvancedFilters in favor of ImageResizer.Plugins.Imageflow. Imageflow offers better sharpening (f.sharpen command) and auto-white balance (still a.balancewhite). Rarely used alpha features a.oilpainting, a.sobel,  a.threshold, a.canny, a.equalize, a.posterize. have been removed.
+* Deprecate ImageResizer.Plugins.TinyCache in favor of ImageResizer.Plugins.HybridCache, as HybridCache offers vastly superior performance and perfect cache size limiting.
+* Deprecate ImageResizer.Plugins.WicRenderer in favor of ImageResizer.Plugins.Imageflow, note that TIFF support is not included in Imageflow.
+* Deprecate ImageResizer.Plugins.FastScaling.x64 in favor of ImageResizer.Plugins.Imageflow as it offers superior performance and easier deployment.
+* Deprecate ImageResizer.Plugins.FastScaling.x86 in favor of ImageResizer.Plugins.Imageflow as it offers superior performance and easier deployment.
+* Deprecate ImageResizer.Plugins.SeamCarving as it is rarely used and no longer maintained.
+* Deprecate ImageResizer.Samples.Jcrop as it is rarely used and no longer maintained.
+* Deprecate ImageResizer.Plugins.Logging as it is rarely used and no longer maintained.
+* Deprecate ImageResizer.Plugins.PsdReader as it is rarely used and no longer maintained.
+* Deprecate ImageResizer.Plugins.PsdComposer as it is rarely used and no longer maintained.
+* Deprecate ImageResizer.Plugins.CloudFront as it is rarely used and no longer maintained. Consider making a config setting?
+* Deprecate ImageResizer.Plugins.BatchZipper as it is rarely used and no longer maintained.
+* Deprecate ImageResizer.Plugins.CopyMetadata as it is rarely used and no longer maintained. Consider adding to Imageflow?
+* Deprecate ImageResizer.Plugins.MongoReader as it is rarely used and no longer maintained. [vote]
+* Deprecate ImageResizer.Plugins.Faces as it is rarely used and no longer maintained. [vote]
+* Deprecate ImageResizer.Plugins.RedEye as it is rarely used and no longer maintained.[vote]
+* Deprecate ImageResizer.Plugins.FFmpeg as it is rarely used and no longer maintained. [vote]
+* Deprecate ImageResizer.Plugins.SqlReader as it is rarely used and no longer maintained. [vote]
+* Deprecate ImageResizer.Plugins.DiagnosticJson as it is rarely used and no longer maintained.
+* Deprecate ImageResizer.Plugins.AzureReader as it has been deprecated since v3
+* Deprecate ImageResizer.Plugins.FriendlyUrls as it has been deprecated since v3
 
 
 # v4-0-0
