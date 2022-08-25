@@ -16,8 +16,6 @@
         <RepositoryType>git</RepositoryType>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
         <Version Condition="'$(Version)' == ''">$(TAGGED_VERSION)</Version>
         <VersionPrefix>0.1.0</VersionPrefix>
