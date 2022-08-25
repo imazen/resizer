@@ -34,6 +34,16 @@ namespace ImageResizer.Plugins.HybridCache
         private Imazen.HybridCache.HybridCache cache;
         private HybridCacheOptions cacheOptions = new HybridCacheOptions(null);
 
+
+        private string GetLegacyDiskCachePhysicalPath(Config config)
+        {
+            var defaultDir = (HostingEnvironment.ApplicationVirtualPath?.TrimEnd('/') ?? "") + "/imagecache";
+            var dir = config.get("diskcache.dir", defaultDir);
+            dir = string.IsNullOrEmpty(dir) ? null : PathUtils.ResolveAppRelativeAssumeAppRelative(dir);
+            return !string.IsNullOrEmpty(dir) ? HostingEnvironment.MapPath(dir) : null;
+        }
+        
+        
         private void LoadSettings(Config c)
         {
             cacheOptions.DiskCacheDirectory = c.get("hybridCache.cacheLocation", cacheOptions.DiskCacheDirectory);
@@ -41,6 +51,9 @@ namespace ImageResizer.Plugins.HybridCache
             cacheOptions.DatabaseShards = c.get("hybridCache.shardCount", cacheOptions.DatabaseShards);
             cacheOptions.QueueSizeLimitInBytes = c.get("hybridCache.writeQueueLimitBytes", cacheOptions.QueueSizeLimitInBytes);
             cacheOptions.MinCleanupBytes = c.get("hybridCache.minCleanupBytes", cacheOptions.MinCleanupBytes);
+
+            var legacyCache = GetLegacyDiskCachePhysicalPath(c);
+            if (Directory.Exists(legacyCache)) throw new ApplicationException("Legacy disk cache directory found at " + legacyCache + ". Please delete this directory (to prevent unauthorized access) and restart the application.");
         }
 
         private string GetDefaultCacheLocation() {
