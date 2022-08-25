@@ -20,13 +20,16 @@
 
 Should Imageflow support &autorotate=false and &autorotate.default = false ?
 
-
+Add caching support for C# API.
 
 Figure out why imageflow.dll ends up in project roots sometimes?
 
 TODO: expose jpeg.progressive in Instructions class- Supported by Imageflow, but not GDI, WIC, or WPF
 TODO: maybe implement `dpi` - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
- 
+
+
+// ADD json endpoint in Imageflow to classify if an image is supported by the first 12 bytes
+// Add json endpoint in Imageflow to provide a cache-breaker key that changes when URL interpretation does.
 
 V5 C# API:
 
@@ -37,7 +40,7 @@ Consider dependent libraries: https://libraries.io/nuget/ImageResizer/dependents
 
 ## LATER
 
-* Make old CommitAttribute crash with informative message that V4 plugins need to be removed (nah, just log a warning)
+* Make old CommitAttribute log a warning during creation to the error output/log  
 
 * Obsolete ResizeSettings members that Imageflow doesn't support
 * Figure out AWS credential delay
@@ -61,9 +64,6 @@ https://docs.rs/native-windows-gui/1.0.1/native_windows_gui/struct.ImageDecoder.
 
 
 Fix possible regression on these
-1. Commands "ignoreicc" and "anchor" should not trigger processing alone. Autorotate should, as that has been legacy behavior.
-
-2. Core:  "scale", "stretch", "cropxunits", "cropyunits","mode" should not trigger image processing, as they are only modifier commands, and do nothing if used alone.
 
 
 

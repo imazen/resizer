@@ -17,7 +17,7 @@ NOTE: Images are now auto-rotated to match the EXIF orientation tag by default.
 * Add `<add name="Imageflow" />` to the `<resizer><plugins>` section of `Web.config` to use Imageflow.
 * The functionality from most plugins has been integrated into the core or into Imageflow, drastically simplifying maintenance for the most common features.
 * Remove references to `Wic*`, `PrettyGifs`, `AnimatedGifs`, `Watermark`, `SimpleFilters`, `WhitespaceTrimmer`, `WebP`, `AdvancedFilters`, `FastScaling.x86` and `FastScaling.x64` from **both nuget.config and Web.config**.
-* Note that Imageflow does not yet support .TIFF files. You can use the default pipeline for these, but advanced file editing and compression will not be available.
+* Note that Imageflow does not yet support .TIFF files. The default pipeline will be used for these, so advanced file editing and compression will not be available.
 
 ### DiskCache and Tiny Cache have been replaced by HybridCache
 
@@ -45,7 +45,30 @@ Check `/resizer.debug` on your website and fix all warnings.
 
 ## V5 URL API Breaking changes
 
-* The following commands **remain** supported: `mode`, `anchor`, `flip`, `sflip`,
+
+### Images are rotated using metadata
+
+Images are now rotated, by default, based on EXIF metadata from the gravity sensor in your camera/phone. We've suggested setting `<pipeline defaultCommands="autorotate.default=true"/>` for five years now, so this may not affect you.
+
+The Imageflow backend does not support &autorotate=false.
+
+### Most AdvancedFilters commands are gone (it was an alpha plugin)
+
+* Imageflow now implements `a.balancewhite`.
+* Sharpening is now done with `f.sharpen` & Imageflow, not `a.sharpen`, and `a.sharpen` is ignored. We don't map the command since they produce different results.
+* Blurring and noise removal are not yet supported, so `a.removenoise` and `a.blur` are ignored.
+* `a.oilpainting`, `a.sobel`,  `a.threshold`, `a.canny`, `a.equalize`, `a.posterize` are gone.
+
+### Imageflow will not be used in niche cases
+The default GDI pipeline will be used (thus disabling file optimization, filters, and other Imageflow features) under the following conditions:
+* `&rotate` values other than 0, 90, 180, 270 (or another multiple of 90) are used.
+* The input file has a .tiff, .tff, .tif, or .bmp extension (Imageflow does not support TIFF and BMP formats, yet).
+* `&frame=x` is used to select a frame from an animated GIF.
+* `paddingWidth`, `paddingHeight`, `margin`, `borderWidth`, `borderColor` or `paddingColor` are used (obsolete, we have good CSS now). `&bgcolor=AARRGGBB` is still supported, of course.
+
+
+### Imageflow supports nearly everything:
+`mode`, `anchor`, `flip`, `sflip`,
   `quality`, `zoom`, `dpr`, `crop`, `cropxunits`, `cropyunits`,
   `w`, `h`, `width`, `height`, `maxwidth`, `maxheight`, `format`,
   `srotate`, `rotate`, `stretch`, `webp.lossless`, `webp.quality`,
@@ -55,24 +78,7 @@ Check `/resizer.debug` on your website and fix all warnings.
   `trim.threshold`, `trim.percentpadding`, `a.balancewhite`,  `jpeg.progressive`,
   `decoder.min_precise_scaling_ratio`, `scale`, `preset`, `s.roundcorners`, `ignoreicc`
 
-* With the Imageflow backend, images are always auto-rotated based on Exif information, so `autorotate` is ignored.
-  This is a breaking change from ImageResizer 4.x where images are not autorotated by default. TODO: change the default backend also.
-* Images can only be rotated in 90 degree intervals, so `rotate` is partially supported.
-* Imageflow is not used for TIFF files, which limits the available commands for TIFF source files.  
-* AnimatedGifs will remain animated if Imageflow is installed, ignoring `frame=x`
-
-* Adding arbitrary margins, padding, and borders to images is obsolete, so
-  `paddingwidth`, `paddingheight`, `margin`
-  `borderwidth`, `bordercolor` and `paddingcolor` are now ignored.
-
-* [MAYBE] Caching, processing, and encoders/builders/decoders are not configurable via the querystring,
-  so `cache`, `process`, `encoder`, `decoder`, and `builder` are ignored.
-* Sharpening is now done with `f.sharpen`, not `a.sharpen`, and `a.sharpen` is ignored. We don't map the command since they produce different results.
-* Noise removal is not yet supported, so `a.removenoise` is ignored.
-* Blurring is not yet supported, so `a.blur` is ignored.
-* [MAYBE] 404 redirects are not implemented, so `404` is ignored.
-
-Things you would expect to be gone:
+### Things you would expect to be gone:
 
 * Gradient plugin is gone, along with &color1,color2, angle commands
 * DropShadow plugin and associated &shadow* commands
@@ -84,6 +90,16 @@ Things you would expect to be gone:
   auto white balance now). This removed a.oilpainting, a.sobel,  a.threshold, a.canny, a.equalize, a.posterize. You can still use `a.balancewhite`
 * &memcache is gone, it's not a great idea in the first place and never exited pre-alpha
 * With Imageflow, Jpeg subsampling is auto-selected by chroma evaluation, so `subsampling` is ignored (it's also not supported in GDI)
+
+
+
+
+
+
+[MAYBE] Caching, processing, and encoders/builders/decoders might not be configurable via the querystring,
+so `cache`, `process`, `encoder`, `decoder`, and `builder` may or may not be ignored (this has implications for denial of service surface area).
+
+
 
 ## V5 C# API breaking changes:
 

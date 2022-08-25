@@ -160,15 +160,44 @@ namespace ImageResizer.Plugins.Imageflow
 
             var weCanOutputThis = job.Dest is Stream || job.Dest is string;
             if (!weCanOutputThis) return RequestedAction.None;
-            
-            //Imageflow doesn't support TIFF files, so use the default builder.
+     
+            //Imageflow doesn't support TIFF OR BMP files, so use the default builder.
             if (job.SourcePathData != null &&
                 (job.SourcePathData.EndsWith(".tif", StringComparison.OrdinalIgnoreCase) ||
-                 job.SourcePathData.EndsWith(".tiff", StringComparison.OrdinalIgnoreCase)))
+                 job.SourcePathData.EndsWith(".tiff", StringComparison.OrdinalIgnoreCase) ||
+                 job.SourcePathData.EndsWith(".tff", StringComparison.OrdinalIgnoreCase) ||
+                 job.SourcePathData.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase)))
             {
                 return RequestedAction.None;
             }
+            //Imageflow doesn't support certain other querystring commands, so use the default builder for those, also
+            var integerCommands = new[] { "paddingWidth", "paddingHeight", "margin", "borderWidth" };
 
+            var usesBordersOrPadding = integerCommands
+                .Select(key => job.Instructions[key])
+                .Where(val => !string.IsNullOrWhiteSpace(val))
+                .Any(val => int.TryParse(val, out var intVal) && intVal > 0);
+            
+            
+            if (usesBordersOrPadding) return RequestedAction.None;
+
+            //Imageflow doesn't support rotation except in intervals of 90.
+            var rotationAngle = job.Instructions["rotate"];
+            if (!string.IsNullOrWhiteSpace(rotationAngle))
+            {
+                if (int.TryParse(job.Instructions["rotate"], out var degrees) && degrees % 90 != 0)
+                    return RequestedAction.None;
+            } 
+            //Imageflow doesn't support GIF frame selection
+            if (!string.IsNullOrWhiteSpace(job.Instructions["frame"]))
+            {
+                return RequestedAction.None;
+            }
+            //Imageflow doesn't support paddingColor, just &bgcolor
+            if (!string.IsNullOrWhiteSpace(job.Instructions["paddingColor"]))
+            {
+                return RequestedAction.None;
+            }
 
             // Acquire the stream and handle its disposal and position as requested.
             Stream s = null;
@@ -218,15 +247,19 @@ namespace ImageResizer.Plugins.Imageflow
         
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new[] {"mode", "anchor", "flip", "sflip",
-                "quality", "zoom", "dpr", "crop", "cropxunits", "cropyunits",
+            //Some commands are only modifier commands, and shouldn't trigger processing without other commands present.
+            // return new[] {"mode", "anchor",  "cropxunits", "cropyunits", "stretch", 
+            //     "down.colorspace","up.colorspace","jpeg_idct_downscale_linear", 
+            //     "decoder.min_precise_scaling_ratio", "scale",  "ignoreicc" };
+
+            return new[] { "flip", "sflip",
+                "quality", "zoom", "dpr", "crop", 
                 "w", "h", "width", "height", "maxwidth", "maxheight", "format",
-                "srotate", "rotate", "stretch", "webp.lossless", "webp.quality",
-                "f.sharpen", "f.sharpen_when", "down.colorspace", "bgcolor", 
-                "jpeg_idct_downscale_linear", "watermark", "s.invert", "s.sepia", 
+                "srotate", "rotate",  "webp.lossless", "webp.quality",
+                "watermark", "s.invert", "s.sepia", 
                 "s.grayscale", "s.alpha", "s.brightness", "s.contrast", "s.saturation", 
                 "trim.threshold", "trim.percentpadding", "a.balancewhite",  "jpeg.progressive",
-                "decoder.min_precise_scaling_ratio", "scale", "preset", "s.roundcorners", "ignoreicc" };
+                "preset", "s.roundcorners"};
         }
     }
 }
