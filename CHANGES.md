@@ -1,24 +1,49 @@
 # v5-0-0
 
-## ImageResizer 5.0 Breaking changes
+## ImageResizer 5.0 has breaking changes
 
-### .NET Framework 4.7.2 or 4.8 is now required
+NOTE: Enable `prerelase` in NuGet to get 5.0 binaries until a stable version is released.
 
-- This allows us to update our dependencies to the latest, safest versions. 
-- The functionality from most plugins has been integrated into the core or into Imageflow, drastically simplifying maintenance for the most common features
+NOTE: All ImageResizer.* packages must have the same version number. If no update is available, remove the plugin.
 
-## Web.config will need to be updated
+### .NET Framework 4.7.2 or higher is now required
 
-Check /resizer.debug on your website.
+* This allows us to update our dependencies to the latest, safest versions.
 
-Most commonly used features have been moved into ImageResizer.Plugins.Imageflow or ImageResizer itself.
-As such, many plugins no longer need to be added. 
+### Most plugins have been merged into the core or ImageResizer.Plugins.Imageflow
+* `Install-Package ImageResizer.Plugins.Imageflow`
+* Add `<add name="Imageflow" />` to the `<resizer><plugins>` section of `Web.config` to use Imageflow.
+* The functionality from most plugins has been integrated into the core or into Imageflow, drastically simplifying maintenance for the most common features.
+* Remove references to `Wic*`, `PrettyGifs`, `AnimatedGifs`, `Watermark`, `SimpleFilters`, `WhitespaceTrimmer`, `WebP`, `AdvancedFilters`, `FastScaling.x86` and `FastScaling.x64` from **both nuget.config and Web.config**.
+* Note that Imageflow does not yet support .TIFF files. You can use the default pipeline for these, but advanced file editing and compression will not be available.
 
-[todo]
+### DiskCache and Tiny Cache have been replaced by HybridCache
+
+* **Delete your `/imagecache/` folder (otherwise it will become publicly accessible!!!)**
+* Delete references to `DiskCache` and `TinyCache` from **both nuget.config and Web.config**
+* `Install-Package ImageResizer.Plugins.HybridCache`
+* Put `<add name="HybridCache" />` in the `<resizer><plugins>` section of `Web.config`
+* Put `<hybridCache cacheLocation="C:\imageresizercache\" cacheMaxSizeBytes="1,000,000,000" />` in the `<resizer>` section of `Web.config`. If you want to use a temp folder, omit cacheLocation.
+* HybridCache requires a cache folder outside of the web root. DiskCache did not support that.
+* HybridCache, unlike DiskCache, can precisely limit the cache size & disk utilization. 
+* HybridCache uses a write-ahead log to prevent orphaned cache entries.
+* HybridCache can store the associated mime-type for cached files.
+
+### We've dropped some unmaintainable or unpopular plugins
+* `PdfRenderer` and `PdfiumRenderer` -  PDF rendering is inherently extremely difficult to keep secure due to the regular pace of security vulnerabilities in all PDF libraries and viewers. In practice, users do not seem to keep the underlying third party libraries patched.
+* `FreeImage` as the underlying FreeImage library does not release updates often enough to provide good security against untrusted input files.
+* `FFmpeg`, as users do not seem to keep the third party tool (ffmpeg.exe) patched.
+* The `JCrop`, `Logging`, `DropShadow`, `Gradient`, `PsdReader`, `PsdCompose`, `CloudFront`, `BatchZipper`, `CopyMetadata`, `Faces`, `RedEye`,  `SqlReader` and `DiagnosticJson` plugins don't seem to have enough use to justify the large continued maintenance cost.
+* If you find one of these essential, please open a [Github Issue](https://github.com/imazen/resizer/issues) so that other can vote on its utility.
+
+## Your packages.config and Web.config will need to be updated
+
+Check `/resizer.debug` on your website and fix all warnings.
+
 
 ## V5 URL API Breaking changes
 
-* The following commands are supported: `mode`, `anchor`, `flip`, `sflip`,
+* The following commands **remain** supported: `mode`, `anchor`, `flip`, `sflip`,
   `quality`, `zoom`, `dpr`, `crop`, `cropxunits`, `cropyunits`,
   `w`, `h`, `width`, `height`, `maxwidth`, `maxheight`, `format`,
   `srotate`, `rotate`, `stretch`, `webp.lossless`, `webp.quality`,
@@ -26,29 +51,29 @@ As such, many plugins no longer need to be added.
   `jpeg_idct_downscale_linear`, `watermark`, `s.invert`, `s.sepia`,
   `s.grayscale`, `s.alpha`, `s.brightness`, `s.contrast`, `s.saturation`,
   `trim.threshold`, `trim.percentpadding`, `a.balancewhite`,  `jpeg.progressive`,
-  `decoder.min_precise_scaling_ratio`, `scale`, `preset`, `s.roundcorners`, 'ignoreicc'
+  `decoder.min_precise_scaling_ratio`, `scale`, `preset`, `s.roundcorners`, `ignoreicc`
 
 * With the Imageflow backend, images are always auto-rotated based on Exif information, so `autorotate` is ignored.
-  This is a breaking change from ImageResizer 4.x where images are not autorotated by default.
+  This is a breaking change from ImageResizer 4.x where images are not autorotated by default. TODO: change the default backend also.
 * Images can only be rotated in 90 degree intervals, so `rotate` is partially supported.
-* TIFF files are not supported in Imageflow, so `page=x` is not supported.
-* Animated GIFs are fully supported in Imageflow, so `frame=x` is not useful/ignored.
+* Imageflow is not used for TIFF files, which limits the available commands for TIFF source files.  
+* AnimatedGifs will remain animated if Imageflow is installed, ignoring `frame=x`
 
 * Adding arbitrary margins, padding, and borders to images is obsolete, so
   `paddingwidth`, `paddingheight`, `margin`
   `borderwidth`, `bordercolor` and `paddingcolor` are now ignored.
 
-* Caching, processing, and encoders/builders/decoders are not configurable via the querystring,
+* [MAYBE] Caching, processing, and encoders/builders/decoders are not configurable via the querystring,
   so `cache`, `process`, `encoder`, `decoder`, and `builder` are ignored.
-* Sharpening is now done with `f.sharpen`, not `a.sharpen`, and `a.sharpen` is ignored.
+* Sharpening is now done with `f.sharpen`, not `a.sharpen`, and `a.sharpen` is ignored. We don't map the command since they produce different results.
 * Noise removal is not yet supported, so `a.removenoise` is ignored.
 * Blurring is not yet supported, so `a.blur` is ignored.
-* 404 redirects are not implemented, so `404` is ignored.
+* [MAYBE] 404 redirects are not implemented, so `404` is ignored.
 
 Things you would expect to be gone:
 
 * Gradient plugin is gone, along with &color1,color2, angle commands
-* DropShadow plugin and assocated &shadow* commands
+* DropShadow plugin and associated &shadow* commands
 * Some plugins have been deprecated for a decade and their commands are gone, such as &speed from SpeedOrQuality
 * Undocumented commands like preservePalette are gone
 * PrettyGifs is gone (Imageflow does 1000x better), along with &dither, &colors, and &preservePalette
@@ -83,6 +108,7 @@ These are not likely to impact you.
 
 ## V5 Nuget Package Deprecations
 
+The following V4 packages will eventually be deprecated on Nuget.org.
 
 * Deprecate ImageResizer.WebConfigAsync in favor of ImageResizer.WebConfig, note that it now uses the async module anyway.
 * Deprecate ImageResizer.MvcWebConfig in favor of ImageResizer.WebConfig, note that it has been an empty redirect package since v4.

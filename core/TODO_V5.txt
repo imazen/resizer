@@ -2,6 +2,9 @@
 ## Todo for V5
 
 * Etags
+* CropAround
+* Switch between builders depending on querystring keys used in the url.
+
 * HybridCache disposal
 * Optimize file serving with and without cache.
 * Good default etags and cache control headers.
@@ -52,6 +55,8 @@ Imageflow needs to be able to shrink watermarks to pixel widths/heights?
 Add source file caching support in HybridCache. And perhaps mem caching.
 
 Figure out &cache=no dilemma.
+
+Vary the cache key by the set of builders installed.
 
 Add WIC support in Imageflow
 https://docs.rs/native-windows-gui/1.0.1/native_windows_gui/struct.ImageDecoder.html
