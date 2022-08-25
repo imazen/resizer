@@ -12,8 +12,10 @@ This plugin only works with the URL API, not the managed API.
 
 1. ` PM> Install-Package ImageResizer.Plugins.HybridCache `
 2. In the `<resizer><plugins>` section of `Web.config`, insert `<add name="HybridCache" />`.
-3. In the `<resizer>` section of Web.config, insert <br />
+3. (optional) In the `<resizer>` section of Web.config, insert <br />
    `<hybridCache cacheLocation="C:\imageresizercache\" cacheMaxSizeBytes="1,000,000,000" />`.
+
+
 
 ## Notes
 
@@ -34,3 +36,20 @@ This plugin only works with the URL API, not the managed API.
 * HybridCache, unlike DiskCache, can precisely limit the cache size & disk utilization.
 * HybridCache uses a write-ahead log to prevent orphaned cache entries.
 * HybridCache can store the associated mime-type for cached files.
+
+
+### The type 'System.Object' is defined in an assembly that is not referenced. You must add a reference to assembly 'netstandard, Version=2.0.0.0,
+
+If you get this error, add `<add assembly="netstandard, Version=2.0.0.0, Culture=neutral,
+PublicKeyToken=cc7b13ffcd2ddd51"/>` to `<system.web><compilation><assemblies>` in web.config.
+
+Example:
+```
+<system.web>
+<compilation debug="true" targetFramework="4.8" >
+    <assemblies>
+        <add assembly="netstandard, Version=2.0.0.0, Culture=neutral,
+        PublicKeyToken=cc7b13ffcd2ddd51"/>
+    </assemblies>
+</compilation>
+```
