@@ -17,8 +17,20 @@ This plugin only works with the URL API, not the managed API.
 
 ## Notes
 
-* `<hybridCache cacheLocation="C:\imageresizercache\"/>` defaults to a app-unique subfolder of the IIS user account's temp folder.
+* `<hybridCache cacheLocation="C:\imageresizercache\"/>` defaults to a app-unique subfolder of the IIS user account's temp folder. Cannot be located in the project or a web-accessible folder.
 * `<hybridCache cacheMaxSizeBytes=""1,000,000,000" />` is in bytes and cannot be set below 9MB (9,000,000) or no files will be cached. 1GiB is the suggested minimum.
 * `<hybridCache databaseShards="8" />` adjust the number of shards (and write ahead log groups) in the database. Delete the cache folder after changing this number. Don't change this number unless directed by support.
 * `<hybridCache queueSizeLimitInBytes="100,000,000" />` limits how much RAM can be used by the asynchronous write queue before making requests wait for caching writing to complete. (HybridCache writes cache entries in the background to improve latency). 100MB is the default and suggested minimum.
 * `<hybridCache.minCleanupBytes="1,000,000" />` determines the minimum amount of bytes to evict from the cache once a cleanup is triggered. 1MB is the default and suggested minimum.
+
+## Migrating from DiskCache or TinyCache
+
+* **Delete your `/imagecache/` folder (otherwise it will become publicly accessible!!!)** (Actually, if installed, HybridCache will kill the application with an error message to prevent that - for all we know you resize images of passwords and have directory listing enabled)
+* Delete references to `DiskCache` and `TinyCache` from **both nuget.config and Web.config**
+* `Install-Package ImageResizer.Plugins.HybridCache`
+* Put `<add name="HybridCache" />` in the `<resizer><plugins>` section of `Web.config`
+* Put `<hybridCache cacheLocation="C:\imageresizercache\" cacheMaxSizeBytes="1,000,000,000" />` in the `<resizer>` section of `Web.config`. If you want to use a temp folder, omit cacheLocation.
+* HybridCache requires a cache folder outside of the web root. DiskCache did not support that.
+* HybridCache, unlike DiskCache, can precisely limit the cache size & disk utilization.
+* HybridCache uses a write-ahead log to prevent orphaned cache entries.
+* HybridCache can store the associated mime-type for cached files.
