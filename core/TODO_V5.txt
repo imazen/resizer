@@ -8,7 +8,6 @@
 * HybridCache disposal
 * Optimize file serving with and without cache.
 * Good default etags and cache control headers.
-* Improve migration tips in CHANGES>md
 * Create watermark system with web.config support
 * Update /resizer.debug to guide removal of old plugins and migration to new
 * Figure out IResponseArgs support in async context
@@ -17,10 +16,9 @@
 * Add support for caching source blobs under certain circumstances
 * Auto-select builder based on unsupported command keys (and maybe watermarks)
 * Address weakness in letting cache=no and process=no happen from querystring; 
-* Add fatal error if HybridCache folder is inside the web root.
 
 
-
+Should Imageflow support &autorotate=false and &autorotate.default = false ?
 
 
 
@@ -29,7 +27,6 @@ Figure out why imageflow.dll ends up in project roots sometimes?
 TODO: expose jpeg.progressive in Instructions class- Supported by Imageflow, but not GDI, WIC, or WPF
 TODO: maybe implement `dpi` - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
  
-
 
 V5 C# API:
 
@@ -40,15 +37,16 @@ Consider dependent libraries: https://libraries.io/nuget/ImageResizer/dependents
 
 ## LATER
 
-* Make v4 packages not permit v5 ImageResizer.dll?
-* Create migration guide
-* Make old CommitAttribute crash with informative message that V4 plugins need to be removed.
+* Make old CommitAttribute crash with informative message that V4 plugins need to be removed (nah, just log a warning)
+
 * Obsolete ResizeSettings members that Imageflow doesn't support
 * Figure out AWS credential delay
 * Figure out graceful shutdown for HybridCache (Dispose on httpmodule?)
 * Integrate licensing from Imazen.Common and migrate just the enforcer tests. Add Edition metadata or API call during new()
 * And maybe GUID for COM? Check V4 API texts for old values [assembly: System.Runtime.InteropServices.Guid("8edaeb47-7067-4c77-aa1b-ffbeeab5e81d")]
 * Document cache control
+
+TODO: Get rid of ImageResizer's encoding namespace
 
 Imageflow needs to be able to shrink watermarks to pixel widths/heights?
 
