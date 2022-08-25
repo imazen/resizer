@@ -160,6 +160,14 @@ namespace ImageResizer.Plugins.Imageflow
 
             var weCanOutputThis = job.Dest is Stream || job.Dest is string;
             if (!weCanOutputThis) return RequestedAction.None;
+            
+            //Imageflow doesn't support TIFF files, so use the default builder.
+            if (job.SourcePathData != null &&
+                (job.SourcePathData.EndsWith(".tif", StringComparison.OrdinalIgnoreCase) ||
+                 job.SourcePathData.EndsWith(".tiff", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RequestedAction.None;
+            }
 
 
             // Acquire the stream and handle its disposal and position as requested.
@@ -180,6 +188,22 @@ namespace ImageResizer.Plugins.Imageflow
 
                 //Save the original stream position
                 originalPosition = restoreStreamPosition ? s.Position : -1;
+
+                //TODO: magic byte detection would be better; but we can't transfer the stream to the other builder
+                // if (s.CanSeek)
+                // {
+                //     //TODO use await
+                //
+                //     var first12 = new byte[12];
+                //     var bytesRead = s.Read(first12, 0, 12);
+                //     s.Seek(0, SeekOrigin.Begin);
+                //     if (bytesRead >= 12)
+                //     {
+                //         var type = new Imazen.Common.FileTypeDetection.FileTypeDetector().GuessMimeType(first12);
+                //         if (type == "image/tiff") return RequestedAction.None;
+                //     }
+                //     
+                // }
 
                 DoJobWithImageflow(s, job);
                 return RequestedAction.Cancel;
