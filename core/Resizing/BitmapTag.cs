@@ -8,6 +8,8 @@ using System.IO;
 namespace ImageResizer.Resizing
 {
     /// <summary>
+    /// Contains Path and Stream information so both can be stored in Bitmap.Tag.
+    /// If a stream is garbage collected before the Bitmap that uses it, stuff will crash.
     /// </summary>
     public class BitmapTag
     {
