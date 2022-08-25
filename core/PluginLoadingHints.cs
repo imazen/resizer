@@ -50,8 +50,12 @@ namespace ImageResizer.Configuration
 
         private void LoadHints()
         {
-            
             AddHint("Imageflow", "ImageResizer.Plugins.Imageflow.ImageflowBackendPlugin, ImageResizer.Plugins.Imageflow");
+            AddHint("AzureReader2", "ImageResizer.Plugins.AzureReader2.AzureReader2Plugin, ImageResizer.Plugins.AzureReader2");
+            AddHint("S3Reader2", "ImageResizer.Plugins.S3Reader2.S3Reader2Plugin, ImageResizer.Plugins.S3Reader2");
+            AddHint("HybridCache", "ImageResizer.Plugins.HybridCache.HybridCachePlugin, ImageResizer.Plugins.HybridCache");
+            AddHint("RemoteReader", "ImageResizer.Plugins.RemoteReader.RemoteReaderPlugin, ImageResizer.Plugins.RemoteReader");
+
 
             //All plugins found in ImageResizer.dll under the ImageResizer.Plugins.Basic namespace
             foreach (var basic in new[]
@@ -95,7 +99,8 @@ namespace ImageResizer.Configuration
 
             //Etags is in CustomOverlay still
             AddHint("Etags", "ImageResizer.Plugins.Etags.EtagsPlugin, ImageResizer.Plugins.CustomOverlay");
-
+            
+            
             //CropAround is inside Faces
             AddHint("CropAround", "ImageResizer.Plugins.CropAround.CropAroundPlugin, ImageResizer.Plugins.Faces");
 
