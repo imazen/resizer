@@ -3,11 +3,14 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
 
-namespace ImageResizer.Encoding
+using System;
+
+namespace ImageResizer.Plugins
 {
     /// <summary>
     ///     A provider (or selector) of IEncoder instances.
     /// </summary>
+    [Obsolete("Cannot be used with Imageflow backend; relies on GDI Image object")]
     public interface IEncoderProvider
     {
         /// <summary>

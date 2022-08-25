@@ -3,15 +3,17 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
 
+using System;
 using System.Drawing;
 using System.IO;
 
-namespace ImageResizer.Encoding
+namespace ImageResizer.Plugins
 {
     /// <summary>
     ///     An image encoder. Exposes methods for suitability checking, encoding, transparency compatibility checking, and
     ///     mime-type/extension calculation.
     /// </summary>
+    [Obsolete("Cannot be used with Imageflow backend; relies on GDI Image object")]
     public interface IEncoder
     {
         /// <summary>

@@ -17,7 +17,6 @@ using ImageResizer.Collections;
 using Imazen.Common.Issues;
 using ImageResizer.Configuration.Logging;
 using ImageResizer.Configuration.Plugins;
-using ImageResizer.Encoding;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;

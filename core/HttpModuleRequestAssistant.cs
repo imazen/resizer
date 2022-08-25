@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Web;
 using System.Web.Hosting;
 using ImageResizer.Configuration.Performance;
-using ImageResizer.Encoding;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;

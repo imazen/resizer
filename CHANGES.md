@@ -6,7 +6,8 @@ NOTE: Enable `prerelase` in NuGet to get 5.0 binaries until a stable version is 
 
 NOTE: All ImageResizer.* packages must have the same version number. If no update is available, remove the plugin. Some ImageResizer.* packages are from third parties and may cause runtime issues; verify the package owner includes "imazen".
 
-NOTE: Images are now auto-rotated to match the EXIF orientation tag by default.
+NOTE: Images are now auto-rotated to match the EXIF orientation tag. We've suggested setting `<pipeline defaultCommands="autorotate.default=true"/>` for five years now, so this may not affect you if so.
+
 
 ### .NET Framework 4.7.2 or higher is now required
 
@@ -50,7 +51,7 @@ Check `/resizer.debug` on your website and fix all warnings.
 
 Images are now rotated, by default, based on EXIF metadata from the gravity sensor in your camera/phone. We've suggested setting `<pipeline defaultCommands="autorotate.default=true"/>` for five years now, so this may not affect you.
 
-The Imageflow backend does not support &autorotate=false.
+The Imageflow backend does not support &autorotate=false, images are always rotated.
 
 ### Most AdvancedFilters commands are gone (it was an alpha plugin)
 
@@ -59,7 +60,7 @@ The Imageflow backend does not support &autorotate=false.
 * Blurring and noise removal are not yet supported, so `a.removenoise` and `a.blur` are ignored.
 * `a.oilpainting`, `a.sobel`,  `a.threshold`, `a.canny`, `a.equalize`, `a.posterize` are gone.
 
-### Imageflow will not be used in niche cases
+### Imageflow backend will not be used in niche cases
 The default GDI pipeline will be used (thus disabling file optimization, filters, and other Imageflow features) under the following conditions:
 * `&rotate` values other than 0, 90, 180, 270 (or another multiple of 90) are used.
 * The input file has a .tiff, .tff, .tif, or .bmp extension (Imageflow does not support TIFF and BMP formats, yet).
@@ -92,15 +93,6 @@ The default GDI pipeline will be used (thus disabling file optimization, filters
 * With Imageflow, Jpeg subsampling is auto-selected by chroma evaluation, so `subsampling` is ignored (it's also not supported in GDI)
 
 
-
-
-
-
-[MAYBE] Caching, processing, and encoders/builders/decoders might not be configurable via the querystring,
-so `cache`, `process`, `encoder`, `decoder`, and `builder` may or may not be ignored (this has implications for denial of service surface area).
-
-
-
 ## V5 C# API breaking changes:
 
 These are not likely to impact you.
@@ -123,6 +115,7 @@ These are not likely to impact you.
 * ImageResizer.InterceptModule has been replaced by AsyncInterceptModule (and inherits from it for web.config compat). This means all those protected methods have vanished.
 * ImageResizer.Configuration.Performance has been refactored to use Imazen.Common, and thus some classes and interfaces are missing.
 * ImageResizer.Util.BuildDateAttribute has moved to Imazen.Common.Licensing.BuildDateAttribute
+* ImageResizer.Encoding.IEncoder and .IEncoderProvider have been moved to the ImageResizer.Plugins namespace and marked obsolete.
 
 ## V5 Nuget Package Deprecations
 

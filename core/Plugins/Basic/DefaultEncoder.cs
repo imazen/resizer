@@ -10,7 +10,6 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using ImageResizer.Configuration;
-using ImageResizer.Encoding;
 using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.Basic

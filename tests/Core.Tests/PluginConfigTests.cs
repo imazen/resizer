@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using ImageResizer.Configuration;
 using Imazen.Common.Issues;
-using ImageResizer.Encoding;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.PluginB;
