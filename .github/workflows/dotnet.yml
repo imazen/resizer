@@ -76,12 +76,14 @@ jobs:
           
       # NOT uploading .zip to github... yet
 
-      - name: Publish nuget packages to MyGet if a prerelease
-        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable != 'true'
+      - name: Publish nuget packages to MyGet
+        #&& steps.version.outputs.is_stable != 'true'
+        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' 
         run: |
           dotnet nuget push uploading\*.nupkg --skip-duplicate --api-key ${{ secrets.MYGET_KEY }}  --source "mygetimazen"
 
-      - name: Publish nuget packages to Nuget.org if a stable release
-        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release' && steps.version.outputs.is_stable == 'true'
+      - name: Publish nuget packages to Nuget.org
+        # && steps.version.outputs.is_stable == 'true'
+        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
         run: |
           dotnet nuget push uploading\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}  --source nuget.org
