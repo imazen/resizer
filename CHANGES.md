@@ -4,7 +4,9 @@
 
 NOTE: Enable `prerelase` in NuGet to get 5.0 binaries until a stable version is released.
 
-NOTE: All ImageResizer.* packages must have the same version number. If no update is available, remove the plugin.
+NOTE: All ImageResizer.* packages must have the same version number. If no update is available, remove the plugin. Some ImageResizer.* packages are from third parties and may cause runtime issues; verify the package owner includes "imazen".
+
+NOTE: Images are now auto-rotated to match the EXIF orientation tag by default.
 
 ### .NET Framework 4.7.2 or higher is now required
 

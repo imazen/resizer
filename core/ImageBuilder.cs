@@ -980,7 +980,7 @@ namespace ImageResizer
 
         protected override RequestedAction PostDecodeStream(ref Bitmap b, ResizeSettings settings)
         {
-            var autorotate = settings.Get<bool>("autorotate", settings.Get<bool>("autorotate.default", false));
+            var autorotate = settings.Get<bool>("autorotate", settings.Get<bool>("autorotate.default", true));
 
             if (!autorotate) return RequestedAction.None;
 
