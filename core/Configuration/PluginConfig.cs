@@ -304,6 +304,14 @@ namespace ImageResizer.Configuration
         public SafeList<ISettingsModifier> SettingsModifierPlugins => settingsModifierPlugins;
 
 
+        private SafeList<IPluginModifiesRequestCacheKey> modifiesRequestCacheKeyPlugins = null;
+
+        /// <summary>
+        ///     Plugins which modify image processing settings.
+        /// </summary>
+        public SafeList<IPluginModifiesRequestCacheKey> ModifiesRequestCacheKeyPlugins => modifiesRequestCacheKeyPlugins;
+
+            
         protected SafeList<IPlugin> allPlugins = null;
 
         /// <summary>
@@ -757,7 +765,9 @@ namespace ImageResizer.Configuration
             if (plugin is ICurrentConfigProvider) ConfigProviders.Remove(plugin as ICurrentConfigProvider);
             if (plugin is ILogManager && LogManager == plugin) LogManager = null;
             if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensePluginsChange();
+            if (plugin is IPluginModifiesRequestCacheKey)  ModifiesRequestCacheKeyPlugins.Remove(plugin as IPluginModifiesRequestCacheKey);
         }
+        
 
         /// <summary>
         ///     Only for use by plugins during IPlugin.Install. Call Plugin.Install instead of this method, since plugins often
@@ -792,6 +802,8 @@ namespace ImageResizer.Configuration
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Add(plugin as IVirtualImageProvider);
             if (plugin is ISettingsModifier) SettingsModifierPlugins.Add(plugin as ISettingsModifier);
             if (plugin is ICurrentConfigProvider) ConfigProviders.Add(plugin as ICurrentConfigProvider);
+            if (plugin is IPluginModifiesRequestCacheKey)
+                ModifiesRequestCacheKeyPlugins.Add(plugin as IPluginModifiesRequestCacheKey);
             if (plugin is ILogManager) LogManager = plugin as ILogManager;
             if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensePluginsChange();
         }
@@ -809,7 +821,7 @@ namespace ImageResizer.Configuration
             var collections = new IList[]
             {
                 AllPlugins.GetCollection(), QuerystringPlugins.GetCollection(), FileExtensionPlugins.GetCollection(),
-                CachingSystems.GetCollection(), ImageEncoders.GetCollection(), ImageBuilderExtensions.GetCollection()
+                CachingSystems.GetCollection(), ImageEncoders.GetCollection(), ImageBuilderExtensions.GetCollection(),
             };
             //Then check all collections, logging an issue if they aren't empty.
             foreach (var coll in collections)
@@ -900,6 +912,7 @@ namespace ImageResizer.Configuration
         /// </summary>
         public LicenseErrorAction LicenseError { get; set; } = LicenseErrorAction.Watermark;
 
+        
         private ConcurrentDictionary<string, string> mappedDomains;
 
         /// <summary>

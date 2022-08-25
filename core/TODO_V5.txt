@@ -1,14 +1,13 @@
 ﻿
 ## TODO NOW for v5
 
-* Etags
-* Optimize file serving with and without cache.
-* Good default etags and cache control headers.
-* Document cache control
+* Add etag support, good default cache control, optimize file serving with and without cache installed.
+
+## TODO LATER for v5
+
 * Update /resizer.debug to guide removal of old plugins and migration to new
 * Check if events work for async
-* Address weakness in letting cache=no and process=no happen from querystring; 
-* Vary the cache key by the set of builders installed and the Imageflow cache breaker
+
 * Integrate licensing from Imazen.Common and migrate just the enforcer tests. Add Edition metadata or API call during new()
 * Unify SizeLimiting with Imageflow and GDI backends.
 
@@ -19,8 +18,7 @@
 * Figure out IResponseArgs support in async context
 * Unify storage providers and add support for proxying static non-image files 
 * Add support for caching source blobs under certain circumstances
-* Get rid of ImageResizer's encoding namespace, it conflicts
-* Figure out &cache=no dilemma.
+* Figure out ideal &cache=no/disk/mem behavior
 
 ## LATER
 
@@ -29,11 +27,12 @@
 * And maybe GUID for COM? Check V4 API texts for old values [assembly: System.Runtime.InteropServices.Guid("8edaeb47-7067-4c77-aa1b-ffbeeab5e81d")]
 
 
-# IN ImageResizer V6:
+# TODO IN ImageResizer V6:
 
 * Add a unified API for configuring both IDNS and IR. And a unified async blob provider api with support for arbitrary files, relay, source caching, etc.
 * Add source file caching support in HybridCache. And perhaps mem caching.
 * Add caching support for C# API. 
+* Maybe add Request.Filter option
 * [MAYBE] Caching, processing, and encoders/builders/decoders might not be configurable via the querystring,
   so `cache`, `process`, `encoder`, `decoder`, and `builder` may or may not be ignored (this has implications for denial of service surface area).
 * Revisit file extension support, mime type handling on non-images.

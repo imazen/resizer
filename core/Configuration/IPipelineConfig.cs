@@ -34,7 +34,7 @@ namespace ImageResizer.Configuration
 
     public delegate void HeartbeatHandler(IPipelineConfig sender, Config c);
 
-    public interface IPipelineConfig : IVirtualImageProvider
+    public interface IPipelineConfig : IVirtualImageProvider, IPluginModifiesRequestCacheKey
     {
         /// <summary>
         ///     True if the specified extension is one that the pipeline can handle

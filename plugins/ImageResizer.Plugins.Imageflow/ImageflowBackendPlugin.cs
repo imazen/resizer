@@ -11,8 +11,14 @@ using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.Imageflow
 {
-    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin, IQuerystringPlugin
+    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin, IQuerystringPlugin, IPluginModifiesRequestCacheKey
     {
+
+        /// <summary>
+        /// Change this whenever the logic around builder selection changes, or when imageflow does.
+        /// </summary>
+        private const string ImageflowCacheVersionKey = "1";
+        
         private readonly ICollection<string> _supportedBuilderStrings =
             new List<string>(new[] { "wic", "freeimage", "imageflow" });
 
@@ -154,6 +160,9 @@ namespace ImageResizer.Plugins.Imageflow
         /// <returns></returns>
         protected override RequestedAction BuildJob(ImageJob job)
         {
+            //!!Bump ImageflowCacheVersionKey whenever we change this logic!!
+            //It's not part URL rewriting so it doesn't change the cache key otherwise
+            
             //Don't get involved if we're specifically not wanted.
             var builderString = job.Instructions["builder"];
             if (!ShouldBuild(builderString)) return RequestedAction.None;
@@ -260,6 +269,12 @@ namespace ImageResizer.Plugins.Imageflow
                 "s.grayscale", "s.alpha", "s.brightness", "s.contrast", "s.saturation", 
                 "trim.threshold", "trim.percentpadding", "a.balancewhite",  "jpeg.progressive",
                 "preset", "s.roundcorners"};
+        }
+
+        public string ModifyRequestCacheKey(string currentKey, string virtualPath, NameValueCollection queryString)
+        {
+            return currentKey + "|imageflow" + ImageflowCacheVersionKey; //TODO: combine with a cache key breaker returned from imageflow.dll itself.
+            // Simply by being installed it invalidates the old GDI results. This is very good. 
         }
     }
 }

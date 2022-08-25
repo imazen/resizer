@@ -45,6 +45,13 @@ Check `/resizer.debug` on your website and fix all warnings.
 
 Imageflow does not use `<sizelimits imageWidth="" and imageHeight="" />`, but has its own default limits for decode and encode.
 
+### Known issues in ImageResizer v5 preview
+
+* Watermarking is not yet enabled, although Imageflow supports it
+* License key validation for Performance/Elite features is not yet enabled.
+* resizer.debug does not provide sufficient guidance for upgrading to v5.0
+* `<sizelimiting>` settings do not apply to Imageflow backend, it has its own default size limits and they aren't configurable yet.
+* 
 
 ## V5 URL API Breaking changes
 

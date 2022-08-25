@@ -734,5 +734,13 @@ namespace ImageResizer.Configuration
             }
             set => _dropQuerystringKeys = value;
         }
+
+        public string ModifyRequestCacheKey(string currentKey, string virtualPath, NameValueCollection queryString)
+        {
+            foreach(var m in c.Plugins.ModifiesRequestCacheKeyPlugins)
+                currentKey = m.ModifyRequestCacheKey(currentKey, virtualPath, queryString);
+
+            return currentKey;
+        }
     }
 }

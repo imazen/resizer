@@ -137,8 +137,9 @@ namespace ImageResizer.Configuration
                 modifiedData != null && modifiedData != DateTime.MinValue && modifiedData != DateTime.MaxValue
                     ? modifiedData.Value.Ticks.ToString(NumberFormatInfo.InvariantInfo)
                     : "";
-            return string.Format("{0}{1}|{2}", RewrittenVirtualPath, PathUtils.BuildQueryString(RewrittenQuery),
-                modified);
+            var baseKey = $"{RewrittenVirtualPath}{PathUtils.BuildQueryString(RewrittenQuery)}|{modified}";
+
+            return conf.ModifyRequestCacheKey(baseKey, RewrittenVirtualPath, RewrittenQuery);
         }
 
 
