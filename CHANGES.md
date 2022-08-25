@@ -116,7 +116,8 @@ These are not likely to impact you.
 * ImageResizer.Configuration.Performance has been refactored to use Imazen.Common, and thus some classes and interfaces are missing.
 * ImageResizer.Util.BuildDateAttribute has moved to Imazen.Common.Licensing.BuildDateAttribute
 * ImageResizer.Encoding.IEncoder and .IEncoderProvider have been moved to the ImageResizer.Plugins namespace and marked obsolete.
-
+* ImageResizer.Plugins.Basic.Trial has been removed as it has never been used by any plugin.
+* 
 ## V5 Nuget Package Deprecations
 
 The following V4 packages will eventually be deprecated on Nuget.org.
