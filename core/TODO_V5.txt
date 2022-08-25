@@ -49,8 +49,20 @@ Consider dependent libraries: https://libraries.io/nuget/ImageResizer/dependents
 
 Imageflow needs to be able to shrink watermarks to pixel widths/heights?
 
+Add source file caching support in HybridCache. And perhaps mem caching.
+
+Figure out &cache=no dilemma.
+
 Add WIC support in Imageflow
 https://docs.rs/native-windows-gui/1.0.1/native_windows_gui/struct.ImageDecoder.html
+
+
+Fix possible regression on these
+1. Commands "ignoreicc" and "anchor" should not trigger processing alone. Autorotate should, as that has been legacy behavior.
+
+2. Core:  "scale", "stretch", "cropxunits", "cropyunits","mode" should not trigger image processing, as they are only modifier commands, and do nothing if used alone.
+
+
 
 
 IN V6:
