@@ -20,7 +20,6 @@ namespace ImageResizer.Plugins.HybridCache
 {
     public class HybridCachePlugin : IAsyncTyrantCache, IPlugin, IPluginInfo, IPluginRequiresShutdown
     {
-        //TODO: Fix multiple instances issue (each HttpModule can have many instances)
         public HybridCachePlugin()
         {
         }
@@ -45,7 +44,7 @@ namespace ImageResizer.Plugins.HybridCache
             return !string.IsNullOrEmpty(dir) ? HostingEnvironment.MapPath(dir) : null;
         }
         
-        private static readonly ConcurrentDictionary<string, HybridCachePlugin> firstInstancePerPath = new ConcurrentDictionary<string, HybridCachePlugin>();
+        private static readonly ConcurrentDictionary<string, HybridCachePlugin> FirstInstancePerPath = new ConcurrentDictionary<string, HybridCachePlugin>();
 
         private static bool conflictsExist = false;
 
@@ -57,7 +56,7 @@ namespace ImageResizer.Plugins.HybridCache
             _cacheOptions.QueueSizeLimitInBytes = c.get("hybridCache.writeQueueLimitBytes", _cacheOptions.QueueSizeLimitInBytes);
             _cacheOptions.MinCleanupBytes = c.get("hybridCache.minCleanupBytes", _cacheOptions.MinCleanupBytes);
 
-            if (firstInstancePerPath.AddOrUpdate(DiskCacheDirectory, this, (k, v) => v) != this)
+            if (FirstInstancePerPath.AddOrUpdate(DiskCacheDirectory, this, (k, v) => v) != this)
             {
                 conflictsExist = true;
             }
@@ -75,38 +74,25 @@ namespace ImageResizer.Plugins.HybridCache
 
         private string ResolveCacheLocation(string virtualOrRelativeOrPhysicalPath)
         {
-            var s = virtualOrRelativeOrPhysicalPath;
             //If it starts with a tilde, we gotta resolve the app prefix
-            if (string.IsNullOrEmpty(s)) return GetDefaultCacheLocation();
+            if (string.IsNullOrEmpty(virtualOrRelativeOrPhysicalPath)) return GetDefaultCacheLocation();
 
-            if (s.StartsWith("~"))
+            if (virtualOrRelativeOrPhysicalPath.StartsWith("~"))
             {
-                //Clearly it's in the app format
-                if (HostingEnvironment.ApplicationPhysicalPath != null)
-                {
-                    return HostingEnvironment.MapPath(s);
-                }
-                else
-                {
-                    throw new ApplicationException("Please specify a cache folder that is not within the web application; it should never be accessible.");
-                }
+                throw new ApplicationException("Please specify a cache folder that is not within the web application; it should never be accessible.");
 
             }
-            else
+            if (!Path.IsPathRooted(virtualOrRelativeOrPhysicalPath))
             {
-                if (!Path.IsPathRooted(s))
-                {
-                    throw new ApplicationException("Please specify a cache folder that is not within the web application; it should never be accessible.");
-                }
+                throw new ApplicationException("Please specify a cache folder that is not within the web application; it should never be accessible.");
             }
-            return Path.GetFullPath(s);
-
+            return Path.GetFullPath(virtualOrRelativeOrPhysicalPath);
         }
 
         /// <summary>
         /// Helper class to run async methods within a sync process.
         /// </summary>
-        internal static class AsyncUtil
+        private static class AsyncUtil
         {
             private static readonly TaskFactory _taskFactory = new
                 TaskFactory(CancellationToken.None,
@@ -155,6 +141,7 @@ namespace ImageResizer.Plugins.HybridCache
             return this;
         }
 
+        private bool _isReady = false;
         public bool Uninstall(Config c)
         {
             c.Plugins.remove_plugin(this);
@@ -167,7 +154,8 @@ namespace ImageResizer.Plugins.HybridCache
         }
         public async Task ProcessAsync(HttpContext current, IAsyncResponsePlan plan)
         {
-            //TODO: Get rid of ImageResizer's encoding namespace
+            if (!_isReady) throw new InvalidOperationException("HybridCache is not running");
+      
             //TODO:  check etags, send not-modified as needed
 
             //TODO: stream directly from virtual file if the virtual file claims to be low-latency/overhead
@@ -180,7 +168,7 @@ namespace ImageResizer.Plugins.HybridCache
         }
 
 
-        private Imazen.HybridCache.HybridCache CreateHybridCacheFromOptions(HybridCacheOptions options, ILogger logger)
+        private static Imazen.HybridCache.HybridCache CreateHybridCacheFromOptions(HybridCacheOptions options, ILogger logger)
         {
             var cacheOptions = new Imazen.HybridCache.HybridCacheOptions(options.DiskCacheDirectory)
             {
@@ -209,13 +197,16 @@ namespace ImageResizer.Plugins.HybridCache
             return new Imazen.HybridCache.HybridCache(database, cacheOptions, logger);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            return _cache.StartAsync(cancellationToken);
+            await _cache.StartAsync(cancellationToken);
+            _isReady = true;
+            return;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            _isReady = false;
             return _cache.StopAsync(cancellationToken);
         }
 
@@ -223,6 +214,7 @@ namespace ImageResizer.Plugins.HybridCache
             CancellationToken cancellationToken,
             bool retrieveContentType)
         {
+            if (!_isReady) throw new InvalidOperationException("HybridCache is not running");
             return _cache.GetOrCreateBytes(key, dataProviderCallback, cancellationToken, retrieveContentType);
         }
 
