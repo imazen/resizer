@@ -15,17 +15,17 @@
         <PackageTags>ImageResizer Imazen Resizer MVC Routing MvcRoutingShim WebConfig  AsyncWebConfig imaging</PackageTags>
         
     </PropertyGroup>
-
+  
     <ItemGroup>
-      <PackageReference Include="ImageResizer" Version="[$(Version),]" />
-    </ItemGroup>
-    <ItemGroup>
-        <Content Include="Web.config.transform" >
+        <Content Include="Web.config.transform">
         </Content>
         <Content Include="ImageResizer5_Readme.txt">
         </Content>
         <None Include="_._" Pack="True" PackagePath="lib\net472" />
             
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Core\ImageResizer.csproj" />
     </ItemGroup>
 
 </Project>
