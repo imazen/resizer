@@ -1,81 +1,66 @@
 ﻿
-## Todo for V5
+## TODO NOW for v5
 
 * Etags
-* CropAround
-* Switch between builders depending on querystring keys used in the url.
-
-* HybridCache disposal
 * Optimize file serving with and without cache.
 * Good default etags and cache control headers.
-* Create watermark system with web.config support
+* Document cache control
 * Update /resizer.debug to guide removal of old plugins and migration to new
+* Check if events work for async
+* Address weakness in letting cache=no and process=no happen from querystring; 
+* Vary the cache key by the set of builders installed and the Imageflow cache breaker
+* Integrate licensing from Imazen.Common and migrate just the enforcer tests. Add Edition metadata or API call during new()
+* Unify SizeLimiting with Imageflow and GDI backends.
+
+
+## TODO for v5.1
+
+* Create watermark system with web.config support
 * Figure out IResponseArgs support in async context
 * Unify storage providers and add support for proxying static non-image files 
-* add a unified API for configuring both IDNS and IR. And a unified async blob provider api with support for arbitrary files, relay, source caching, etc.
 * Add support for caching source blobs under certain circumstances
-* Auto-select builder based on unsupported command keys (and maybe watermarks)
-* Address weakness in letting cache=no and process=no happen from querystring; 
-
-
-Should Imageflow support &autorotate=false and &autorotate.default = false ?
-
-Add caching support for C# API.
-
-Figure out why imageflow.dll ends up in project roots sometimes?
-
-TODO: expose jpeg.progressive in Instructions class- Supported by Imageflow, but not GDI, WIC, or WPF
-TODO: maybe implement `dpi` - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
-
-
-// ADD json endpoint in Imageflow to classify if an image is supported by the first 12 bytes
-// Add json endpoint in Imageflow to provide a cache-breaker key that changes when URL interpretation does.
-
-V5 C# API:
-
-REVISIT: private readonly string[] _supportedFileExtensions = new string[]
-            { "bmp", "gif", "exif", "png", "tif", "tiff", "tff", "jpg", "jpeg", "jpe", "jif", "jfif", "jfi" };
-
-Consider dependent libraries: https://libraries.io/nuget/ImageResizer/dependents
+* Get rid of ImageResizer's encoding namespace, it conflicts
+* Figure out &cache=no dilemma.
 
 ## LATER
 
 * Make old CommitAttribute log a warning during creation to the error output/log  
-
 * Obsolete ResizeSettings members that Imageflow doesn't support
-* Figure out AWS credential delay
-* Figure out graceful shutdown for HybridCache (Dispose on httpmodule?)
-* Integrate licensing from Imazen.Common and migrate just the enforcer tests. Add Edition metadata or API call during new()
 * And maybe GUID for COM? Check V4 API texts for old values [assembly: System.Runtime.InteropServices.Guid("8edaeb47-7067-4c77-aa1b-ffbeeab5e81d")]
-* Document cache control
-
-TODO: Get rid of ImageResizer's encoding namespace
-
-Imageflow needs to be able to shrink watermarks to pixel widths/heights?
-
-Add source file caching support in HybridCache. And perhaps mem caching.
-
-Figure out &cache=no dilemma.
-
-Vary the cache key by the set of builders installed.
-
-Add WIC support in Imageflow
-https://docs.rs/native-windows-gui/1.0.1/native_windows_gui/struct.ImageDecoder.html
 
 
-Fix possible regression on these
+# IN ImageResizer V6:
 
-
-
-
-IN V6:
-
+* Add a unified API for configuring both IDNS and IR. And a unified async blob provider api with support for arbitrary files, relay, source caching, etc.
+* Add source file caching support in HybridCache. And perhaps mem caching.
+* Add caching support for C# API. 
+* [MAYBE] Caching, processing, and encoders/builders/decoders might not be configurable via the querystring,
+  so `cache`, `process`, `encoder`, `decoder`, and `builder` may or may not be ignored (this has implications for denial of service surface area).
+* Revisit file extension support, mime type handling on non-images.
+* Figure out AWS credential delay
 * Add direct support for Imazen.Common.Storage.IBlobProvider, unify provider APIs
 * Fix response headers system under async
 * Unify RemoteReader and encrypted/signed URL system.
 * Unify SizeLimiting and JobSecurity 
+* ImageResizing via Response.Filter - https://weblog.west-wind.com/posts/2009/nov/13/capturing-and-transforming-aspnet-output-with-responsefilter
 
-## Nuget.Org manual package updates
+## TODO In Imageflow
+
+* Add support for &autorotate=false and &autorotate.default=false (although the latter could be ImageResizer only)
+* Imageflow needs to be able to shrink watermarks to pixel widths/heights. Also underlay/overlay support?
+* expose jpeg.progressive in Instructions class- Supported by Imageflow, but not GDI, WIC, or WPF
+* maybe implement `dpi` - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
+* Add json endpoint in Imageflow to provide a cache-breaker key that changes when URL interpretation does.
+* ADD json endpoint in Imageflow to classify if an image is supported by the first 12 bytes
+* Add CropAround feature
+* Add Faces feature?
+* Add WIC support in Imageflow - https://docs.rs/native-windows-gui/1.0.1/native_windows_gui/struct.ImageDecoder.html
+* Figure out why imageflow.dll ends up in project roots sometimes?
+
+## Help third parties update their packages
+
+Consider dependent libraries: https://libraries.io/nuget/ImageResizer/dependents
+And Github projects (2.3k): https://github.com/imazen/resizer/network/dependents?package_id=UGFja2FnZS0xNTY3Mjc5NDk%3D
 
 Help with Forte.ImageResizer.AzureBlobCache
 Help with ImageResizer.Plugins.PdfiumRenderer.Pdfium.Dll
@@ -86,3 +71,4 @@ Help with TNX.ImageResizer
 Help with ImageResizer.Plugins.Tint
 Help with ImageResizer.Plugins.AzureReader3
 Help with ImageResizer.Plugins.AzureBlobStorageCache
+

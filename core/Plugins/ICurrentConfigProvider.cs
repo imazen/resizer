@@ -18,6 +18,7 @@ namespace ImageResizer.Plugins
         ///     Implementations MUST return the same instance of Config for two identical requests. Multiple Config instances per
         ///     tenant/area will cause problems.
         ///     MUST be thread-safe, concurrent calls WILL occur, and WILL occur during initial call.
+        ///     Do NOT let two instances of Config exist with HybridCache installed unless they have different cache locations.
         /// </summary>
         /// <returns></returns>
         Config GetCurrentConfig();

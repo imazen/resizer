@@ -7,6 +7,9 @@ using System.Collections.Specialized;
 
 namespace ImageResizer.Configuration
 {
+    /// <summary>
+    /// Used by URL rewriting and authorization event handlers in ImageResizer
+    /// </summary>
     public interface IUrlEventArgs
     {
         NameValueCollection QueryString { get; set; }
