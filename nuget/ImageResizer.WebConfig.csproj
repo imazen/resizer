@@ -13,7 +13,7 @@
         
         Docs: https://imageresizing.net/</Description>
         <PackageTags>ImageResizer Imazen Resizer MVC Routing MvcRoutingShim WebConfig  AsyncWebConfig imaging</PackageTags>
-        
+        <IncludeSymbols>false</IncludeSymbols>
     </PropertyGroup>
   
     <ItemGroup>
