@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -53,11 +54,11 @@ namespace ImageResizer
         }
         public void Dispose()
         {
-            if (Interlocked.Decrement(ref moduleInstancesActiveSharedCounter) == 0)
-            {
-                //The last instance of the module is being disposed, now we can tear down shared services.
-                // Todo: Call StopAsync on services like HybridCache to avoid leaving files open
-            }
+            if (Interlocked.Decrement(ref moduleInstancesActiveSharedCounter) != 0) return;
+            
+            //The last instance of the module is being disposed, now we can tear down shared services.
+            var tasks = Config.Current.Plugins.GetAll<IPluginRequiresShutdown>().Select(p => p.StopAsync(CancellationToken.None)).ToArray();
+            Task.WaitAll(tasks); //Is this OK??
         }
 
 
