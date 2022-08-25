@@ -1,4 +1,6 @@
-# Builder Extensions
+# Builder Extensions (deprecated)
+
+NOTE: BuilderExtensions no longer make sense as they are not compatible with the Imageflow backend. Add features to Imageflow instead.
 
 The ImageResizer plugin model encompases several aspects of the resizer
 pipeline.  The most obvious are the ImageBuilder BuilderExtensions, which

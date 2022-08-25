@@ -1,10 +1,85 @@
 # v5-0-0
 
-### .NET 4.7.2 is now required
+## ImageResizer 5.0 Breaking changes
+
+### .NET Framework 4.7.2 or 4.8 is now required
 
 - This allows us to update our dependencies to the latest, safest versions. 
-- The functionality from most plugins has been integrated into the core, drastically simplifying maintenance for the most common features
-- If you are still using packages.config instead of PackageReference, you'll need to reference another NuGet package
+- The functionality from most plugins has been integrated into the core or into Imageflow, drastically simplifying maintenance for the most common features
+
+## Web.config will need to be updated
+
+Check /resizer.debug on your website.
+
+Most commonly used features have been moved into ImageResizer.Plugins.Imageflow or ImageResizer itself.
+As such, many plugins no longer need to be added. 
+
+[todo]
+
+## V5 URL API Breaking changes
+
+* The following commands are supported: `mode`, `anchor`, `flip`, `sflip`,
+  `quality`, `zoom`, `dpr`, `crop`, `cropxunits`, `cropyunits`,
+  `w`, `h`, `width`, `height`, `maxwidth`, `maxheight`, `format`,
+  `srotate`, `rotate`, `stretch`, `webp.lossless`, `webp.quality`,
+  `f.sharpen`, `f.sharpen_when`, `down.colorspace`, `bgcolor`,
+  `jpeg_idct_downscale_linear`, `watermark`, `s.invert`, `s.sepia`,
+  `s.grayscale`, `s.alpha`, `s.brightness`, `s.contrast`, `s.saturation`,
+  `trim.threshold`, `trim.percentpadding`, `a.balancewhite`,  `jpeg.progressive`,
+  `decoder.min_precise_scaling_ratio`, `scale`, `preset`, `s.roundcorners`, 'ignoreicc'
+
+* With the Imageflow backend, images are always auto-rotated based on Exif information, so `autorotate` is ignored.
+  This is a breaking change from ImageResizer 4.x where images are not autorotated by default.
+* Images can only be rotated in 90 degree intervals, so `rotate` is partially supported.
+* TIFF files are not supported in Imageflow, so `page=x` is not supported.
+* Animated GIFs are fully supported in Imageflow, so `frame=x` is not useful/ignored.
+
+* Adding arbitrary margins, padding, and borders to images is obsolete, so
+  `paddingwidth`, `paddingheight`, `margin`
+  `borderwidth`, `bordercolor` and `paddingcolor` are now ignored.
+
+* Caching, processing, and encoders/builders/decoders are not configurable via the querystring,
+  so `cache`, `process`, `encoder`, `decoder`, and `builder` are ignored.
+* Sharpening is now done with `f.sharpen`, not `a.sharpen`, and `a.sharpen` is ignored.
+* Noise removal is not yet supported, so `a.removenoise` is ignored.
+* Blurring is not yet supported, so `a.blur` is ignored.
+* 404 redirects are not implemented, so `404` is ignored.
+
+Things you would expect to be gone:
+
+* Gradient plugin is gone, along with &color1,color2, angle commands
+* DropShadow plugin and assocated &shadow* commands
+* Some plugins have been deprecated for a decade and their commands are gone, such as &speed from SpeedOrQuality
+* Undocumented commands like preservePalette are gone
+* PrettyGifs is gone (Imageflow does 1000x better), along with &dither, &colors, and &preservePalette
+* FreeImage is gone (it is rarely updated and a big security risk), along with &fi.scale
+* AdvancedFilters is gone (most features were infrequently used, and Imageflow has sharpening (f.sharpen) and
+  auto white balance now). This removed a.oilpainting, a.sobel,  a.threshold, a.canny, a.equalize, a.posterize. You can still use `a.balancewhite`
+* &memcache is gone, it's not a great idea in the first place and never exited pre-alpha
+* With Imageflow, Jpeg subsampling is auto-selected by chroma evaluation, so `subsampling` is ignored (it's also not supported in GDI)
+
+## V5 C# API breaking changes:
+
+These are not likely to impact you.
+
+* Many items have been deprecated for removal in ImageResizer 6.0
+* Add the Imazen.Common nuget package to your project, some interfaces and classes have moved there.
+* Replaced use of ImageResizer.Configuration.Issues namespace with Imazen.Common.Issues. All members are idential, but this changes the type signature of many common members such as .IssueSink, .configurationSectionIssues, .AllIssues, .GetIssues()
+* ImageResizer.Storage.IBlobMetadata no longer includes setters on Exists and LastModifiedDateUtc
+* ImageResizer.Plugins.Basic.SpeedOrQuality and ImageResizer.Plugins.Basic.NoCacheHandler, ImageResizer.Plugins.Basic.IEPngFix has been removed.
+* Synchronous mode for the HttpModule has been removed, resulting in some additional API deletions and changes.
+    * ImageResizer.Caching.ICacheProvider and .ICacheSelectionEventArgs are gone since synchronous caches are no longer supported.
+    * Removed ImageResizer.Configuration.CacheSelectionHandler
+    * Removed PipelineConfig.SelectCachingSystem, PipelineConfig.GetCacheProvider, and PipelineConfig.GetCachingSystem.
+    * PluginConfig.CachingSystems is now a list of IAsyncTyrantCache not ICache;
+    * Removed ImageResizer.Configuration.Config.IsVirtualFile, .VirtualFile, and .GetCacheProvider()
+    * protected AsyncInterceptModule.HandleRequest signature changed
+
+* ImageResizer.Configuration.PluginConfig.LoggingAvaialableEvent has been renamed to ImageResizer.Configuration.PluginConfig.LoggingAvailableEvent
+* ImageResizer.Plugins.AzureReader2.AzureReader2Plugin.CloudBlobClient and .GetBlobRefAsync has been removed as part of the upgrade to Microsoft.Azure API
+* ImageResizer.InterceptModule has been replaced by AsyncInterceptModule (and inherits from it for web.config compat). This means all those protected methods have vanished.
+* ImageResizer.Configuration.Performance has been refactored to use Imazen.Common, and thus some classes and interfaces are missing.
+* ImageResizer.Util.BuildDateAttribute has moved to Imazen.Common.Licensing.BuildDateAttribute
 
 
 

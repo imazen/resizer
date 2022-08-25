@@ -31,6 +31,7 @@ V5 C# API:
 REVISIT: private readonly string[] _supportedFileExtensions = new string[]
             { "bmp", "gif", "exif", "png", "tif", "tiff", "tff", "jpg", "jpeg", "jpe", "jif", "jfif", "jfi" };
 
+Consider dependent libraries: https://libraries.io/nuget/ImageResizer/dependents
 
 LATER
 

@@ -1,32 +1,56 @@
 <a name="top"></a>
 
-## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
-[![Build status for develop branch](https://github.com/imazen/resizer/actions/workflows/dotnet.yml/badge.svg?branch=develop)](https://github.com/imazen/resizer/actions/workflows/dotnet.yml)
- View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
+## [ImageResizer](http://imageresizing.net) 5 - Better images, faster sites
+![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Downloads](https://img.shields.io/nuget/dt/ImageResizer) [![Build status for develop branch](https://github.com/imazen/resizer/actions/workflows/dotnet.yml/badge.svg?branch=develop)](https://github.com/imazen/resizer/actions/workflows/dotnet.yml)
 
-![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) 
+If you can use .NET Core 3.1, .NET 5, 6, or 7, use [Imageflow.Server](https://github.com/imazen/imageflow-dotnet-server) in place of ImageResizer. This readme is for **ImageResizer 5.x for .NET Framework**. Click for the [ImageResizer 4.x](https://github.com/imazen/resizer/tree/support/v4#top), [3.x]( https://github.com/imazen/resizer/tree/support/v3#top), or [2.x](https://github.com/imazen/resizer/tree/support/v2#top) readme.
 
-If you're looking for a .NET Core 5/6+ version, check out [Imageflow.NET Server](https://github.com/imazen/imageflow-dotnet-server)
+We've made some *major* changes in V5. Read the [changelog](https://github.com/imazen/resizer/blob/develop/CHANGES.md) and check `/resizer.debug`
 
-# What is it?
+Quick Start: Install the `ImageResizer.WebConfig` NuGet package, run your app, then visit `/resizer.debug` 
 
-* An IIS/ASP.NET HttpModule & image server. On-demand image manipulation, delivery, and optimization &mdash; with low latency &mdash; makes responsive images easy
-* An image processing library optimized and secured for server-side use
-* A framework and collection of 40+ plugins to accomplish most common web imaging needs. 
+## What can it do?
+* Enables fast on-demand image compression, resizing, and manipulation via the querystring.
+* Easy: https://example.com/image.jpg?width=100&height=200&mode=crop
+* Use `<picture>` and `srcset` without leaving your editor (bye, Photoshop).
+* Makes implementing product and image galleries trivially easy.
+* Can process images from S3, Azure Blobs, and more (very extensible).
+* Cutting-edge low-latency disk caching to keep response times blazing fast.
+* Designed and hardened for server-side use.  
+* Easy to use with a CDN, or behind a reverse proxy.
+* Extensive collection of plugins, including more than a dozen from the wider community.
+* Integrates with most CMSes, and is included by many.
+* Great for use with both public and private (secured) images; supports custom authorization rules.
+
+## Packages
+
+* `ImageResizer` includes an HttpModule for .NET Framework 4.7.2/4.8. 
+* `ImageResizer.WebConfig` installs the HttpModule in Web.config.
+* `ImageResizer.Plugins.Imageflow` installs the Imageflow backend. Imageflow is what provides excellent image quality and file sizes, and is required for most image manipulation commands. If you're not using ASP.NET, you can use it directly via the `Imageflow.Net` package.
+* `Imageflow.NativeRuntime.win-x86 (enable pre-release)` installs the 32-bit imageflow.dll
+* `Imageflow.NativeRuntime.win-x86_64 (enable pre-release)` installs the 64-bit imageflow.dll. Keep this pacakge updated!
+* `ImageResizer.Plugins.AzureReader2` allows processing images located in Azure Blob storage.
+* `ImageResizer.Plugins.S3Reader2` allows processing images located in Amazon S3.
+* `ImageResizer.Plugins.HybridCache` is essential for scaling your website to high traffic. It offers an insanely well optimized, low latency disk cache with accurate space limiting. It replaces DiskCache and does everything better.
+* `ImageResizer.Storage` is useful for integrating ImageResizer with alternate image storage locations.
+
+
+
+# How do you apply commands?
 
 ImageResizer has a very simple (and powerful) URL API.
 
 ![Fit modes](http://z.zr.io/rw/diagrams/resizing-modes.png)
 
-For more information, [check out our website](http://www.imageresizing.net). To contribute, see [CONTRIBUTING](https://github.com/imazen/resizer/blob/develop/CONTRIBUTING.md).
+For more information, [check out the  website](http://www.imageresizing.net).
 
-#### Changes
 
-We've made some major changes in V4. Check out our [changelog](https://github.com/imazen/resizer/blob/develop/CHANGES.md) for more details.
+### License
 
-#### License
-Over half of ImageResizer's plugins are available under the Apache 2.0 license. See [license.txt for details]( https://github.com/imazen/resizer/blob/develop/license.txt).
+* ImageResizer and ImageResizer.WebConfig are licensed under the Apache 2.0 license.
+* ImageResizer.Plugins.Imageflow, .HybridCache, .AzureReader2, and .S3Reader2 require a [commercial license](https://imageresizing.net/licenses) or compliance with the AGPL 3.0.
 
+# TODO - Content below this point has not been updated for V5
 
 # Table of Contents
 2. [Getting Started](#getting_started)
@@ -57,8 +81,6 @@ Below is a basic installation guide, although a more comprehensive one can be fo
 
 Starting with ImageResizer v5, you'll want to avoid nuget.packages and use the ProjectReference format instead in your projects. 
 
-If you can't use ProjectReference, you'll have to install these in each of your final exeuctable/test/web project(s).
-
 ```
 PM> Install-Package Imageflow.NativeRuntime.win-x86 -pre
 PM> Install-Package Imageflow.NativeRuntime.win-x86_64 -pre
@@ -79,6 +101,8 @@ Get the basics:
 ```
 PM> Install-Package ImageResizer.WebConfig
 PM> Install-Package ImageResizer.Plugins.Imageflow
+PM> Install-Package Imageflow.NativeRuntime.win-x86 -pre
+PM> Install-Package Imageflow.NativeRuntime.win-x86_64 -pre
 PM> Install-Package ImageResizer.Plugins.HybridCache
 ```
 
