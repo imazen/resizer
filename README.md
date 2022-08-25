@@ -3,16 +3,16 @@
 ## [ImageResizer](http://imageresizing.net) 5 - Better images, faster sites
 ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Downloads](https://img.shields.io/nuget/dt/ImageResizer) [![Build status for develop branch](https://github.com/imazen/resizer/actions/workflows/dotnet.yml/badge.svg?branch=develop)](https://github.com/imazen/resizer/actions/workflows/dotnet.yml)
 
-If you can use .NET Core 3.1, .NET 5, 6, or 7, use [Imageflow.Server](https://github.com/imazen/imageflow-dotnet-server) in place of ImageResizer. This readme is for **ImageResizer 5.x for .NET Framework**. Click for the [ImageResizer 4.x](https://github.com/imazen/resizer/tree/support/v4#top), [3.x]( https://github.com/imazen/resizer/tree/support/v3#top), or [2.x](https://github.com/imazen/resizer/tree/support/v2#top) readme.
+If you can use .NET 5, 6, or 7, use [Imageflow.Server](https://github.com/imazen/imageflow-dotnet-server) in place of ImageResizer. This readme is for **ImageResizer 5.x for .NET Framework 4.x**. Click for the [ImageResizer 4.x](https://github.com/imazen/resizer/tree/support/v4#top), [3.x]( https://github.com/imazen/resizer/tree/support/v3#top), or [2.x](https://github.com/imazen/resizer/tree/support/v2#top) readme.
 
-We've made some *major* changes in V5. Read the [changelog](https://github.com/imazen/resizer/blob/develop/CHANGES.md) and check `/resizer.debug`
+We've made some *major* changes in V5 to greatly improve image quality, file sizes, concurrency, maintainability, and response times. Read the [changelog](https://github.com/imazen/resizer/blob/develop/CHANGES.md) and follow suggestions in `/resizer.debug` when migrating from V4.
 
 Quick Start: Install the `ImageResizer.WebConfig` NuGet package, run your app, then visit `/resizer.debug` 
 
 ## What can it do?
 * Enables fast on-demand image compression, resizing, and manipulation via the querystring.
 * Easy: https://example.com/image.jpg?width=100&height=200&mode=crop
-* Use `<picture>` and `srcset` without leaving your editor (bye, Photoshop).
+* Use `<picture>` and `srcset` without leaving your IDE (bye, Photoshop).
 * Makes implementing product and image galleries trivially easy.
 * Can process images from S3, Azure Blobs, and more (very extensible).
 * Cutting-edge low-latency disk caching to keep response times blazing fast.
