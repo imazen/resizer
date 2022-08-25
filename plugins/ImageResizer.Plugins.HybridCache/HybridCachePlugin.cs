@@ -36,10 +36,11 @@ namespace ImageResizer.Plugins.HybridCache
 
         private void LoadSettings(Config c)
         {
-            cacheOptions.DiskCacheDirectory = c.get("hybridcache.cacheLocation", cacheOptions.DiskCacheDirectory);
-            cacheOptions.CacheSizeLimitInBytes = c.get("hybridcache.cacheMaxSizeBytes", cacheOptions.CacheSizeLimitInBytes);
-            cacheOptions.DatabaseShards = c.get("hybridcache.shardCount", cacheOptions.DatabaseShards);
+            cacheOptions.DiskCacheDirectory = c.get("hybridCache.cacheLocation", cacheOptions.DiskCacheDirectory);
+            cacheOptions.CacheSizeLimitInBytes = c.get("hybridCache.cacheMaxSizeBytes", cacheOptions.CacheSizeLimitInBytes);
+            cacheOptions.DatabaseShards = c.get("hybridCache.shardCount", cacheOptions.DatabaseShards);
             cacheOptions.QueueSizeLimitInBytes = c.get("hybridCache.writeQueueLimitBytes", cacheOptions.QueueSizeLimitInBytes);
+            cacheOptions.MinCleanupBytes = c.get("hybridCache.minCleanupBytes", cacheOptions.MinCleanupBytes);
         }
 
         private string GetDefaultCacheLocation() {
