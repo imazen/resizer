@@ -243,7 +243,7 @@ namespace ImageResizer.Configuration
             if (int.TryParse(s, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i)) return i;
             else
                 configurationSectionIssues.AcceptIssue(
-                    new Issue("Invalid integer value in imageresizer configuration section, " + selector + ":" + s,
+                    new Issue("Invalid integer value in <resizer> configuration section, " + selector + ":" + s,
                         IssueSeverity.ConfigurationError));
             return defaultValue;
         }
