@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Reflection;
 using System.Security;
+using System.Security.Cryptography;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -62,6 +63,23 @@ namespace ImageResizer.Util
                    (!string.IsNullOrEmpty(newExtension) ? "." + newExtension.TrimStart('.') : "") +
                    path.Substring(query);
         }
+
+        internal static string Base64Hash(string data)
+        {
+            using (var sha2 = SHA256.Create())
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(data);
+                // check cache and return if cached
+                var hashBytes =
+                    sha2.ComputeHash(stringBytes);
+                return Convert.ToBase64String(hashBytes)
+                    .Replace("=", string.Empty)
+                    .Replace('+', '-')
+                    .Replace('/', '_');
+            }
+        }
+
+        
 
         /// <summary>
         ///     Removes all extension segments from the filename or URL, leaving the querystring intact. I.e, image.jpg.bmp.tiff?hi

@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 using ImageResizer.Configuration;
+using ImageResizer.Configuration.Performance;
 using ImageResizer.Util;
 using Imazen.Common.Extensibility.StreamCache;
 using Imazen.Common.Instrumentation.Support.InfoAccumulators;
@@ -152,18 +155,16 @@ namespace ImageResizer.Plugins.HybridCache
             //TODO: use normal access instead of casting
             return ((ResizeSettings)e.RewrittenQuerystring).Cache != ServerCacheMode.No;
         }
-        public async Task ProcessAsync(HttpContext current, IAsyncResponsePlan plan)
+        
+        
+        public async Task ProcessAsync(HttpContext context, IAsyncResponsePlan plan)
         {
             if (!_isReady) throw new InvalidOperationException("HybridCache is not running");
-      
-            //TODO:  check etags, send not-modified as needed
 
-            //TODO: stream directly from virtual file if the virtual file claims to be low-latency/overhead
-
-            //TODO: Otherwise use GetOrCreateBytes
-
+            
+            
             // And respond using the stream
-            await new NewModuleHelpers().ProcessWithStreamCache(_logger, this._cache, current, plan);
+            await new NewModuleHelpers().ProcessWithStreamCache(_logger, this._cache, context, plan);
           
         }
 

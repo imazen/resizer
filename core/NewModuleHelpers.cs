@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using ImageResizer.Configuration.Performance;
 using ImageResizer.Plugins;
+using ImageResizer.Util;
 using Microsoft.Extensions.Logging;
 using Imazen.Common.Extensibility.StreamCache;
 
@@ -76,27 +78,66 @@ namespace ImageResizer
         
         private void SetCachingHeaders(HttpContext context, string etag)
         {
+            // var mins = c.get("clientcache.minutes", -1);
+            // //Set the expires value if present
+            // if (mins > 0)
+            //     e.ResponseHeaders.Expires = DateTime.UtcNow.AddMinutes(mins);
+            //
+            // //NDJ Jan-16-2013. The last modified date sent in the headers should NOT match the source modified date when using DiskCaching.
+            // //Setting this will prevent 304s from being sent properly.
+            // // (Moved to NoCache)
+            //
+            // //Authenticated requests only allow caching on the client. 
+            // //Anonymous requests get caching on the server, proxy and client
+            // if (context.Request.IsAuthenticated)
+            //     e.ResponseHeaders.CacheControl = HttpCacheability.Private;
+            // else
+            //     e.ResponseHeaders.CacheControl = HttpCacheability.Public;
+            //
+            
             context.Response.Headers["ETag"] = etag;
+
+            //TODO: Add support for max-age and public/private based on authentication.
+            
+            //context.Response.CacheControl = "max-age=604800";
             // if (options.DefaultCacheControlString != null)
             //     context.Response.Headers["Cache-Control"] = options.DefaultCacheControlString;
         }
         
-        private async Task ServeFileFromDisk(HttpContext context, string path, string etag)
-        {
-            using (var readStream = File.OpenRead(path))
-            {
-                if (readStream.Length < 1)
-                {
-                    throw new InvalidOperationException("DiskCache file entry has zero bytes");
-                }
-
-                SetCachingHeaders(context, etag);
-                await ProxyToStream(readStream, context.Response).ConfigureAwait(false);
-            }
-        }
-        
+        // private async Task ServeFileFromDisk(HttpContext context, string path, string etag)
+        // {
+        //     using (var readStream = File.OpenRead(path))
+        //     {
+        //         if (readStream.Length < 1)
+        //         {
+        //             throw new InvalidOperationException("DiskCache file entry has zero bytes");
+        //         }
+        //
+        //         SetCachingHeaders(context, etag);
+        //         await ProxyToStream(readStream, context.Response).ConfigureAwait(false);
+        //     }
+        // }
+        //
         public async Task ProcessWithStreamCache(ILogger logger, IStreamCache streamCache, HttpContext context, IAsyncResponsePlan plan)
         {
+            
+            var cacheHash = PathUtils.Base64Hash(plan.RequestCachingKey);
+            var cacheHashQuoted = "\"" + cacheHash + "\"";
+            var cacheHashWeakValidation = "W/\"" + cacheHash + "\"";
+
+            // Send 304
+            var ifNoneMatch = (IList)context.Request.Headers.GetValues("If-None-Match");
+            if (ifNoneMatch != null && (ifNoneMatch.Contains(cacheHash) || ifNoneMatch.Contains(cacheHashQuoted) || ifNoneMatch.Contains(cacheHashWeakValidation)))
+            {
+                context.Response.StatusCode = 304;
+                context.Response.AppendHeader("Content-Length", "0");
+                context.Response.End();
+                return;
+            }
+            //
+            // context.Response.AppendHeader("ETag", cacheHashWeakValidation);
+            //
+            
             var keyBytes = System.Text.Encoding.UTF8.GetBytes(plan.RequestCachingKey);
             var typeName = streamCache.GetType().Name;
             
@@ -143,7 +184,7 @@ namespace ImageResizer
                     {
                         throw new InvalidOperationException($"{typeName} returned cache entry with zero bytes");
                     }
-                    SetCachingHeaders(context, plan.RequestCachingKey);
+                    SetCachingHeaders(context, cacheHashWeakValidation);
                     await ProxyToStream(cacheResult.Data, context.Response).ConfigureAwait(true);
                 }
                 // logger?.LogDebug("Serving from {CacheName} {VirtualPath}?{CommandString}", typeName, plan., plan.RewrittenQuerystring);

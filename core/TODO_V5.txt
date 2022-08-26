@@ -1,7 +1,9 @@
 ﻿
 ## TODO NOW for v5
 
-* Add etag support, good default cache control, optimize file serving with and without cache installed.
+* Add etag support for no cache installed
+* Add better cache control configuration that works in async mode.
+
 
 ## TODO LATER for v5
 
@@ -19,6 +21,7 @@
 * Unify storage providers and add support for proxying static non-image files 
 * Add support for caching source blobs under certain circumstances
 * Figure out ideal &cache=no/disk/mem behavior
+* HybridCache should stream directly from virtual file if the virtual file claims to be low-latency/overhead
 
 ## LATER
 
