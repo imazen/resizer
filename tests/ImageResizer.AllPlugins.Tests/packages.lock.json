@@ -2,6 +2,23 @@
   "version": 1,
   "dependencies": {
     ".NETFramework,Version=v4.7.2": {
+      "Imageflow.NativeRuntime.win-x86_64": {
+        "type": "Direct",
+        "requested": "[1.7.3-rc67, )",
+        "resolved": "1.7.3-rc67",
+        "contentHash": "70f1jodgmbiWHxd3KxR8fo+8CK55oMD/f/5OYYSnBCSdTxzec8ks4bhXASzmx7bgCujipCa4E1s0uQt3PCf8+w=="
+      },
+      "Imageflow.Net": {
+        "type": "Direct",
+        "requested": "[0.8.4, )",
+        "resolved": "0.8.4",
+        "contentHash": "7C+sa9W/dk8JCzKXyj+OTMMWcZxr5qwpC5l24vd3a8CTlGtTNE7sVjYfqq/JBLn5kCSHv0XUuBbmz/Lwgte0vw==",
+        "dependencies": {
+          "Microsoft.CSharp": "4.7.0",
+          "Microsoft.IO.RecyclableMemoryStream": "[1.2.2, 3.0.0)",
+          "Newtonsoft.Json": "[10.0.3, 14.0.0)"
+        }
+      },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[1.1.1, )",
@@ -11,6 +28,12 @@
           "Microsoft.Build.Tasks.Git": "1.1.1",
           "Microsoft.SourceLink.Common": "1.1.1"
         }
+      },
+      "Newtonsoft.Json": {
+        "type": "Direct",
+        "requested": "[13.0.1, )",
+        "resolved": "13.0.1",
+        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
       "PublicApiGenerator": {
         "type": "Direct",
@@ -122,21 +145,6 @@
         "resolved": "1.7.3-rc67",
         "contentHash": "mhhTqkSaSaMHMJIqiVU9aGpDEFqE5qZNxI8wY22a8lKPJMdQTl3n4e61JlFKrPHPxv/H2UJ9sAagfTmqV1/zSw=="
       },
-      "Imageflow.NativeRuntime.win-x86_64": {
-        "type": "Transitive",
-        "resolved": "1.7.3-rc67",
-        "contentHash": "70f1jodgmbiWHxd3KxR8fo+8CK55oMD/f/5OYYSnBCSdTxzec8ks4bhXASzmx7bgCujipCa4E1s0uQt3PCf8+w=="
-      },
-      "Imageflow.Net": {
-        "type": "Transitive",
-        "resolved": "0.8.4",
-        "contentHash": "7C+sa9W/dk8JCzKXyj+OTMMWcZxr5qwpC5l24vd3a8CTlGtTNE7sVjYfqq/JBLn5kCSHv0XUuBbmz/Lwgte0vw==",
-        "dependencies": {
-          "Microsoft.CSharp": "4.7.0",
-          "Microsoft.IO.RecyclableMemoryStream": "[1.2.2, 3.0.0)",
-          "Newtonsoft.Json": "[10.0.3, 14.0.0)"
-        }
-      },
       "Imazen.Common": {
         "type": "Transitive",
         "resolved": "0.7.6",
@@ -239,11 +247,6 @@
         "type": "Transitive",
         "resolved": "0.11.4",
         "contentHash": "IC1h5g0NeJGHIUgzM1P82ld57knhP0IcQfrYITDPXlNpMYGUrsG5TxuaWTjaeqDNQMBDNZkB8L0rBnwsY6JHuQ=="
-      },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "hSXaFmh7hNCuEoC4XNY5DrRkLDzYHqPx/Ik23R4J86Z7PE/Y6YidhG602dFVdLBRSdG6xp9NabH3dXpcoxWvww=="
       },
       "System.Buffers": {
         "type": "Transitive",

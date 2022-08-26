@@ -29,6 +29,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Imageflow.NativeRuntime.win-x86_64">
+      <Version>1.7.3-rc67</Version>
+    </PackageReference>
+    <PackageReference Include="Imageflow.Net">
+      <Version>0.8.4</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
     <PackageReference Include="PublicApiGenerator">
       <Version>10.3.0</Version>
     </PackageReference>

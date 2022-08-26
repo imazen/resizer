@@ -13,11 +13,14 @@ using ImageResizer.Plugins.Imageflow;
 using ImageResizer.Plugins.RemoteReader;
 using ImageResizer.Util;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ImageResizer.AllPlugins.Tests
 {
     public class TestAll
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
         public static Config GetConfig()
         {
             var c = new Config();
@@ -63,16 +66,16 @@ namespace ImageResizer.AllPlugins.Tests
                 new[]
                     { "auto", "none", "(0,0,0,0)", "100,100,-100,100", "1000,1000,-1000,-1000", "10,10,50,50" });
             data.Add("stretch", new[] { "fill", "proportionally", "huh" });
-            data.Add("format", new[] { "jpg", "png", "gif" });
             data.Add("quality", new[] { "1", "80", "100" });
-            data.Add("dither", new[] { "true", "4pass", "none" });
-            data.Add("colors", new[] { "2", "128", "256" });
-            data.Add("shadowWidth", new[] { "0", "2", "100" });
-            data.Add("shadowColor", new[] { "black", "green", "gray" });
-            data.Add("shadowOffset", new[] { "-3,-1", "-10,-10", "0,0", "30,30" });
+            // data.Add("dither", new[] { "true", "4pass", "none" });
+            // data.Add("colors", new[] { "2", "128", "256" });
+            // data.Add("shadowWidth", new[] { "0", "2", "100" });
+            // data.Add("shadowColor", new[] { "black", "green", "gray" });
+            // data.Add("shadowOffset", new[] { "-3,-1", "-10,-10", "0,0", "30,30" });
             data.Add("trim.threshold", new[] { "0", "255", "80" });
             data.Add("trim.percentpadding", new[] { "0", "1", "51", "100" });
-            data.Add("carve", new[] { "false", "true" });
+            // data.Add("carve", new[] { "false", "true" });
+            data.Add("format", new[] { "jpg", "png", "gif", "webp" });
             data.Add("filter",
                 new[]
                 {
@@ -82,27 +85,27 @@ namespace ImageResizer.AllPlugins.Tests
             data.Add("scale", new[] { "downscaleonly", "upscaleonly", "upscalecanvas", "both" });
             data.Add("ignoreicc", new[] { "true", "false" });
             data.Add("angle", new[] { "0", "361", "15", "180" });
-            data.Add("rotate", new[] { "0", "90", "270", "400", "15", "45" });
+            data.Add("rotate", new[] { "0", "90", "270", "-90", "180"});// , "400", "15", "45" });
             var colors = new[]
             {
                 "", "black", "white", ParseUtils.SerializeColor(Color.FromArgb(25, Color.Green)),
                 ParseUtils.SerializeColor(Color.Transparent)
             };
-            data.Add("color1", colors);
-            data.Add("color2", colors);
-            data.Add("page", new[] { "-10", "1", "5" });
-            data.Add("frame", new[] { "-10", "1", "5" });
-            data.Add("margin", new[] { "-10", "1", "5", "100" });
-            data.Add("borderWidth", new[] { "-10", "1", "5", "100" });
-            data.Add("paddingWidth", new[] { "-10", "1", "5", "100" });
-            data.Add("paddingColor", colors);
-            data.Add("borderColor", colors);
+            // data.Add("color1", colors);
+            // data.Add("color2", colors);
+            // data.Add("page", new[] { "-10", "1", "5" });
+            // data.Add("frame", new[] { "-10", "1", "5" });
+            // data.Add("margin", new[] { "-10", "1", "5", "100" });
+            // data.Add("borderWidth", new[] { "-10", "1", "5", "100" });
+            // data.Add("paddingWidth", new[] { "-10", "1", "5", "100" });
+            // data.Add("paddingColor", colors);
+            // data.Add("borderColor", colors);
             data.Add("bgcolor", colors);
             data.Add("flip", new[] { "h", "v", "hv", "both", "none" });
             data.Add("sourceflip", new[] { "h", "v", "hv", "both", "none" });
-            data.Add("blur", new[] { "0", "1", "5" });
-            data.Add("sharpen", new[] { "0", "1", "5" });
-            data.Add("builder", new[] { "default", "imageflow" });
+            // data.Add("blur", new[] { "0", "1", "5" });
+            // data.Add("sharpen", new[] { "0", "1", "5" });
+            data.Add("builder", new[] { "default", "imageflow", "gdi" });
             //TODO: add watermark, advanced filter, S3reader, sqlreader, remotereader
             //gradient.png: "color1","color2", "angle", "width", "height" 
             return data;
@@ -111,7 +114,8 @@ namespace ImageResizer.AllPlugins.Tests
         public static List<object> GetSourceObjects()
         {
             var sources = new List<object>();
-            sources.Add("~/images/red-leaf.jpg");
+            sources.Add(@"C:\Users\lilith\work\resizer\examples\images\red-leaf.jpg");
+            //sources.Add("~/images/red-leaf.jpg");
             // sources.Add("/gradient.png");
             return sources;
         }
@@ -141,10 +145,19 @@ namespace ImageResizer.AllPlugins.Tests
 
         private int counter = 0;
 
-        [Theory(Skip = "Skip on CI")]
+        [Theory]
         [MemberData(nameof(RandomCombinations))]
         public void RandomTest(object source, string query)
         {
+            if ("true".Equals(Environment.GetEnvironmentVariable("CI"), StringComparison.OrdinalIgnoreCase))
+            {
+                //SKIP on ci
+                _testOutputHelper.WriteLine("Skipping TestAll.RandomTest on CI");
+                return;
+            }
+            
+            //TODO: we could embed an assembly attribute via .csproj containing $(SolutionDir)?
+            
             var c = GetConfig();
 
             if (!Directory.Exists("test-images")) Directory.CreateDirectory("test-images");
@@ -154,12 +167,21 @@ namespace ImageResizer.AllPlugins.Tests
             var dir = Path.GetFullPath("test-images\\");
             if (fname.Length + dir.Length > 250) fname = fname.Substring(0, 250 - dir.Length) + "...";
             var instructions = new Instructions(query);
+            if (instructions["format"] == "webp")
+            {
+                instructions["builder"] = "imageflow";
+            }
             instructions["scache"] = "mem";
             c.CurrentImageBuilder.Build(new ImageJob(source as string, dir + fname, instructions, false, true));
             counter++;
         }
 
         private Random r = new Random();
+
+        public TestAll(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
 
         [Theory]
         [MemberData(nameof(RandomCombinations))]
