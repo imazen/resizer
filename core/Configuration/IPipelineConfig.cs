@@ -117,6 +117,15 @@ namespace ImageResizer.Configuration
         /// </summary>
         /// <returns></returns>
         ImageBuilder GetImageBuilder();
+        
+        
+        /// <summary>
+        /// Returns a mime-type and file extension pair expected to be produced by the given query string and path
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
+        ImageFileType GuessOutputFileTypeIfSupported(Instructions commands, string virtualPath);
 
 
         IAsyncTyrantCache GetAsyncCacheFor(HttpContext context, IAsyncResponsePlan plan);

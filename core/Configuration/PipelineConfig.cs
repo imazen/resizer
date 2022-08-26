@@ -475,6 +475,17 @@ namespace ImageResizer.Configuration
             return c.CurrentImageBuilder;
         }
 
+        public ImageFileType GuessOutputFileTypeIfSupported(Instructions commands, string virtualPath)
+        {
+            foreach (var p in c.Plugins.GetAll<IPluginSupportsOutputFileTypes>())
+            {
+                var guess = p.GuessOutputFileTypeIfSupported(commands, virtualPath);
+                if (guess != null) return guess;
+            }
+
+            return null;
+        }
+
         /// <summary>
         ///     Fired once, on the first PostAuthorizeRequest event.
         /// </summary>

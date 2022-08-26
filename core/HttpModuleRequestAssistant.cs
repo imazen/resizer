@@ -7,6 +7,7 @@ using ImageResizer.Configuration.Performance;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;
+using ImageResizer.Resizing;
 using ImageResizer.Util;
 
 namespace ImageResizer.Configuration
@@ -150,14 +151,22 @@ namespace ImageResizer.Configuration
 
         public void EstimateResponseInfo()
         {
-            IEncoder guessedEncoder = null;
+           
+            ImageFileType guessedOutputType = null;
             //Only use an encoder to determine extension/mime-type when it's an image extension or when we've set process = always.
             if (ProcessingIndicated)
             {
-                guessedEncoder = conf.GetImageBuilder().EncoderProvider
-                    .GetEncoder(new ResizeSettings(RewrittenInstructions), RewrittenVirtualPath);
-                if (guessedEncoder == null)
-                    throw new ImageProcessingException("Image Resizer: No image encoder was found for the request.");
+                guessedOutputType = conf.GuessOutputFileTypeIfSupported(RewrittenInstructions, RewrittenVirtualPath);
+                if (guessedOutputType == null)
+                {
+
+                    var guessedEncoder = conf.GetImageBuilder()
+                        .EncoderProvider.GetEncoder(new ResizeSettings(RewrittenInstructions), RewrittenVirtualPath);
+                    if (guessedEncoder == null)
+                        throw new ImageProcessingException(
+                            "Image Resizer: No image encoder was found for the request.");
+                    guessedOutputType = new ImageFileType(){ MimeType = guessedEncoder.MimeType, Extension = guessedEncoder.Extension };
+                }
             }
 
             //Determine the file extension for the caching system to use if we aren't processing the image
@@ -175,8 +184,8 @@ namespace ImageResizer.Configuration
                 fallbackContentType = DefaultEncoder.GetContentTypeFromImageFormat(recognizedExtension);
 
 
-            EstimatedContentType = ProcessingIndicated ? guessedEncoder.MimeType : fallbackContentType;
-            EstimatedFileExtension = ProcessingIndicated ? guessedEncoder.Extension : fallbackExtension;
+            EstimatedContentType = ProcessingIndicated ? guessedOutputType.MimeType : fallbackContentType;
+            EstimatedFileExtension = ProcessingIndicated ? guessedOutputType.Extension : fallbackExtension;
 
             GlobalPerf.Singleton.IncrementCounter("module_response_ext_" + EstimatedFileExtension);
         }
