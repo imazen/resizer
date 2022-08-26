@@ -22,14 +22,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Imageflow.AllPlatforms">
-      <Version>0.8.4</Version>
-    </PackageReference>
-    <PackageReference Include="Imageflow.Net">
-      <Version>0.8.4</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Name>ImageResizer</Name>
     </ProjectReference>

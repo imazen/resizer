@@ -454,8 +454,6 @@
         "type": "Project",
         "dependencies": {
           "ImageResizer": "0.1.0--notset",
-          "Imageflow.AllPlatforms": "0.8.4",
-          "Imageflow.Net": "0.8.4",
           "Imazen.Common": "0.7.6",
           "Imazen.HybridCache": "0.7.6",
           "Microsoft.Extensions.Configuration.Abstractions": "2.2.0",
