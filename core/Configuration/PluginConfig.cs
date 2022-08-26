@@ -49,6 +49,8 @@ namespace ImageResizer.Configuration
             virtualProviderPlugins = new SafeList<IVirtualImageProvider>();
             settingsModifierPlugins = new SafeList<ISettingsModifier>();
             configProviders = new SafeList<ICurrentConfigProvider>();
+            modifiesRequestCacheKeyPlugins = new SafeList<IPluginModifiesRequestCacheKey>();
+
             LicenseError = c.getNode("licenses")?.Attrs?.Get<LicenseErrorAction>("licenseError") ?? LicenseError;
             LicenseScope = c.getNode("licenses")?.Attrs?.Get<LicenseAccess>("licenseScope") ?? LicenseScope;
         }
