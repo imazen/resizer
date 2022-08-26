@@ -111,12 +111,12 @@ namespace ImageResizer
     }
     public class ImageBuilder : ImageResizer.Resizing.AbstractImageProcessor, ImageResizer.Plugins.IFileExtensionPlugin, ImageResizer.Plugins.IQuerystringPlugin
     {
-        protected ImageResizer.Encoding.IEncoderProvider _encoderProvider;
+        protected ImageResizer.Plugins.IEncoderProvider _encoderProvider;
         protected ImageResizer.Plugins.ISettingsModifier _settingsModifier;
         protected ImageBuilder() { }
-        public ImageBuilder(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Encoding.IEncoderProvider encoderProvider, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier) { }
-        public ImageBuilder(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Encoding.IEncoderProvider encoderProvider, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier, int? maxConcurrentJobs) { }
-        public ImageResizer.Encoding.IEncoderProvider EncoderProvider { get; }
+        public ImageBuilder(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Plugins.IEncoderProvider encoderProvider, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier) { }
+        public ImageBuilder(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Plugins.IEncoderProvider encoderProvider, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier, int? maxConcurrentJobs) { }
+        public ImageResizer.Plugins.IEncoderProvider EncoderProvider { get; }
         public int? MaxConcurrentJobs { get; }
         public ImageResizer.Plugins.ISettingsModifier SettingsModifier { get; }
         public ImageResizer.Plugins.IVirtualImageProvider VirtualFileProvider { get; }
@@ -141,7 +141,7 @@ namespace ImageResizer
         protected System.Drawing.Bitmap BuildJobBitmapToBitmap(ImageResizer.ImageJob job, System.Drawing.Bitmap source, bool transparencySupported) { }
         protected override ImageResizer.Resizing.RequestedAction BuildJobBitmapToStream(ImageResizer.ImageJob job, System.Drawing.Bitmap source, System.IO.Stream dest) { }
         public virtual ImageResizer.ImageBuilder Copy() { }
-        public virtual ImageResizer.ImageBuilder Create(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Encoding.IEncoderProvider writer, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier) { }
+        public virtual ImageResizer.ImageBuilder Create(System.Collections.Generic.IEnumerable<ImageResizer.Resizing.BuilderExtension> extensions, ImageResizer.Plugins.IEncoderProvider writer, ImageResizer.Plugins.IVirtualImageProvider virtualFileProvider, ImageResizer.Plugins.ISettingsModifier settingsModifier) { }
         protected override ImageResizer.Resizing.RequestedAction CreateImageAttribues(ImageResizer.Resizing.ImageState s) { }
         public override System.Drawing.Bitmap DecodeStream(System.IO.Stream s, ImageResizer.ResizeSettings settings, string optionalPath) { }
         protected override ImageResizer.Resizing.RequestedAction EndLayout(ImageResizer.Resizing.ImageState s) { }
@@ -185,6 +185,12 @@ namespace ImageResizer
     public class ImageCorruptedException : ImageResizer.ImageProcessingException
     {
         public ImageCorruptedException(string message, System.Exception innerException) { }
+    }
+    public class ImageFileType
+    {
+        public ImageFileType() { }
+        public string Extension { get; set; }
+        public string MimeType { get; set; }
     }
     public class ImageJob
     {
@@ -653,7 +659,7 @@ namespace ImageResizer.Configuration
             Complete = 2,
         }
     }
-    public interface IPipelineConfig : ImageResizer.Plugins.IVirtualImageProvider
+    public interface IPipelineConfig : ImageResizer.Plugins.IPluginModifiesRequestCacheKey, ImageResizer.Plugins.IVirtualImageProvider
     {
         bool AuthorizeAllImages { get; set; }
         string DropQuerystringKeys { get; set; }
@@ -681,6 +687,7 @@ namespace ImageResizer.Configuration
         new ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
         System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
         ImageResizer.ImageBuilder GetImageBuilder();
+        ImageResizer.ImageFileType GuessOutputFileTypeIfSupported(ImageResizer.Instructions commands, string virtualPath);
         bool HasPipelineDirective(System.Collections.Specialized.NameValueCollection q);
         bool IsAcceptedImageType(string filePath);
         bool IsAppDomainUnrestricted();
@@ -711,7 +718,7 @@ namespace ImageResizer.Configuration
         Watermark = 0,
         Exception = 1,
     }
-    public class PipelineConfig : ImageResizer.Configuration.IPipelineConfig, ImageResizer.Plugins.ISettingsModifier, ImageResizer.Plugins.IVirtualImageProvider
+    public class PipelineConfig : ImageResizer.Configuration.IPipelineConfig, ImageResizer.Plugins.IPluginModifiesRequestCacheKey, ImageResizer.Plugins.ISettingsModifier, ImageResizer.Plugins.IVirtualImageProvider
     {
         [System.CLSCompliant(false)]
         protected volatile System.Collections.Generic.Dictionary<, > _cachedDirectives;
@@ -770,10 +777,12 @@ namespace ImageResizer.Configuration
         public ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
         public System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
         public ImageResizer.ImageBuilder GetImageBuilder() { }
+        public ImageResizer.ImageFileType GuessOutputFileTypeIfSupported(ImageResizer.Instructions commands, string virtualPath) { }
         public bool HasPipelineDirective(System.Collections.Specialized.NameValueCollection q) { }
         public bool IsAcceptedImageType(string path) { }
         public bool IsAppDomainUnrestricted() { }
         public ImageResizer.ResizeSettings Modify(ImageResizer.ResizeSettings settings) { }
+        public string ModifyRequestCacheKey(string currentKey, string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
         public string TrimFakeExtensions(string path) { }
         protected void _cacheUrlData() { }
         protected System.Collections.Generic.Dictionary<string, bool> getCachedDirectives() { }
@@ -781,7 +790,7 @@ namespace ImageResizer.Configuration
         protected string getExtension(string path) { }
         protected void urlModifyingPlugins_Changed(ImageResizer.Collections.SafeList<ImageResizer.Plugins.IQuerystringPlugin> sender) { }
     }
-    public class PluginConfig : Imazen.Common.Issues.IssueSink, ImageResizer.Encoding.IEncoderProvider
+    public class PluginConfig : Imazen.Common.Issues.IssueSink, ImageResizer.Plugins.IEncoderProvider
     {
         public ImageResizer.Configuration.PluginConfig.LoggingAvailableEvent LoggingAvailable;
         protected object _loadPluginsSync;
@@ -794,7 +803,7 @@ namespace ImageResizer.Configuration
         protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.ICurrentConfigProvider> configProviders;
         protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.IFileExtensionPlugin> fileExtensionPlugins;
         protected ImageResizer.Collections.SafeList<ImageResizer.Resizing.BuilderExtension> imageBuilderExtensions;
-        protected ImageResizer.Collections.SafeList<ImageResizer.Encoding.IEncoder> imageEncoders;
+        protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.IEncoder> imageEncoders;
         protected ImageResizer.Configuration.Plugins.NativeDependencyManager ndeps;
         protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.IQuerystringPlugin> querystringPlugins;
         protected ImageResizer.Collections.SafeList<ImageResizer.Plugins.ISettingsModifier> settingsModifierPlugins;
@@ -803,13 +812,14 @@ namespace ImageResizer.Configuration
         public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IPlugin> AllPlugins { get; }
         public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IAsyncTyrantCache> CachingSystems { get; }
         public ImageResizer.Collections.SafeList<ImageResizer.Plugins.ICurrentConfigProvider> ConfigProviders { get; }
-        public ImageResizer.Encoding.IEncoderProvider EncoderProvider { get; }
+        public ImageResizer.Plugins.IEncoderProvider EncoderProvider { get; }
         public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IFileExtensionPlugin> FileExtensionPlugins { get; }
         public ImageResizer.Collections.SafeList<ImageResizer.Resizing.BuilderExtension> ImageBuilderExtensions { get; }
-        public ImageResizer.Collections.SafeList<ImageResizer.Encoding.IEncoder> ImageEncoders { get; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IEncoder> ImageEncoders { get; }
         public ImageResizer.Configuration.LicenseErrorAction LicenseError { get; set; }
         public ImageResizer.Configuration.LicenseAccess LicenseScope { get; set; }
         public ImageResizer.Configuration.Logging.ILogManager LogManager { get; set; }
+        public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IPluginModifiesRequestCacheKey> ModifiesRequestCacheKeyPlugins { get; }
         public bool PluginsLoaded { get; }
         public ImageResizer.Collections.SafeList<ImageResizer.Plugins.IQuerystringPlugin> QuerystringPlugins { get; }
         public ImageResizer.Collections.SafeList<ImageResizer.Plugins.ISettingsModifier> SettingsModifierPlugins { get; }
@@ -825,7 +835,7 @@ namespace ImageResizer.Configuration
         public void ForceLoadPlugins() { }
         public T Get<T>() { }
         public System.Collections.Generic.IList<T> GetAll<T>() { }
-        public ImageResizer.Encoding.IEncoder GetEncoder(ImageResizer.ResizeSettings settings, object original) { }
+        public ImageResizer.Plugins.IEncoder GetEncoder(ImageResizer.ResizeSettings settings, object original) { }
         public override System.Collections.Generic.IEnumerable<Imazen.Common.Issues.IIssue> GetIssues() { }
         public System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetLicensedDomainMappings() { }
         protected System.Collections.Generic.List<string> GetOptimizedAssemblyList(string assemblyName, string pluginName) { }
@@ -1017,21 +1027,6 @@ namespace ImageResizer.Configuration.Xml
         public override string ToString() { }
     }
 }
-namespace ImageResizer.Encoding
-{
-    public interface IEncoder
-    {
-        string Extension { get; }
-        string MimeType { get; }
-        bool SupportsTransparency { get; }
-        ImageResizer.Encoding.IEncoder CreateIfSuitable(ImageResizer.ResizeSettings settings, object original);
-        void Write(System.Drawing.Image i, System.IO.Stream s);
-    }
-    public interface IEncoderProvider
-    {
-        ImageResizer.Encoding.IEncoder GetEncoder(ImageResizer.ResizeSettings settings, object original);
-    }
-}
 namespace ImageResizer.ExtensionMethods
 {
     public static class EnumExtensions
@@ -1150,7 +1145,7 @@ namespace ImageResizer.Plugins.Basic
         public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
         public bool Uninstall(ImageResizer.Configuration.Config c) { }
     }
-    public class DefaultEncoder : ImageResizer.Encoding.IEncoder, ImageResizer.Plugins.IFileSignatureProvider, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
+    public class DefaultEncoder : ImageResizer.Plugins.IEncoder, ImageResizer.Plugins.IFileSignatureProvider, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
     {
         public DefaultEncoder() { }
         public DefaultEncoder(System.Drawing.Imaging.ImageFormat outputFormat) { }
@@ -1161,7 +1156,7 @@ namespace ImageResizer.Plugins.Basic
         public System.Drawing.Imaging.ImageFormat OutputFormat { get; set; }
         public int Quality { get; set; }
         public bool SupportsTransparency { get; }
-        public virtual ImageResizer.Encoding.IEncoder CreateIfSuitable(ImageResizer.ResizeSettings settings, object original) { }
+        public virtual ImageResizer.Plugins.IEncoder CreateIfSuitable(ImageResizer.ResizeSettings settings, object original) { }
         public System.Collections.Generic.IEnumerable<ImageResizer.Plugins.FileSignature> GetSignatures() { }
         public virtual System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
         public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
@@ -1213,16 +1208,6 @@ namespace ImageResizer.Plugins.Basic
         Localhost = 1,
         AllHosts = 2,
     }
-    public class DropShadow : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin
-    {
-        public DropShadow() { }
-        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
-        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
-        protected override ImageResizer.Resizing.RequestedAction LayoutEffects(ImageResizer.Resizing.ImageState s) { }
-        protected override ImageResizer.Resizing.RequestedAction RenderEffects(ImageResizer.Resizing.ImageState s) { }
-        public bool Uninstall(ImageResizer.Configuration.Config c) { }
-        public static void DrawOuterGradient(System.Drawing.Graphics g, System.Drawing.PointF[] poly, System.Drawing.Color inner, System.Drawing.Color outer, float width) { }
-    }
     public class EndpointPlugin : ImageResizer.Plugins.IPlugin
     {
         public EndpointPlugin() { }
@@ -1246,27 +1231,6 @@ namespace ImageResizer.Plugins.Basic
         public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
         public bool Uninstall(ImageResizer.Configuration.Config c) { }
         protected string parseResizeFolderSyntax(string path, System.Collections.Specialized.NameValueCollection q) { }
-    }
-    public class Gradient : ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin, ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderAsync
-    {
-        public Gradient() { }
-        public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
-        public System.Threading.Tasks.Task<bool> FileExistsAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
-        public ImageResizer.Plugins.IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
-        public System.Threading.Tasks.Task<ImageResizer.Plugins.IVirtualFileAsync> GetFileAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
-        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
-        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
-        public bool Uninstall(ImageResizer.Configuration.Config c) { }
-        public class GradientVirtualFile : ImageResizer.Plugins.IVirtualBitmapFile, ImageResizer.Plugins.IVirtualFile, ImageResizer.Plugins.IVirtualFileAsync, ImageResizer.Plugins.IVirtualFileSourceCacheKey
-        {
-            protected ImageResizer.ResizeSettings query;
-            public GradientVirtualFile(System.Collections.Specialized.NameValueCollection query) { }
-            public string VirtualPath { get; }
-            public System.Drawing.Bitmap GetBitmap() { }
-            public string GetCacheKey(bool includeModifiedDate) { }
-            public System.IO.Stream Open() { }
-            public System.Threading.Tasks.Task<System.IO.Stream> OpenAsync() { }
-        }
     }
     public interface IDiagnosticsFooterProvider
     {
@@ -1404,21 +1368,6 @@ namespace ImageResizer.Plugins.Basic
         public static string CleanupLicenseString(string license) { }
         public static ImageResizer.Plugins.Basic.StaticLicenseProvider One(string license) { }
     }
-    public class Trial : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IPlugin
-    {
-        public Trial() { }
-        public virtual void DrawString(System.Drawing.RectangleF area, System.Drawing.Graphics g, string text, System.Drawing.FontFamily ff, System.Drawing.Color c) { }
-        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
-        protected override ImageResizer.Resizing.RequestedAction PreFlushChanges(ImageResizer.Resizing.ImageState s) { }
-        public bool Uninstall(ImageResizer.Configuration.Config c) { }
-        public static void InstallPermanent() { }
-        public enum TrialWatermarkMode
-        {
-            After500 = 0,
-            Always = 1,
-            Randomly = 2,
-        }
-    }
     public class VirtualFolder : System.Web.Hosting.VirtualPathProvider, ImageResizer.Plugins.IMultiInstancePlugin, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderAsync, Imazen.Common.Issues.IIssueProvider
     {
         public VirtualFolder(System.Collections.Specialized.NameValueCollection args) { }
@@ -1502,6 +1451,20 @@ namespace ImageResizer.Plugins
     {
         ImageResizer.Configuration.Config GetCurrentConfig();
     }
+    [System.Obsolete("Cannot be used with Imageflow backend; relies on GDI Image object")]
+    public interface IEncoder
+    {
+        string Extension { get; }
+        string MimeType { get; }
+        bool SupportsTransparency { get; }
+        ImageResizer.Plugins.IEncoder CreateIfSuitable(ImageResizer.ResizeSettings settings, object original);
+        void Write(System.Drawing.Image i, System.IO.Stream s);
+    }
+    [System.Obsolete("Cannot be used with Imageflow backend; relies on GDI Image object")]
+    public interface IEncoderProvider
+    {
+        ImageResizer.Plugins.IEncoder GetEncoder(ImageResizer.ResizeSettings settings, object original);
+    }
     public interface IFileExtensionPlugin
     {
         System.Collections.Generic.IEnumerable<string> GetSupportedFileExtensions();
@@ -1533,6 +1496,18 @@ namespace ImageResizer.Plugins
     public interface IPluginInfo
     {
         System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetInfoPairs();
+    }
+    public interface IPluginModifiesRequestCacheKey
+    {
+        string ModifyRequestCacheKey(string currentKey, string virtualPath, System.Collections.Specialized.NameValueCollection queryString);
+    }
+    public interface IPluginRequiresShutdown
+    {
+        System.Threading.Tasks.Task StopAsync(System.Threading.CancellationToken cancellationToken);
+    }
+    public interface IPluginSupportsOutputFileTypes
+    {
+        ImageResizer.ImageFileType GuessOutputFileTypeIfSupported(ImageResizer.Instructions commands, string virtualPath);
     }
     public interface IProfiler
     {
@@ -1796,6 +1771,8 @@ namespace ImageResizer.Resizing
         public override string ToString() { }
         public static ImageResizer.Resizing.BoxPadding Parse(string text, ImageResizer.Resizing.BoxPadding fallbackValue) { }
     }
+    [System.Obsolete("ImageResizer is migrating away from GDI. Suggest new features be added to Imagefl" +
+        "ow instead.")]
     public class BuilderExtension : ImageResizer.Resizing.AbstractImageProcessor
     {
         public BuilderExtension() { }
@@ -2082,8 +2059,6 @@ namespace ImageResizer.Util
     {
         public const System.Globalization.NumberStyles floatingPointStyle = 231;
         public Utils() { }
-        [System.Obsolete("This method will be removed in V3.3. Use DropShadow.DrawOuterGradient instead")]
-        public static void DrawOuterGradient(System.Drawing.Graphics g, System.Drawing.PointF[] poly, System.Drawing.Color inner, System.Drawing.Color outer, float width) { }
         public static System.Drawing.RotateFlipType combineFlipAndRotate(System.Drawing.RotateFlipType flip, double angle) { }
         [System.Obsolete("Use ImageResizer.ExtensionMethods instead.")]
         public static void copyStream(System.IO.Stream source, System.IO.Stream dest) { }

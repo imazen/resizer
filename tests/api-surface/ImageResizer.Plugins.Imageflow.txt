@@ -4,7 +4,7 @@
 [assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
 namespace ImageResizer.Plugins.Imageflow
 {
-    public class ImageflowBackendPlugin : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IFileExtensionPlugin, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin, Imazen.Common.Issues.IIssueProvider
+    public class ImageflowBackendPlugin : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IFileExtensionPlugin, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IPluginModifiesRequestCacheKey, ImageResizer.Plugins.IPluginSupportsOutputFileTypes, ImageResizer.Plugins.IQuerystringPlugin, Imazen.Common.Issues.IIssueProvider
     {
         public ImageflowBackendPlugin() { }
         public ImageflowBackendPlugin(System.Collections.Specialized.NameValueCollection args) { }
@@ -12,7 +12,9 @@ namespace ImageResizer.Plugins.Imageflow
         public System.Collections.Generic.IEnumerable<Imazen.Common.Issues.IIssue> GetIssues() { }
         public System.Collections.Generic.IEnumerable<string> GetSupportedFileExtensions() { }
         public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.ImageFileType GuessOutputFileTypeIfSupported(ImageResizer.Instructions commands, string virtualPath) { }
         public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public string ModifyRequestCacheKey(string currentKey, string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
         public bool Uninstall(ImageResizer.Configuration.Config c) { }
     }
 }

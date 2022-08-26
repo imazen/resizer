@@ -14,15 +14,16 @@ namespace ImageResizer.Plugins.HybridCache
         public long MinCleanupBytes { get; set; }
         public long QueueSizeLimitInBytes { get; set; }
     }
-    public class HybridCachePlugin : ImageResizer.Plugins.IAsyncTyrantCache, ImageResizer.Plugins.IPlugin
+    public class HybridCachePlugin : ImageResizer.Plugins.IAsyncTyrantCache, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IPluginInfo, ImageResizer.Plugins.IPluginRequiresShutdown
     {
         public HybridCachePlugin() { }
         public HybridCachePlugin(ImageResizer.Plugins.HybridCache.HybridCacheOptions options, Microsoft.Extensions.Logging.ILogger logger) { }
         public bool CanProcess(System.Web.HttpContext current, ImageResizer.Plugins.IAsyncResponsePlan e) { }
+        public System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetInfoPairs() { }
         public System.Collections.Generic.IEnumerable<Imazen.Common.Issues.IIssue> GetIssues() { }
         public System.Threading.Tasks.Task<Imazen.Common.Extensibility.StreamCache.IStreamCacheResult> GetOrCreateBytes(byte[] key, Imazen.Common.Extensibility.StreamCache.AsyncBytesResult dataProviderCallback, System.Threading.CancellationToken cancellationToken, bool retrieveContentType) { }
         public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
-        public System.Threading.Tasks.Task ProcessAsync(System.Web.HttpContext current, ImageResizer.Plugins.IAsyncResponsePlan plan) { }
+        public System.Threading.Tasks.Task ProcessAsync(System.Web.HttpContext context, ImageResizer.Plugins.IAsyncResponsePlan plan) { }
         public System.Threading.Tasks.Task StartAsync(System.Threading.CancellationToken cancellationToken) { }
         public System.Threading.Tasks.Task StopAsync(System.Threading.CancellationToken cancellationToken) { }
         public bool Uninstall(ImageResizer.Configuration.Config c) { }
