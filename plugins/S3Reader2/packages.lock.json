@@ -4,17 +4,17 @@
     ".NETFramework,Version=v4.7.2": {
       "AWSSDK.Core": {
         "type": "Direct",
-        "requested": "[3.1.3.2, )",
-        "resolved": "3.1.3.2",
-        "contentHash": "V3IBgo2ZSlO2d2U9DZGVSdXhaRqRZ0LKROEQefnWiZ143ALevvBCQdv1ohaNhucvfRW3ZAYcwszN3yzMsnkDhA=="
+        "requested": "[3.7.12.25, )",
+        "resolved": "3.7.12.25",
+        "contentHash": "zvGGsVChO2TILuXNACS3Ji7wKA7ARYTC81cAiVa0Q6REetCoWAkUN8AXutSvzpOFNcW5kf8nisPvWtwmq3Lsnw=="
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.1.3.1, )",
-        "resolved": "3.1.3.1",
-        "contentHash": "Ky9QX0oWAlvlv+LIaqATZkJBwP8XTUfIC373skPOSUm22En4vOyLYjXiQXzXCSdX/SXhDdFDVnFApnZ0543yWQ==",
+        "requested": "[3.7.9.43, )",
+        "resolved": "3.7.9.43",
+        "contentHash": "Jc7cp9w4+igrKJlIgNsEHo0XSiJV7hpFlY07RjRr0qcXuzLHVf8W+sbPm3rQk//8+de4CBny+KEp79y1Iv39oA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.1.2.1, 3.2.0)"
+          "AWSSDK.Core": "[3.7.12.25, 4.0.0)"
         }
       },
       "Microsoft.SourceLink.GitHub": {
