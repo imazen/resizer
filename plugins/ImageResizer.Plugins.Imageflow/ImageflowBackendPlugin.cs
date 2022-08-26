@@ -11,7 +11,7 @@ using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.Imageflow
 {
-    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin, IQuerystringPlugin, IPluginModifiesRequestCacheKey
+    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin, IQuerystringPlugin, IPluginModifiesRequestCacheKey, IPluginSupportsOutputFileTypes
     {
 
         /// <summary>
@@ -33,6 +33,41 @@ namespace ImageResizer.Plugins.Imageflow
             _defaultBuilder = args.Get<bool>("defaultBuilder", true);
             _supportedBuilderStrings = args.GetAsString("builderStrings", "imageflow,wic,freeimage")
                 .Split(new[] { ',' }, StringSplitOptions.None);
+        }
+
+        public ImageFileType GuessOutputFileTypeIfSupported(Instructions commands, string virtualPath)
+        {
+            //TODO: review and test
+            //The alternate implementation in DefaultEncoder is way more complicated
+            
+            var format = Path.GetExtension(virtualPath).Trim('.', ' ');
+            if (!string.IsNullOrWhiteSpace(commands.Format))
+            {
+                format = commands.Format;
+            }
+
+            format = format.ToLowerInvariant();
+            
+            if (format == "webp")
+            {
+                //TODO: Technically we should only return this if the builder will actually handle the request
+                
+                return new ImageFileType() { MimeType = "image/webp", Extension = "webp" };
+            }
+            if (format == "jpg" || format == "jpeg")
+            {
+                return new ImageFileType() { MimeType = "image/jpeg", Extension = "jpg" };
+            }
+            if (format == "png")
+            {
+                return new ImageFileType() { MimeType = "image/png", Extension = "png" };
+            }
+            if (format == "gif")
+            {
+                return new ImageFileType() { MimeType = "image/gif", Extension = "gif" };
+            }
+
+            return null;
         }
 
         private Config c;
@@ -110,8 +145,8 @@ namespace ImageResizer.Plugins.Imageflow
                 var firstDecodeResult = jobResult.Result.DecodeResults.First();
                 var firstEncodeResult = jobResult.Result.EncodeResults.First();
 
-                job.ResultInfo["result.ext"] = firstEncodeResult.PreferredExtension;
-                job.ResultInfo["result.mime"] = firstEncodeResult.PreferredMimeType;
+                job.ResultInfo["result.ext"] = firstEncodeResult.PreferredExtension ?? "jpg"; //Leaving this null causes the request to fail later;
+                job.ResultInfo["result.mime"] = firstEncodeResult.PreferredMimeType ?? "image/jpeg"; //Leaving this null causes the request to fail later;
                 job.ResultInfo["source.width"] = firstDecodeResult.Width;
                 job.ResultInfo["source.height"] = firstDecodeResult.Height;
                 job.ResultInfo["final.width"] = firstEncodeResult.Width;
