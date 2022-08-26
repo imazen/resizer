@@ -1,18 +1,14 @@
 ﻿
-## TODO NOW for v5
 
-* Add etag support for no cache installed
-* Add better cache control configuration that works in async mode.
+## TODO for v5
 
-
-## TODO LATER for v5
-
+* Add etag support even when no cache is installed or enabled in the querystring
+* Add cache control configuration that works in async mode.
 * Update /resizer.debug to guide removal of old plugins and migration to new
 * Check if events work for async
-
 * Integrate licensing from Imazen.Common and migrate just the enforcer tests. Add Edition metadata or API call during new()
 * Unify SizeLimiting with Imageflow and GDI backends.
-
+* Document CropAround/Faces/RedEye lack of support
 
 ## TODO for v5.1
 
