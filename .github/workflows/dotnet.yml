@@ -57,9 +57,15 @@ jobs:
       - name: Build Solution
         run:  dotnet build -c Release ImageResizer.sln
       
-      - name: Test Solution (except azure)
+      - name: Test Solution AnyCPU (except azure)
         run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln  --blame --no-build
-        
+
+      - name: Test Solution x86 (except azure)
+        run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln  --blame --no-build --arch x86
+
+      - name: Test Solution x64 (except azure)
+        run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln  --blame --no-build --arch x64
+      
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
