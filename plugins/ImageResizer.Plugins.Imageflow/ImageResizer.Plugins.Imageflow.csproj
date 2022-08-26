@@ -23,10 +23,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Imageflow.AllPlatforms">
-      <Version>0.8.4</Version>
+      <Version>0.8.5</Version>
     </PackageReference>
     <PackageReference Include="Imageflow.Net">
-      <Version>0.8.4</Version>
+      <Version>0.8.5</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
