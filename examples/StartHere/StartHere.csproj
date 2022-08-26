@@ -47,11 +47,14 @@
         <Reference Include="Imageflow.Net, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>packages\Imageflow.Net.0.8.4\lib\netstandard2.0\Imageflow.Net.dll</HintPath>
         </Reference>
-        <Reference Include="ImageResizer, Version=5.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>packages\ImageResizer.5.0.1-preview02\lib\net472\ImageResizer.dll</HintPath>
+        <Reference Include="ImageResizer, Version=5.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>packages\ImageResizer.5.0.3-preview04\lib\net472\ImageResizer.dll</HintPath>
         </Reference>
         <Reference Include="ImageResizer.Plugins.HybridCache, Version=5.0.1.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>packages\ImageResizer.Plugins.HybridCache.5.0.1-preview02\lib\net472\ImageResizer.Plugins.HybridCache.dll</HintPath>
+        </Reference>
+        <Reference Include="ImageResizer.Plugins.Imageflow, Version=5.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>packages\ImageResizer.Plugins.Imageflow.5.0.3-preview04\lib\net472\ImageResizer.Plugins.Imageflow.dll</HintPath>
         </Reference>
         <Reference Include="Imazen.Common, Version=0.7.6.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>packages\Imazen.Common.0.7.6\lib\netstandard2.0\Imazen.Common.dll</HintPath>
