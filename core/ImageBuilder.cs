@@ -710,7 +710,7 @@ namespace ImageResizer
                     job.FinalPath = job.ResolveTemplatedPath(dest as string,
                         delegate(string var)
                         {
-                            if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) return job.ResultFileExtension;
+                            if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) return job.ResultFileExtension ?? "jpg"; //Leaving this null causes the request to fail later
                             if ("width".Equals(var, StringComparison.OrdinalIgnoreCase))
                                 return GetFinalSize(new Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Width
                                     .ToString(NumberFormatInfo.InvariantInfo);
