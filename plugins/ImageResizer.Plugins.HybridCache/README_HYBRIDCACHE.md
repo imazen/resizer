@@ -3,8 +3,10 @@
 This plugin is suggested for all ImageResizer installations. It caches image processing requests as static files and is essential for consistent low-latency responses and scalability.
 
 
+HybridCache is our 7th-generation disk caching engine based on 13 years of large-scale production deployments.
+
 HybridCache offers accurately bounded disk usage,
-capable of storing mime-type metadata when needed, and utilizing a sharded write-ahead-log for scalability. Cache entries are written as separate files to improve OS level performance.
+can store mime-type metadata when needed, and uses a sharded, asynchronous write-ahead-log for scalability. Cache entries are written as separate files to improve OS level performance.
 
 This plugin only works with the URL API, not the managed API.
 
