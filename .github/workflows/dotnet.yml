@@ -55,7 +55,7 @@ jobs:
         run: dotnet restore
           
       - name: Build Solution
-        run:  dotnet build -c Release ImageResizer.sln --maxcpucount 1
+        run:  dotnet build --maxcpucount 1 -c Release ImageResizer.sln 
       
       - name: Test Solution AnyCPU (except azure)
         run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln  --blame --no-build
