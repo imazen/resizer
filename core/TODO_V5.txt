@@ -9,6 +9,12 @@
 * Integrate licensing from Imazen.Common and migrate just the enforcer tests. Add Edition metadata or API call during new()
 * Unify SizeLimiting with Imageflow and GDI backends.
 * Document CropAround/Faces/RedEye lack of support
+* Document new stuff NOT in IR4, like &webp.quality=1
+
+
+## QA TODO
+
+* Test that upgrading from a project will all plugins provides enough guidance.
 
 ## TODO for v5.1
 

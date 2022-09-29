@@ -4,7 +4,10 @@ This is an image processing backend that uses the [Imageflow](https://github.com
 Imageflow is written in Rust for speed and security, and offers incredible performance and file optimization.
 
 ### Installation
-* `Install-Package ImageResizer.Plugins.Imageflow`
+* Enable pre-release packages in NuGet
+* `Install-Package ImageResizer.Plugins.Imageflow -pre`
+* `Install-Package Imageflow.NativeRuntime.win-x86 -pre` installs the 32-bit imageflow.dll
+* `Install-Package Imageflow.NativeRuntime.win-x86_64 -pre` installs the 64-bit imageflow.dll
 * Add `<add name="Imageflow" />` to the `<resizer><plugins>` section of `Web.config` to use Imageflow.
 * The functionality from most plugins has been integrated into the core or into Imageflow, drastically simplifying maintenance for the most common features.
 * Remove references to `Wic*`, `PrettyGifs`, `AnimatedGifs`, `Watermark`, `SimpleFilters`, `WhitespaceTrimmer`, `WebP`, `AdvancedFilters`, `FastScaling.x86` and `FastScaling.x64` from **both nuget.config and Web.config**.
