@@ -1,17 +1,23 @@
-`# v5-0-0
+# v5-0-0
 
-## ImageResizer 5.0 has breaking changes
+## ImageResizer 5 has breaking changes
 
-NOTE: Enable `prerelase` in NuGet to get 5.0 binaries until a stable version is released.
+### Migration Summary
+**You'll need to remove all plugins except Azure, S3, & RemoteReader, then install Imageflow and HybridCache. Make sure you check /resizer.debug for issues.**
 
-NOTE: All ImageResizer.* packages must have the same version number. If no update is available, remove the plugin. Some ImageResizer.* packages are from third parties and may cause runtime issues; verify the package owner includes "imazen".
+* Change your project target framework to 4.8.
+* Enable pre-release packages in NuGet or use the Package Manager Console
+* `Install-Package ImageResizer.Plugins.HybridCache -pre`
+* `Install-Package ImageResizer.Plugins.Imageflow -pre`
+* `Install-Package Imageflow.NativeRuntime.win-x86 -pre` (installs the 32-bit imageflow.dll)
+* `Install-Package Imageflow.NativeRuntime.win-x86_64 -pre` (installs the 64-bit imageflow.dll). Keep these updated!
+* Uninstall all 4.x Nuget Packages.  All ImageResizer.* packages must have the same version number. If no update is available, remove the plugin. Some ImageResizer.* packages are from third parties and may cause runtime issues; verify the package owner includes "imazen".
+* Images are now auto-rotated to match the EXIF orientation tag. If you have `<pipeline defaultCommands="autorotate.default=true"/>` in Web.config (per our 2017 suggestion), this will not affect you.
 
-NOTE: Images are now auto-rotated to match the EXIF orientation tag. We've suggested setting `<pipeline defaultCommands="autorotate.default=true"/>` for five years now, so this may not affect you if so.
 
+### .NET Framework 4.8 or higher is now required
 
-### .NET Framework 4.7.2 or higher is now required
-
-* This allows us to update our dependencies to the latest, safest versions.
+* This allows us to update our dependencies to the latest, safest versions and use 
 
 ### Most plugins have been merged into the core or ImageResizer.Plugins.Imageflow
 * `Install-Package ImageResizer.Plugins.Imageflow`
@@ -51,7 +57,6 @@ Imageflow does not use `<sizelimits imageWidth="" and imageHeight="" />`, but ha
 * License key validation for Performance/Elite features is not yet enabled.
 * resizer.debug does not provide sufficient guidance for upgrading to v5.0
 * `<sizelimiting>` settings do not apply to Imageflow backend, it has its own default size limits and they aren't configurable yet.
-* 
 
 ## V5 URL API Breaking changes
 
