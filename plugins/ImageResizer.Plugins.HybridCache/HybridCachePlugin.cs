@@ -177,7 +177,7 @@ namespace ImageResizer.Plugins.HybridCache
             {
                 AsyncCacheOptions = new AsyncCacheOptions()
                 {
-                    MaxQueuedBytes = Math.Max(0, options.WriteQueueMemoryMb),
+                    MaxQueuedBytes = Math.Max(0, options.WriteQueueMemoryMb) * 1024 * 1024,
                     WriteSynchronouslyWhenQueueFull = true,
                     MoveFileOverwriteFunc = (from, to) =>
                     {
@@ -187,8 +187,8 @@ namespace ImageResizer.Plugins.HybridCache
                 },
                 CleanupManagerOptions = new CleanupManagerOptions()
                 {
-                    MaxCacheBytes = Math.Max(0, options.CacheSizeMb),
-                    MinCleanupBytes = Math.Max(1, options.EvictionSweepSizeMb),
+                    MaxCacheBytes = Math.Max(0, options.CacheSizeMb) * 1024 * 1024,
+                    MinCleanupBytes = Math.Max(1, options.EvictionSweepSizeMb) * 1024 * 1024,
                     MinAgeToDelete = options.MinAgeToDelete.Ticks > 0 ? options.MinAgeToDelete : TimeSpan.Zero
                 }
             };
