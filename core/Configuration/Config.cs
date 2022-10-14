@@ -247,6 +247,18 @@ namespace ImageResizer.Configuration
                         IssueSeverity.ConfigurationError));
             return defaultValue;
         }
+        
+        public long get(string selector, long defaultValue)
+        {
+            long i;
+            var s = cs.getAttr(selector, defaultValue.ToString(NumberFormatInfo.InvariantInfo));
+            if (long.TryParse(s, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i)) return i;
+            else
+                configurationSectionIssues.AcceptIssue(
+                    new Issue("Invalid integer value in <resizer> configuration section, " + selector + ":" + s,
+                        IssueSeverity.ConfigurationError));
+            return defaultValue;
+        }
 
         public bool get(string selector, bool defaultValue)
         {
@@ -269,7 +281,7 @@ namespace ImageResizer.Configuration
 
         public T get<T>(string selector, T defaultValue) where T : struct, IConvertible
         {
-            //if (!typeof(T).IsEnum) throw new ArgumentException("T must be an enumerated type");
+            if (!typeof(T).IsEnum) throw new ArgumentException("T must be an enumerated type");
 
             var value = get(selector, null);
             if (value == null) return defaultValue;
