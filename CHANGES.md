@@ -32,7 +32,7 @@
 * Delete references to `DiskCache` and `TinyCache` from **both nuget.config and Web.config**
 * `Install-Package ImageResizer.Plugins.HybridCache`
 * Put `<add name="HybridCache" />` in the `<resizer><plugins>` section of `Web.config`
-* Put `<hybridCache cacheLocation="C:\imageresizercache\" cacheMaxSizeBytes="1,000,000,000" />` in the `<resizer>` section of `Web.config`. If you want to use a temp folder, omit cacheLocation.
+* Put `<hybridCache cacheLocation="C:\imageresizercache\" cacheSizeMb="1,000" />` in the `<resizer>` section of `Web.config`. If you want to use a temp folder, omit cacheLocation.
 * HybridCache requires a cache folder outside of the web root. DiskCache did not support that.
 * HybridCache, unlike DiskCache, can precisely limit the cache size & disk utilization. 
 * HybridCache uses a write-ahead log to prevent orphaned cache entries.

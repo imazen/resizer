@@ -53,15 +53,14 @@ namespace ImageResizer.Plugins.HybridCache
 
         private void LoadSettings(Config c)
         {
-            _cacheOptions.DiskCacheDirectory = c.get("hybridCache.cacheLocation", ResolveCacheLocation(_cacheOptions.DiskCacheDirectory));
-            _cacheOptions.CacheSizeLimitInBytes = c.get("hybridCache.cacheMaxSizeBytes", _cacheOptions.CacheSizeLimitInBytes);
-            _cacheOptions.DatabaseShards = c.get("hybridCache.shardCount", _cacheOptions.DatabaseShards);
-            _cacheOptions.QueueSizeLimitInBytes = c.get("hybridCache.writeQueueLimitBytes", _cacheOptions.QueueSizeLimitInBytes);
-            _cacheOptions.MinCleanupBytes = c.get("hybridCache.minCleanupBytes", _cacheOptions.MinCleanupBytes);
+            var cacheSizeMb = c.get("hybridCache.cacheSizeMb", _cacheOptions.CacheSizeMb);
+            var writeQueueMemoryMb = c.get("hybridCache.writeQueueMemoryMb", _cacheOptions.WriteQueueMemoryMb);
+            var evictionSweepSizeMb = c.get("hybridCache.evictionSweepSizeMb", _cacheOptions.EvictionSweepSizeMb);
+            var shardCount = c.get("hybridCache.shardCount", _cacheOptions.DatabaseShards);
             
+            _cacheOptions.CacheLocation = c.get("hybridCache.cacheLocation", ResolveCacheLocation(_cacheOptions.CacheLocation));
             // Resolve cache directory
-            _cacheOptions.DiskCacheDirectory = ResolveCacheLocation(_cacheOptions.DiskCacheDirectory);
-
+            _cacheOptions.CacheLocation = ResolveCacheLocation(_cacheOptions.CacheLocation);
 
             if (FirstInstancePerPath.AddOrUpdate(DiskCacheDirectory, this, (k, v) => v) != this)
             {
@@ -74,7 +73,7 @@ namespace ImageResizer.Plugins.HybridCache
         }
 
         private string GetDefaultCacheLocation() {
-            var subfolder = $"imageresizer_cache_{Math.Abs(PathUtils.AppPhysicalPath.GetHashCode())}";
+            var subfolder = $"imageresizer_cache_{Math.Abs(PathUtils.AppPhysicalPath.GetHashCode()).ToString()}";
             return Path.Combine(Path.GetTempPath(), subfolder);
         }
 
@@ -174,11 +173,11 @@ namespace ImageResizer.Plugins.HybridCache
 
         private static Imazen.HybridCache.HybridCache CreateHybridCacheFromOptions(HybridCacheOptions options, ILogger logger)
         {
-            var cacheOptions = new Imazen.HybridCache.HybridCacheOptions(options.DiskCacheDirectory)
+            var cacheOptions = new Imazen.HybridCache.HybridCacheOptions(options.CacheLocation)
             {
                 AsyncCacheOptions = new AsyncCacheOptions()
                 {
-                    MaxQueuedBytes = Math.Max(0, options.QueueSizeLimitInBytes),
+                    MaxQueuedBytes = Math.Max(0, options.WriteQueueMemoryMb),
                     WriteSynchronouslyWhenQueueFull = true,
                     MoveFileOverwriteFunc = (from, to) =>
                     {
@@ -188,12 +187,12 @@ namespace ImageResizer.Plugins.HybridCache
                 },
                 CleanupManagerOptions = new CleanupManagerOptions()
                 {
-                    MaxCacheBytes = Math.Max(0, options.CacheSizeLimitInBytes),
-                    MinCleanupBytes = Math.Max(0, options.MinCleanupBytes),
+                    MaxCacheBytes = Math.Max(0, options.CacheSizeMb),
+                    MinCleanupBytes = Math.Max(1, options.EvictionSweepSizeMb),
                     MinAgeToDelete = options.MinAgeToDelete.Ticks > 0 ? options.MinAgeToDelete : TimeSpan.Zero
                 }
             };
-            var database = new MetaStore(new MetaStoreOptions(options.DiskCacheDirectory)
+            var database = new MetaStore(new MetaStoreOptions(options.CacheLocation)
             {
                 Shards = Math.Max(1, options.DatabaseShards),
                 MaxLogFilesPerShard = 3
@@ -222,7 +221,7 @@ namespace ImageResizer.Plugins.HybridCache
             return _cache.GetOrCreateBytes(key, dataProviderCallback, cancellationToken, retrieveContentType);
         }
 
-        private string DiskCacheDirectory => _cacheOptions?.DiskCacheDirectory;
+        private string DiskCacheDirectory => _cacheOptions?.CacheLocation;
 
 
         private bool HasNtfsPermission()
@@ -282,13 +281,17 @@ namespace ImageResizer.Plugins.HybridCache
     "Please give user " + GetExecutingUser() + " read and write access to directory \"" + DiskCacheDirectory + "\" to correct the problem. You can access NTFS security settings by right-clicking the aforementioned folder and choosing Properties, then Security.", IssueSeverity.ConfigurationError));
             
             //Warn user about setting hashModifiedDate=false in a web garden.
-            if (_cacheOptions.MinCleanupBytes < 1000 * 1000)
-                issues.Add(new Issue("HybridCache", "minCleanupBytes should not be set below 1 megabyte (1,000,000). Found in the <hybridCache /> element in Web.config.",
+            if (_cacheOptions.EvictionSweepSizeMb < 1)
+                issues.Add(new Issue("HybridCache", "evictionSweepSizeMb should not be set below 1 MB. Found in the <hybridCache /> element in Web.config.",
                     "Setting a value too low will waste energy and reduce performance", IssueSeverity.ConfigurationError));
 
-            if (_cacheOptions.CacheSizeLimitInBytes < 1000 * 1000 * 100)
-                issues.Add(new Issue("HybridCache", "cacheMaxSizeBytes should not be set below 100 MiB, 1GiB is the suggested minimum . Found in the <hybridCache /> element in Web.config.",
+            if (_cacheOptions.CacheSizeMb < 100)
+                issues.Add(new Issue("HybridCache", "cacheSizeMb should not be set below 100 MiB, 1GB is the suggested minimum . Found in the <hybridCache /> element in Web.config.",
                     "Setting a value too low will increase latency, increase cache misses, waste energy and reduce server performance.", IssueSeverity.ConfigurationError));
+            
+            if (_cacheOptions.WriteQueueMemoryMb < 50)
+                issues.Add(new Issue("HybridCache", "writeQueueMemoryMb should not be set below 50 MiB, 100Mib is the suggested minimum . Found in the <hybridCache /> element in Web.config.",
+                    "Setting a value too low will increase latency by forcing images to be written to disk before HTTP responses are sent.", IssueSeverity.ConfigurationError));
 
             if (conflictsExist)
                 issues.Add(new Issue("HybridCache", "More than one instance of HybridCache has been created for the same directory, these instances will fight.", IssueSeverity.ConfigurationError));
@@ -304,9 +307,9 @@ namespace ImageResizer.Plugins.HybridCache
         public IEnumerable<KeyValuePair<string, string>> GetInfoPairs()
         {
             var list = new List<KeyValuePair<string, string>>();
-            list.Add(new KeyValuePair<string, string>("hybridCache_" + "cacheMaxSizeBytes", _cacheOptions.CacheSizeLimitInBytes.ToString()));
-            list.Add(new KeyValuePair<string, string>("hybridCache_" + "writeQueueLimitBytes", _cacheOptions.QueueSizeLimitInBytes.ToString()));
-            list.Add(new KeyValuePair<string, string>("hybridCache_" + "minCleanupBytes", _cacheOptions.MinCleanupBytes.ToString()));
+            list.Add(new KeyValuePair<string, string>("hybridCache_" + "cacheSizeMb", _cacheOptions.CacheSizeMb.ToString()));
+            list.Add(new KeyValuePair<string, string>("hybridCache_" + "writeQueueMemoryMb", _cacheOptions.WriteQueueMemoryMb.ToString()));
+            list.Add(new KeyValuePair<string, string>("hybridCache_" + "evictionSweepSizeMb", _cacheOptions.EvictionSweepSizeMb.ToString()));
             list.Add(new KeyValuePair<string, string>("hybridCache_" + "shardCount", _cacheOptions.DatabaseShards.ToString()));
             list.Add(new KeyValuePair<string, string>("hybridCache_network_drive", CacheDriveOnNetwork() ? "1" : "0"));
             list.Add(new KeyValuePair<string, string>("hybridCache_filesystem", GetCacheDrive()?.DriveFormat ?? ""));

@@ -7,12 +7,12 @@ namespace ImageResizer.Plugins.HybridCache
     public class HybridCacheOptions
     {
         public HybridCacheOptions(string cacheDir) { }
-        public long CacheSizeLimitInBytes { get; set; }
+        public string CacheLocation { get; set; }
+        public long CacheSizeMb { get; set; }
         public int DatabaseShards { get; set; }
-        public string DiskCacheDirectory { get; set; }
+        public long EvictionSweepSizeMb { get; set; }
         public System.TimeSpan MinAgeToDelete { get; set; }
-        public long MinCleanupBytes { get; set; }
-        public long QueueSizeLimitInBytes { get; set; }
+        public long WriteQueueMemoryMb { get; set; }
     }
     public class HybridCachePlugin : ImageResizer.Plugins.IAsyncTyrantCache, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IPluginInfo, ImageResizer.Plugins.IPluginRequiresShutdown
     {

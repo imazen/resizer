@@ -622,6 +622,7 @@ namespace ImageResizer.Configuration
         public void WriteDiagnosticsTo(string path) { }
         public bool get(string selector, bool defaultValue) { }
         public int get(string selector, int defaultValue) { }
+        public long get(string selector, long defaultValue) { }
         public string get(string selector, string defaultValue) { }
         public T get<T>(string selector, T defaultValue)
             where T :  struct, System.IConvertible { }

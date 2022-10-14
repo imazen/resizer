@@ -114,6 +114,7 @@ namespace ImageResizer.AllPlugins.Tests
         public static List<object> GetSourceObjects()
         {
             var sources = new List<object>();
+            //TODO: This breaks!
             sources.Add(@"C:\Users\lilith\work\resizer\examples\images\red-leaf.jpg");
             //sources.Add("~/images/red-leaf.jpg");
             // sources.Add("/gradient.png");
