@@ -141,8 +141,8 @@ namespace ImageResizer.Plugins.HybridCache
 
             //OK, we have our cacheOptions;
             this._cache = CreateHybridCacheFromOptions(_cacheOptions, _logger);
-            c.Plugins.add_plugin(this);
             AsyncUtil.RunSync(() => this._cache.StartAsync(CancellationToken.None));
+            c.Plugins.add_plugin(this);
             return this;
         }
 
