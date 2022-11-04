@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -142,6 +142,7 @@ namespace ImageResizer.Plugins.HybridCache
             //OK, we have our cacheOptions;
             this._cache = CreateHybridCacheFromOptions(_cacheOptions, _logger);
             AsyncUtil.RunSync(() => this._cache.StartAsync(CancellationToken.None));
+            _isReady = true;
             c.Plugins.add_plugin(this);
             return this;
         }
