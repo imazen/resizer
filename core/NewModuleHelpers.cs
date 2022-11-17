@@ -48,11 +48,6 @@ namespace ImageResizer
         /// <exception cref="InvalidOperationException"></exception>
         internal static async Task ProxyToStream(Stream sourceStream, HttpResponse response)
         {
-            if (sourceStream.CanSeek)
-            {
-                var contentLength = sourceStream.Length - sourceStream.Position;
-                if (contentLength > 0) response.Headers.Add("Content-Length", contentLength.ToString());
-            }
             
             // We really only need 12 bytes but it would be a waste to only read that many. 
             const int bufferSize = 4096;
