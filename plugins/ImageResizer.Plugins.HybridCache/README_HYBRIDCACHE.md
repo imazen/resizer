@@ -22,10 +22,10 @@ This plugin only works with the URL API, not the managed API.
 ## Notes
 
 * `<hybridCache cacheLocation="C:\imageresizercache\"/>` defaults to a app-unique subfolder of the IIS user account's temp folder. Cannot be located in the project or a web-accessible folder.
-* `<hybridCache cacheSizeMb="1,000" />` is in bytes and cannot be set below 9MB (9,000,000) or no files will be cached. 1GiB is the suggested minimum.
+* `<hybridCache cacheSizeMb="1,000" />` is in MiB and cannot be set below 9 or no files will be cached. 1GiB is the suggested minimum.
 * `<hybridCache databaseShards="8" />` adjust the number of shards (and write ahead log groups) in the database. Delete the cache folder after changing this number. Don't change this number unless directed by support.
 * `<hybridCache writeQueueMemoryMb="100" />` limits how much RAM can be used by the asynchronous write queue before making requests wait for caching writing to complete. (HybridCache writes cache entries in the background to improve latency). 100MB is the default and suggested minimum.
-* `<hybridCache.evictionSweepSizeMb="1" />` determines the minimum amount of bytes to evict from the cache once a cleanup is triggered. 1MB is the default and suggested minimum.
+* `<hybridCache.evictionSweepSizeMb="1" />` determines the minimum amount of bytes to evict from the cache once a cleanup is triggered. 1MB is the default and suggested minimum. 
 
 ## Migrating from DiskCache or TinyCache
 
