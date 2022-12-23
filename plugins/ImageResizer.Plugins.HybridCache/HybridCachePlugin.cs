@@ -53,10 +53,10 @@ namespace ImageResizer.Plugins.HybridCache
 
         private void LoadSettings(Config c)
         {
-            var cacheSizeMb = c.get("hybridCache.cacheSizeMb", _cacheOptions.CacheSizeMb);
-            var writeQueueMemoryMb = c.get("hybridCache.writeQueueMemoryMb", _cacheOptions.WriteQueueMemoryMb);
-            var evictionSweepSizeMb = c.get("hybridCache.evictionSweepSizeMb", _cacheOptions.EvictionSweepSizeMb);
-            var shardCount = c.get("hybridCache.shardCount", _cacheOptions.DatabaseShards);
+            _cacheOptions.CacheSizeMb = c.get("hybridCache.cacheSizeMb", _cacheOptions.CacheSizeMb);
+            _cacheOptions.WriteQueueMemoryMb = c.get("hybridCache.writeQueueMemoryMb", _cacheOptions.WriteQueueMemoryMb);
+            _cacheOptions.EvictionSweepSizeMb = c.get("hybridCache.evictionSweepSizeMb", _cacheOptions.EvictionSweepSizeMb);
+            _cacheOptions.DatabaseShards = c.get("hybridCache.shardCount", _cacheOptions.DatabaseShards);
             
             _cacheOptions.CacheLocation = c.get("hybridCache.cacheLocation", ResolveCacheLocation(_cacheOptions.CacheLocation));
             // Resolve cache directory
