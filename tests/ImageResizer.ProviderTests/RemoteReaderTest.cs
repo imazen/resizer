@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.RemoteReader;
+using ImageResizer.Util;
 using Xunit;
 
 namespace ImageResizer.ProviderTests
@@ -322,16 +323,24 @@ namespace ImageResizer.ProviderTests
         public void Open()
         {
             // Arrange
-            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var signingKey = "ag383ht23sag#laf#lafF#oyfafqewt;2twfqw";
+            var remoteUrl = "https://i.zr.io/ri/tractor-tiny.jpg";
             IVirtualImageProvider reader = new RemoteReaderPlugin();
             var rs = new ResizerSection(
-                "<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+                "<resizer><remotereader signingKey=\"" + signingKey + "\" allowAllSignedRequests=\"true\" /></resizer>");
             var c = new Config(rs);
             ((RemoteReaderPlugin)reader).Install(c);
             var settings = Settings;
-            settings["hmac"] = "k_RU-UFkOaA";
-            settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
-            var target = reader.GetFile(virtualPath, settings);
+            var signedUrl = ((RemoteReaderPlugin)reader).CreateSignedUrlWithKey(remoteUrl, "", signingKey);
+
+            var virtualPath = signedUrl.Substring(0, signedUrl.IndexOf('?'));
+            var queryStr = signedUrl.Substring(signedUrl.IndexOf('?'));
+
+            
+            var signedQuery = new Instructions(queryStr);
+            var target = reader.GetFile(virtualPath, signedQuery);
+
+          
 
             // Act
             var actual = target.Open();
@@ -400,22 +409,29 @@ namespace ImageResizer.ProviderTests
         ///     does exist.
         /// </summary>
         /// <remarks>
-        ///     Requires a file to be present at http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg
+        ///     Requires a file to be present at https://i.zr.io/ri/tractor-tiny.jpg
         /// </remarks>
         [Fact]
         public async Task OpenAsync()
         {
             // Arrange
-            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            //var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var signingKey = "ag383ht23sag#laf#lafF#oyfafqewt;2twfqw";
+            var remoteUrl = "https://i.zr.io/ri/tractor-tiny.jpg";
             IVirtualImageProviderAsync reader = new RemoteReaderPlugin();
             var rs = new ResizerSection(
-                "<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+                "<resizer><remotereader signingKey=\"" + signingKey + "\" allowAllSignedRequests=\"true\" /></resizer>");
             var c = new Config(rs);
             ((RemoteReaderPlugin)reader).Install(c);
             var settings = Settings;
-            settings["hmac"] = "k_RU-UFkOaA";
-            settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
-            var target = await reader.GetFileAsync(virtualPath, settings);
+            var signedUrl = ((RemoteReaderPlugin)reader).CreateSignedUrlWithKey(remoteUrl, "", signingKey);
+
+            var virtualPath = signedUrl.Substring(0, signedUrl.IndexOf('?'));
+            var queryStr = signedUrl.Substring(signedUrl.IndexOf('?'));
+
+            
+            var signedQuery = new Instructions(queryStr);
+            var target = await reader.GetFileAsync(virtualPath, signedQuery);
 
             // Act
             var actual = await target.OpenAsync();

@@ -29,23 +29,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Imageflow.NativeRuntime.win-x86_64">
-      <Version>1.7.3-rc67</Version>
-    </PackageReference>
     <PackageReference Include="Imageflow.NativeRuntime.win-x86">
-      <Version>1.7.3-rc67</Version>
+      <Version>2.0.0-preview8</Version>
+    </PackageReference>
+    <PackageReference Include="Imageflow.NativeRuntime.win-x86_64">
+      <Version>2.0.0-preview8</Version>
     </PackageReference>
     <PackageReference Include="Imageflow.Net">
-      <Version>0.8.5</Version>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.1</Version>
+      <Version>0.10.2</Version>
     </PackageReference>
     <PackageReference Include="PublicApiGenerator">
-      <Version>10.3.0</Version>
+      <Version>11.0.0</Version>
     </PackageReference>
     <PackageReference Include="xunit">
-      <Version>2.4.2</Version>
+      <Version>2.5.1</Version>
     </PackageReference>
     <PackageReference Include="xunit.runner.console">
       <Version>2.4.2</Version>

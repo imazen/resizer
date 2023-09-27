@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Imazen.Common">
-      <Version>0.7.6</Version>
+      <Version>0.8.2</Version>
     </PackageReference>
   </ItemGroup>
 </Project>

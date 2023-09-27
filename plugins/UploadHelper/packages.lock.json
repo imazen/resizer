@@ -14,8 +14,8 @@
       },
       "Imazen.Common": {
         "type": "Transitive",
-        "resolved": "0.7.6",
-        "contentHash": "2iAcHnuz3lIadnM1b5XZeaI+XmQ9AyfIqT38ArbKdbPr0ngXWfpJWDFpNv4ZmqnH0ATpsSLms93n+FCV4eg2Ig==",
+        "resolved": "0.8.2",
+        "contentHash": "EAnfbEUy2vnyFQYRV75/AZYwy6z4vhEkSQXXqM77ksO5NqL0sIUcGX9cb51lqTfhHS0Dxu0YQC05fMsBtxhiew==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
@@ -104,8 +104,8 @@
       "imageresizer": {
         "type": "Project",
         "dependencies": {
-          "Imazen.Common": "0.7.6",
-          "System.Buffers": "4.5.1"
+          "Imazen.Common": "[0.8.2, )",
+          "System.Buffers": "[4.5.1, )"
         }
       }
     }

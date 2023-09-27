@@ -4,17 +4,17 @@
     ".NETFramework,Version=v4.7.2": {
       "AWSSDK.Core": {
         "type": "Direct",
-        "requested": "[3.7.12.25, )",
-        "resolved": "3.7.12.25",
-        "contentHash": "zvGGsVChO2TILuXNACS3Ji7wKA7ARYTC81cAiVa0Q6REetCoWAkUN8AXutSvzpOFNcW5kf8nisPvWtwmq3Lsnw=="
+        "requested": "[3.7.202.14, )",
+        "resolved": "3.7.202.14",
+        "contentHash": "bo5vFW7rB8ABeY6RMK/kOjCOJOHpGO0sHpRILx3HTpvh3fvuWYnI/aHJMpnU/SCvAidyTgrHJcvAHOVGWwPbCA=="
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.7.9.43, )",
-        "resolved": "3.7.9.43",
-        "contentHash": "Jc7cp9w4+igrKJlIgNsEHo0XSiJV7hpFlY07RjRr0qcXuzLHVf8W+sbPm3rQk//8+de4CBny+KEp79y1Iv39oA==",
+        "requested": "[3.7.205, )",
+        "resolved": "3.7.205",
+        "contentHash": "05g/7/h+S+xpvfzh9kYB6vsYZpuotfNC5piCLN2tMwh3s9orYrlR8+ZBwGwupHb/zb3hArnj9xF9otGfRwTohA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.12.25, 4.0.0)"
+          "AWSSDK.Core": "[3.7.202.14, 4.0.0)"
         }
       },
       "Microsoft.SourceLink.GitHub": {
@@ -29,8 +29,8 @@
       },
       "Imazen.Common": {
         "type": "Transitive",
-        "resolved": "0.7.6",
-        "contentHash": "2iAcHnuz3lIadnM1b5XZeaI+XmQ9AyfIqT38ArbKdbPr0ngXWfpJWDFpNv4ZmqnH0ATpsSLms93n+FCV4eg2Ig==",
+        "resolved": "0.8.2",
+        "contentHash": "EAnfbEUy2vnyFQYRV75/AZYwy6z4vhEkSQXXqM77ksO5NqL0sIUcGX9cb51lqTfhHS0Dxu0YQC05fMsBtxhiew==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
@@ -119,14 +119,14 @@
       "imageresizer": {
         "type": "Project",
         "dependencies": {
-          "Imazen.Common": "0.7.6",
-          "System.Buffers": "4.5.1"
+          "Imazen.Common": "[0.8.2, )",
+          "System.Buffers": "[4.5.1, )"
         }
       },
       "imageresizer.storage": {
         "type": "Project",
         "dependencies": {
-          "ImageResizer": "0.1.0--notset"
+          "ImageResizer": "[0.1.0--notset, )"
         }
       }
     }
