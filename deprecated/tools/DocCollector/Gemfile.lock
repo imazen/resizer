@@ -24,28 +24,33 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    base64 (0.2.0)
     erubis (2.7.0)
     github-markdown (0.6.9)
     hub (1.12.4)
     mini_portile2 (2.8.0)
-    mustermann (2.0.2)
+    mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     nokogiri (1.13.8)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     racc (1.6.0)
-    rack (2.2.6.4)
-    rack-protection (2.2.2)
-      rack
+    rack (3.0.9.1)
+    rack-protection (4.0.0)
+      base64 (>= 0.1.0)
+      rack (>= 3.0.0, < 4)
+    rack-session (2.0.0)
+      rack (>= 3.0.0)
     rake (13.0.1)
     ruby2_keywords (0.0.5)
     rugged (0.25.1.1)
-    sinatra (2.2.2)
-      mustermann (~> 2.0)
-      rack (~> 2.2)
-      rack-protection (= 2.2.2)
+    sinatra (4.0.0)
+      mustermann (~> 3.0)
+      rack (>= 3.0.0, < 4)
+      rack-protection (= 4.0.0)
+      rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
-    tilt (2.0.11)
+    tilt (2.3.0)
 
 PLATFORMS
   ruby
