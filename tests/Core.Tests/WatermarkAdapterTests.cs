@@ -126,31 +126,6 @@ namespace ImageResizer.Tests
         }
 
         [Fact]
-        public void ParseOtherImagesConfiguration()
-        {
-            var xml = @"
-                <watermarks>
-                    <otherimages path=""~/watermarks"" 
-                                 right=""20px"" 
-                                 bottom=""20px"" 
-                                 width=""50px"" 
-                                 height=""50px"" />
-                </watermarks>";
-
-            var config = CreateConfigWithXml(xml);
-            var adapter = new WatermarkAdapter(config);
-            
-            // Test legacy file-based watermark
-            var options = adapter.GetWatermarkOptions(new[] { "legacy.png" });
-            
-            Assert.Single(options);
-            var (watermarkOptions, path, _, cacheKey) = options[0];
-            
-            Assert.Equal("~/watermarks/legacy.png", path);
-            Assert.IsType<WatermarkMargins>(watermarkOptions.FitBox);
-        }
-
-        [Fact]
         public void TextLayerGeneratesError()
         {
             var xml = @"

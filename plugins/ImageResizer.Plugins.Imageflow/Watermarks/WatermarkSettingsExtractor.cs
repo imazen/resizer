@@ -35,18 +35,16 @@ namespace ImageResizer.Plugins.Imageflow.Watermarks
             if (preprocessing["scale"] == "both")
             {
                 options.FitMode = WatermarkConstraintMode.Fit;
-                preprocessing.Remove("scale");
             }
+            preprocessing.Remove("scale");
 
             // Extract all FastScaling parameters that can be mapped to ResampleHints
-            var hasResampleParams = HasResampleParameters(preprocessing);
-            if (hasResampleParams)
-            {
-                options.Hints = ExtractResampleHints(preprocessing);
-            }
+            options.Hints = ExtractResampleHints(preprocessing);
 
             // Ignore format parameter
             preprocessing.Remove("format");
+            preprocessing.Remove("quality");
+
             
 
             return (options, preprocessing);
