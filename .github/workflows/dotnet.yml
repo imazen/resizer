@@ -20,15 +20,15 @@ jobs:
     runs-on: windows-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         id: cache
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-breaker1-${{ hashFiles('**/packages.lock.json') }}
           
-      - uses: nowsprinting/check-version-format-action@v3
+      - uses: nowsprinting/check-version-format-action@v4
         id: version
         with:
           prefix: 'v'
@@ -66,7 +66,7 @@ jobs:
 #      - name: Test Solution x64 (except azure)
 #        run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln  --blame --no-build --arch x64
 #      
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: TestResults-${{matrix.os}}
