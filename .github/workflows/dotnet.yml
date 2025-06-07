@@ -42,7 +42,7 @@ jobs:
         
       - name: Upload planned for Nuget.org?
         run: echo "This runner will upload to Nuget.org if tests pass"
-        if: matrix.uploader && github.event_name == 'release' &&  steps.version.outputs.is_valid == 'true'
+        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
           
 
       - name: Clear & clean on release or cache miss

@@ -174,7 +174,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.7.2/win7-x86": {
+    ".NETFramework,Version=v4.7.2/win-x86": {
       "Imageflow.NativeRuntime.osx-x86_64": {
         "type": "Transitive",
         "resolved": "2.0.0-preview8",
