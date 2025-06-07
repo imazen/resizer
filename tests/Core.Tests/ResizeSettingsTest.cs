@@ -19,9 +19,9 @@ namespace ImageResizer.Core.Tests
             var s = new ResizeSettings();
             s.CropBottomRight = new PointF(50, 50);
             s.CropTopLeft = new PointF(0, 0);
-            Assert.Equal<string>("?crop=0,0,50,50", s.ToString());
+            Assert.Equal("?crop=0,0,50,50", s.ToString());
             s.CropMode = CropMode.Auto;
-            Assert.Equal<string>("?crop=auto", s.ToString());
+            Assert.Equal("?crop=auto", s.ToString());
         }
 
 
@@ -29,8 +29,8 @@ namespace ImageResizer.Core.Tests
         public void TestIntParsingOfInvalidSyntax()
         {
             var s = new ResizeSettings("maxwidth=100px&maxheight=50.6");
-            Assert.Equal<int>(-1, s.MaxWidth);
-            Assert.Equal<int>(-1, s.MaxHeight);
+            Assert.Equal(-1, s.MaxWidth);
+            Assert.Equal(-1, s.MaxHeight);
         }
 
         [Theory]

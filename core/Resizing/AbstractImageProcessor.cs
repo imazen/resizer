@@ -45,7 +45,7 @@ namespace ImageResizer.Resizing
         {
             exts = null;
         }
-
+#pragma warning disable CS0618
         /// <summary>
         ///     Creates a new AbstractImageProcessor which will run the specified extensions with each method call.
         /// </summary>
@@ -54,7 +54,7 @@ namespace ImageResizer.Resizing
         {
             exts = new List<BuilderExtension>(extensions != null ? extensions : new BuilderExtension[] { });
         }
-
+#pragma warning restore CS0618
         /// <summary>
         ///     Contains the set of extensions that are called for every method.
         /// </summary>

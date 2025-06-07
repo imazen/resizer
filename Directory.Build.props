@@ -4,7 +4,7 @@
     </ItemGroup>
     
     <PropertyGroup>
-        <Copyright>Copyright © 2022 Imazen LLC</Copyright>
+        <Copyright>Copyright © 2025 Imazen LLC</Copyright>
         <PackageProjectUrl>https://github.com/imazen/resizer</PackageProjectUrl>
         <RepositoryUrl Condition="'$(GITHUB_REPOSITORY)' != ''">$(GITHUB_SERVER_URL)/$(GITHUB_REPOSITORY)</RepositoryUrl>
         <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">$(GITHUB_SHA)</SourceRevisionId>

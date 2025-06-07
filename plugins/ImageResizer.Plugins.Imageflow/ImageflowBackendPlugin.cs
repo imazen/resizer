@@ -8,6 +8,7 @@ using ImageResizer.Configuration;
 using Imazen.Common.Issues;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Resizing;
+using ImageResizer.Plugins.Imageflow.Watermarks;
 
 namespace ImageResizer.Plugins.Imageflow
 {
@@ -23,6 +24,9 @@ namespace ImageResizer.Plugins.Imageflow
             new List<string>(new[] { "wic", "freeimage", "imageflow" });
 
         private readonly bool _defaultBuilder = true;
+        
+        private WatermarkAdapter _watermarkAdapter;
+        private WatermarkLoader _watermarkLoader;
 
         public ImageflowBackendPlugin()
         {
@@ -76,6 +80,11 @@ namespace ImageResizer.Plugins.Imageflow
         {
             c.Plugins.add_plugin(this);
             this.c = c;
+            
+            // Initialize watermark adapter
+            _watermarkAdapter = new WatermarkAdapter(c);
+            _watermarkLoader = new WatermarkLoader(c);
+            
             return this;
         }
 
@@ -88,6 +97,11 @@ namespace ImageResizer.Plugins.Imageflow
 
         public IEnumerable<IIssue> GetIssues()
         {
+            // Include watermark adapter issues
+            if (_watermarkAdapter != null)
+            {
+                return _watermarkAdapter.GetIssues();
+            }
             return Enumerable.Empty<IIssue>();
         }
 
@@ -133,11 +147,27 @@ namespace ImageResizer.Plugins.Imageflow
             // The command string we're passing to Imageflow
             var commandString = job.Instructions.ToQueryString().Trim('?');
 
+            var disposables = new List<IDisposable>();
+            try{
             using (var imageflowJob = new global::Imageflow.Fluent.ImageJob())
             {
-                var jobResult = imageflowJob.BuildCommandString(
-                        new StreamSource(source, false),
-                        new BytesDestination(), commandString) //TODO: Watermarks go here
+                // Set up primary source
+                var primarySource = new StreamSource(source, false);
+                
+                // Get watermarks if any
+                var watermarks = GetWatermarks(job.Instructions, disposables);
+                
+                BuildEndpoint builder;
+                if (watermarks != null && watermarks.Count > 0)
+                {
+                    builder = imageflowJob.BuildCommandString(primarySource, new BytesDestination(), commandString, watermarks);
+                }
+                else
+                {
+                    builder = imageflowJob.BuildCommandString(primarySource, new BytesDestination(), commandString);
+                }
+                
+                var jobResult = builder
                     .Finish()
                     //.SetSecurityOptions(options.JobSecurityOptions)
                     .InProcessAsync();
@@ -183,6 +213,43 @@ namespace ImageResizer.Plugins.Imageflow
                         throw new NotSupportedException("We should have filtered these out already");
                 }
             }
+            }
+            finally{
+                foreach (var disposable in disposables)
+                {
+                    disposable.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Gets watermarks for the image job
+        /// </summary>
+        private List<InputWatermark> GetWatermarks(Instructions settings, List<IDisposable> disposables)
+        {
+            if (_watermarkAdapter == null) return null;
+            
+            var watermarkStr = settings["watermark"];
+            if (string.IsNullOrEmpty(watermarkStr)) return null;
+            
+            var watermarkNames = _watermarkAdapter.ParseWatermarkNames(watermarkStr);
+            var watermarkConfigs = _watermarkAdapter.GetWatermarkOptions(watermarkNames);
+            
+            var watermarks = new List<InputWatermark>();
+    
+            foreach (var (options, path, preprocessing, cacheKey) in watermarkConfigs)
+            {
+                // Load watermark image using the executor
+                var watermarkSource = _watermarkLoader.LoadWatermarkImage(c.CurrentImageBuilder,path, preprocessing);
+                
+                if (watermarkSource != null)
+                {
+                    disposables.Add(watermarkSource);
+                    watermarks.Add(new InputWatermark(watermarkSource, options));
+                }
+            }
+            
+            return watermarks.Count > 0 ? watermarks : null;
         }
 
         /// <summary>
@@ -308,6 +375,18 @@ namespace ImageResizer.Plugins.Imageflow
 
         public string ModifyRequestCacheKey(string currentKey, string virtualPath, NameValueCollection queryString)
         {
+            var watermarkStr = queryString["watermark"];
+            if (!string.IsNullOrEmpty(watermarkStr) && _watermarkAdapter != null)
+            {
+                var watermarkNames = _watermarkAdapter.ParseWatermarkNames(watermarkStr);
+                var watermarkConfigs = _watermarkAdapter.GetWatermarkOptions(watermarkNames);
+                var watermarkCacheKey = watermarkConfigs.Select(c => c.cacheKey).Aggregate((a, b) => a + "|" + b);
+                if (!string.IsNullOrEmpty(watermarkCacheKey))
+                {
+                    currentKey += "|wm:" + watermarkCacheKey;
+                }
+            }
+            
             return currentKey + "|imageflow" + ImageflowCacheVersionKey; //TODO: combine with a cache key breaker returned from imageflow.dll itself.
             // Simply by being installed it invalidates the old GDI results. This is very good. 
         }

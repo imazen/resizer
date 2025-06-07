@@ -2,7 +2,7 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-
+#pragma warning disable CS0618
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -756,6 +756,7 @@ namespace ImageResizer.Configuration
         /// <param name="plugin"></param>
         public void remove_plugin(object plugin)
         {
+            #pragma warning disable CS0618
             if (plugin is IPlugin) AllPlugins.Remove(plugin as IPlugin);
             if (plugin is IQuerystringPlugin) QuerystringPlugins.Remove(plugin as IQuerystringPlugin);
             if (plugin is IFileExtensionPlugin) FileExtensionPlugins.Remove(plugin as IFileExtensionPlugin);
@@ -768,6 +769,7 @@ namespace ImageResizer.Configuration
             if (plugin is ILogManager && LogManager == plugin) LogManager = null;
             if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensePluginsChange();
             if (plugin is IPluginModifiesRequestCacheKey)  ModifiesRequestCacheKeyPlugins.Remove(plugin as IPluginModifiesRequestCacheKey);
+            #pragma warning restore CS0618
         }
         
 
@@ -794,7 +796,7 @@ namespace ImageResizer.Configuration
                     IssueSeverity.Error));
                 return;
             }
-
+            #pragma warning disable CS0618
             AllPlugins.Add(plugin);
             if (plugin is IQuerystringPlugin) QuerystringPlugins.Add(plugin as IQuerystringPlugin);
             if (plugin is IFileExtensionPlugin) FileExtensionPlugins.Add(plugin as IFileExtensionPlugin);
@@ -808,6 +810,7 @@ namespace ImageResizer.Configuration
                 ModifiesRequestCacheKeyPlugins.Add(plugin as IPluginModifiesRequestCacheKey);
             if (plugin is ILogManager) LogManager = plugin as ILogManager;
             if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensePluginsChange();
+            #pragma warning restore CS0618
         }
 
         /// <summary>

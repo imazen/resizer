@@ -1,0 +1,1390 @@
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/resizer/refs/heads/support/v4/Plugins/Watermark/readme.md
+// =========================================
+Tags: plugin
+Edition: creative
+Tagline: Render multiple image & text overlays and background layers with incredible flexibility and great performance. 
+Aliases: /plugins/watermark
+
+
+# Watermark plugin
+
+The Watermark plugin in is fully XML configurable, and supports named watermark configurations, 
+multiple image and text layers, layer groups, and background (as well as overlay) layers. 
+The positioning system is per-layer, permits flexible pixel and percent layout, anchoring, and container selection.
+
+*Imageflow and future versions of ImageResizer are unlikely to support text layers. For best forwards compatibility, stick to image layers.*
+
+## Installation
+
+Either run `Install-Package ImageResizer.Plugins.Watermark` in the NuGet package manager, or:
+
+1. Add ImageResizer.Plugins.Watermark.dll to your project
+2. Add `<add name="Watermark" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
+
+## Configuration
+
+The `<watermarks/>` element allows you to define image layers, text layers, and layer groups. 
+
+By default all layers are overlays, but can be rendered as a background layer using `drawAs="background"`. This is effective when combined with padding or transparent source images.
+
+The name attribute defines the ID that will be used from the querystring to enable the watermark.
+
+Both image and text layers have a very flexible positioning system. You can use any combination of Left, Top, Right, Bottom, Width, and Height to get the layout desired. In rare instances where you still need to specify alignment, you can use the `align` [attribute to set it](http://msdn.microsoft.com/en-us/library/system.drawing.contentalignment.aspx). All values can be pixels (default) or percentages. Percentages are relative to the container width/height. `Right` and `Bottom` are relative to the right and bottom sides of the container.  The container is specified by `relativeTo`. Valid container names include 'image', 'imageArea', and 'canvas'. `image` is the photo itself, `imageArea` includes padding added to the image to keep aspect ratio, and `canvas` is the final dimensions of the file, including any borders, padding, or margins. 
+
+Image layers can pre-process the watermark itself using the `imageQuery` attribute.
+
+Text layers can print values passed in from the querystring if you use the #{key} notation in the `text` attribute, where `key` is a querystring key.
+
+Example configuration:
+
+```xml
+  <resizer>
+    ...
+    <watermarks>
+      <otherimages path="~/watermarks" right="20" bottom="20" width="20" height="20" />
+      <image name="test1" path="~/watermarks/Sun_64.png" imageQuery="filter=alpha(0.5)&amp;rotate=45" top="0" left="0" />
+      <text name="test2" text="Hello #{name}!" vertical="true" align="topright" />
+      <image name="gradientbg" path="~/gradient.png" drawAs="background" imageQuery="color1=black&amp;color2=white&amp;angle=45" top="0" right="0" left="0" bottom="0" />
+      <group name="storyBG">
+        <image path="~/watermarks/Sun_64.png" align="topleft" width="100%" height="100%" relativeTo="canvas" drawAs="Background"></image >
+      </group>
+    </watermarks>
+  </resizer>
+```
+
+Like the original plugin, it is possible to specify the watermark filename (but not path) in the querystring. When used in this way, it will first look for the `<otherimages />` element to determine the watermarks directory (from the 'path' attribute), and if `<otherimages path="">` is not present, it will fall back to the legacy configuration values and layout system for compatibility.
+
+
+## Usage
+
+You can specify multiple watermark layers and groups at the same time:
+
+```
+  image.jpg?watermark=test1,test2,storyBG
+```
+
+Like the old version, you can also specify watermark images by name, which will all use the configuration specified in the `<otherimages/>` element.
+
+```
+  image.jpg?watermark=image.png
+```
+
+## Common errors
+
+* Make sure that the production server has all the fonts you are using installed. Servers, by default, don't have very many fonts installed.
+  
+## Layer attribute reference
+
+* **name** - The key to use in the URL to invoke the application of the layer or group.
+* **align** - How to align the layer content within its bounds when there is an ambiguity [List of possible values](http://msdn.microsoft.com/en-us/library/system.drawing.contentalignment.aspx).
+* **Left** - Pixel or percent value relative to the left of the container. Ex. 10px, 3%. Percentages relative to container width.
+* **Top** - Pixel or percent value relative to the left of the container. Ex. 10px, 3%. Percentages relative to container height.
+* **Right** - Pixel or percent value relative to the right of the container. "10px" would be 10 pixels leftwards from the right side of the container. Percentages relative to container width.
+* **Bottom** - Pixel or percent value relative to the bottom of the container. "10px" would be 10 pixels upwards from the bottom side of the container. 3%. Percentages relative to container height.
+* **Width** - Pixel or percent value for the width of the layer.
+* **Height** - Pixel or percent value for the height of the layer.
+* **relativeTo** - Name of the container, such as 'image', 'imageArea', or 'canvas'. `image` is the photo itself, `imageArea` includes padding added to the image to keep aspect ratio, and `canvas` is the final dimensions of the file, including any borders, padding, or margins. 
+* **fill** - True/false (defaults to false). If true, the contents of the layer will attempt to fill the layer, even if they are normally smaller. Maintains aspect ratio, but may upscale text and images, potentially causing blurriness. If no width/height values are specified, this will also make the layer attempt to fill the container bounds.
+* **drawAs** - 'background' or 'overlay'. If 'background', the layer will be rendered over the background color, but underneath everything else. Combine with padding, alpha adjustment, or transparency on the original image to let it show through.
+
+## ImageLayer specific attributes
+
+
+* **path** - A virtual path (i.e, ~/folder/image or /app/folder/image) to the watermark image. 
+* **imageQuery** - Allows pre-processing of the image. For example, use "stretch=fill" to distort the watermark to fit the aspect ratio of the layer. Multiple commands can be separated with ;
+
+## TextLayer specific attributes
+
+**Imageflow and future versions of ImageResizer are unlikely to support text layers. For best forwards compatibility, avoid their use.**
+
+* **text** - The text to display. May contain querystring-specified values, referenced like this: "Hello #{name}" - `image.jpg?watermark=hi&name=Nathanael`.
+* **vertical** - True to display the text vertically. May also be achieved with Angle, but rendering may be slightly better.
+* **color** - A 3, 6, or 8-digit hex color reference, or a named color.
+* **font** - like "Verdana". The font family.
+* **style** - like "Regular", "Bold", "Italic", "Underline", "Strikeout", or comma-delimited combinations like "Bold,Italic". The default is "Bold".
+* **angle** - the degrees clockwise to rotate the text.
+* **fontSize** the height in pixels of the text. May not be very accurate, GDI isn't great at font heights. Will definitely vary with your font choice.
+* **outlineColor** - The color for the outline of the text. Only rendered if outlineWidth >0
+* **outlineWidth** - How many pixels wide to draw the outline. As the outline is under the text, start with 3 for a 1px outline, and increase by adding 2.
+* **glowColor** - The color for the glow effect.
+* **glowWidth** - The width of the glow effect.  As the glow is under the text, start with 3 for a 1px outline, and increase by adding 2.
+* **rendering** - (3.1.5+) The rendering algorithm for the text. Valid values are SystemDefault, SingleBitPerPixelGridFit, SingleBitPerPixel, AntiAliasGridFit, AntiAlias, and ClearTypeGridFit. The default before 3.1.5 was ClearTypeGridFit. Afterwards, the default was AntiAliasGridFit.
+
+## Managed API
+
+Referencing a watermark already configured in XML is easy: 
+
+```
+  ImageBuilder.Current.Build(source,dest,new ResizeSettings("watermark=name"));
+```
+
+If you want to build a custom watermark from code, that's also easy, but needs to happen during Application\_Start if you're modifying Config.Current. 
+Installing plugins on a shared Config instance on different threads can result in warnings on /resizer.debug, although the threading is handled correctly.
+
+```
+  //You can have multiple configurations. Config.Current contains web.config settings, but you can use new Config(); to get a clean slate.
+  Config c = Config.Current; 
+  
+  //Get a reference to the instance we added previously
+  WatermarkPlugin wp = c.Plugins.Get<WatermarkPlugin>();
+  if (wp == null) { //Install it if it's missing
+    wp = new WatermarkPlugin();
+    wp.Install(c);
+  }
+  //Re-query in case another thread beat us to installation.
+  wp = c.Plugins.Get<WatermarkPlugin>();
+  
+  //Let's make some layers
+  TextLayer t = new TextLayer();
+  t.Text = "Hello #{name}";
+  t.Fill = true; //Fill the image with the text
+  ImageLayer i = new ImageLayer(c); //ImageLayer needs a Config instance so it knows where to locate images
+  i.Path = "~/image.png";
+  
+  //Let's register them with the watermark plugin. Note a layer name can have multiple layers
+  wp.NamedWatermarks["img"] = new Layer[]{ i };
+  wp.NamedWatermarks["text"] = new Layer[] { t };
+
+  
+  //Let's build an image
+  c.CurrentImageBuilder.Build(source,dest,new ResizeSettings("watermark=text,img;name=John Doe"));
+```
+
+# Original watermark plugin (Versions 3.0.13 and older)
+
+The original version of the Watermark plugin did not support XML configuration, and only allowed one set of layout directions, which were applied to all watermark files. 
+All watermark files were required to be located in the same folder. The &watermark=file.png command would select a file from that directory for use.
+
+To install and configure the plugin, you must place some code in the Application_Start event of Global.asax.cs.
+
+Here is an example Global.asax.cs file
+
+``` 
+  using System;
+  using System.Collections.Generic;
+  using System.Web;
+  using ImageResizer;
+  using System.Drawing;
+  using ImageResizer.Configuration;
+  using ImageResizer.Plugins.RemoteReader;
+  
+  namespace ComplexWebApplication {
+    public class Global : System.Web.HttpApplication {
+      protected void Application_Start(object sender, EventArgs e) {
+      
+        // Code that runs on application startup
+        ImageResizer.Plugins.Watermark.WatermarkPlugin w = new ImageResizer.Plugins.Watermark.WatermarkPlugin();
+        w.align = System.Drawing.ContentAlignment.BottomLeft; //Where to align the watermark within the bounds specified by bottomRightPadding and topLeftPadding
+        w.hideIfTooSmall = true;
+        w.keepAspectRatio = true; //Maintains the aspect ratio of the watermark itself.
+        w.valuesPercentages = false; //When true .bottomRightPadding, .topLeftPadding, and .watermarkSize are all percentages of the primary image size. Percentages are 0..1, not 0..100.
+        w.watermarkDir = "~/watermarks/"; //Where the watermark plugin looks for the image specified in the querystring ?watermark=file.png
+        w.bottomRightPadding = new System.Drawing.SizeF(20, 20); //Padding between the bottom and right edges of the watermark and the primary image
+        w.topLeftPadding = new System.Drawing.SizeF(20, 20); //Padding between the top  and left edges of the watermark and the primary image
+        w.watermarkSize = new System.Drawing.SizeF(30, 30); //The desired size of the watermark, maximum dimensions (aspect ratio maintained if keepAspectRatio = true)
+        //Install the plugin
+        w.Install(Config.Current);
+      }
+    }
+  }
+
+```
+
+
+
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/resizer/refs/heads/support/v4/Plugins/Watermark/Watermark.cs
+// =========================================
+﻿/* Copyright (c) 2014 Imazen See license.txt for your rights. */
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.Web;
+using ImageResizer.Util;
+using ImageResizer.Resizing;
+using System.Web.Hosting;
+using ImageResizer.Configuration;
+using System.Web.Caching;
+using ImageResizer.Configuration.Xml;
+using ImageResizer.Configuration.Issues;
+
+namespace ImageResizer.Plugins.Watermark
+{
+    /// <summary>
+    /// Provides extensibility points for drawing watermarks and even modifying resizing/image settings
+    /// </summary>
+    public class WatermarkPlugin : LegacyWatermarkFeatures, IPlugin, IQuerystringPlugin, ILicensedPlugin
+    {
+        /// <summary>
+        /// Creates a new instance of the watermark plugin.
+        /// </summary>
+        public WatermarkPlugin() {
+        }
+
+
+        private ResizeSettings _defaultImageQuery = new ResizeSettings("scache=true");
+        /// <summary>
+        /// Default querystring parameters for all image watermarks.
+        /// If not specified in the watermark configuration, defaults to
+        /// "scache=true".
+        /// </summary>
+        public ResizeSettings DefaultImageQuery
+        {
+            get { return _defaultImageQuery; }
+            set { _defaultImageQuery = value; }
+        }
+
+        ImageLayer _otherImages = new ImageLayer(null);
+        /// <summary>
+        /// When a &amp;watermark command does not specify a named preset, it is assumed to be a file name. 
+        /// Set OtherImages.Path to the search folder. All watermark images (except for presets) must be in the root of the search folder. 
+        /// The remainder of the settings affect how each watermark will be positioned and displayed.
+        /// </summary>
+        public ImageLayer OtherImages {
+            get { return _otherImages; }
+            set { _otherImages = value; }
+        }
+        protected Dictionary<string, IEnumerable<Layer>> _namedWatermarks = null;
+        /// <summary>
+        /// This dictionary contains watermarks keyed by name. Values are enumerations of layers - a watermark can have multiple layers.
+        /// </summary>
+        public Dictionary<string, IEnumerable<Layer>> NamedWatermarks {
+            get { return _namedWatermarks; }
+            set { _namedWatermarks = value; }
+        }
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public IPlugin Install(Configuration.Config c) {
+            c.Plugins.add_plugin(this);
+            this.c = c;
+            this.OtherImages.ConfigInstance = c;
+            _namedWatermarks = ParseWatermarks(c.getConfigXml().queryFirst("watermarks"), ref _defaultImageQuery, ref _otherImages);
+            c.Pipeline.PostRewrite += Pipeline_PostRewrite;
+            c.Plugins.GetOrInstall<LicenseVerifier.LicenseEnforcer<WatermarkPlugin>>();
+            return this;
+        }
+
+      /// <summary>
+      /// Removes the plugin from the given configuration container
+      /// </summary>
+      /// <param name="c"></param>
+      /// <returns></returns>
+        public bool Uninstall(Configuration.Config c) {
+            c.Plugins.remove_plugin(this);
+            return true;
+        }
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "watermark" };
+        }
+
+        protected Dictionary<string, IEnumerable<Layer>> ParseWatermarks(Node n, ref ResizeSettings defaultImageQuery, ref ImageLayer otherImageDefaults) {
+            // Grab the defaultImageQuery value (if it exists) from the watermarks
+            // node, so that we can apply them to any subsequent image watermarks.
+            if (n != null && !string.IsNullOrEmpty(n.Attrs["defaultImageQuery"])) {
+                defaultImageQuery = new ResizeSettings(n.Attrs["defaultImageQuery"]);
+            }
+
+            Dictionary<string, IEnumerable<Layer>> dict = new Dictionary<string, IEnumerable<Layer>>(StringComparer.OrdinalIgnoreCase);
+            if (n == null || n.Children == null) return dict;
+            foreach (Node c in n.Children) {
+                //Verify the name is specified and is unique.
+                string name = c.Attrs["name"];
+                if (c.Name.Equals("image", StringComparison.OrdinalIgnoreCase) 
+                    || c.Name.Equals("text", StringComparison.OrdinalIgnoreCase)
+                    || c.Name.Equals("group", StringComparison.OrdinalIgnoreCase)) {
+                    if (string.IsNullOrEmpty(name) || dict.ContainsKey(name)) {
+                        this.c.configurationSectionIssues.AcceptIssue(new Issue("WatermarkPlugin", "The name attribute for each watermark or watermark group must be specified, and must be unique.",
+                        "XML: " + c.ToString(), IssueSeverity.ConfigurationError));
+                        continue;
+                    }
+                }
+
+                
+                if (c.Name.Equals("otherimages", StringComparison.OrdinalIgnoreCase)) otherImageDefaults = new ImageLayer(c.Attrs, defaultImageQuery, this.c);
+                if (c.Name.Equals("image", StringComparison.OrdinalIgnoreCase)) dict.Add(name, new Layer[] { new ImageLayer(c.Attrs, defaultImageQuery, this.c) });
+                if (c.Name.Equals("text", StringComparison.OrdinalIgnoreCase)) dict.Add(name, new Layer[] {new TextLayer(c.Attrs) });
+                if (c.Name.Equals("group", StringComparison.OrdinalIgnoreCase)) {
+                    
+                    List<Layer> layers = new List<Layer>();
+                    if (c.Children != null) {
+                        foreach (Node layer in c.Children) {
+                            if (layer.Name.Equals("image", StringComparison.OrdinalIgnoreCase)) layers.Add(new ImageLayer(layer.Attrs, defaultImageQuery, this.c));
+                            if (layer.Name.Equals("text", StringComparison.OrdinalIgnoreCase)) layers.Add(new TextLayer(layer.Attrs));
+                        }
+                    }
+                    dict.Add(name, layers);
+                }  
+            }
+            return dict;
+        }
+        /*<resizer>
+         * <watermarks>
+         *  <otherimages path="~/watermarks" align="topleft" width="50%" />
+         *  <group name="wmark">
+         *   <image path="~/watermarks/image.png" align="topleft" width="50px" height="50px" />
+         *  </group>
+         */
+        //top, left, bottom, right = px or percentages (relative to container)
+        //relativeTo = image|imageArea|padding|border|margin|canvas
+        //drawAs overlay|background
+        //image
+        //imagesettings
+        //align = topleft|topright|bottomleft|bottomright|...
+
+        void Pipeline_PostRewrite(IHttpModule sender, HttpContext context, IUrlEventArgs e)
+        {
+            //Cache breaking
+            string[] parts = WatermarksToUse(e.QueryString);
+            if (parts == null) return;
+
+            foreach (string w in parts)
+            {
+                if (NamedWatermarks.ContainsKey(w))
+                {
+                    IEnumerable<Layer> layers = NamedWatermarks[w];
+                    foreach (Layer l in layers)
+                    {
+                        e.QueryString["watermark-cachebreak"] = (e.QueryString["watermark-cachebreak"] ?? "") + "_" + l.GetDataHash().ToString();
+                    }
+                }
+            }
+        }
+
+        protected RequestedAction RenderLayersForLevel(ImageState s, Layer.LayerPlacement only) {
+            string watermark;
+            string[] parts = WatermarksToUse(s.settings, out watermark);
+            Graphics g = s.destGraphics;
+            if (parts == null || g == null) return RequestedAction.None;
+
+            bool foundPart = false;
+
+            foreach (string w in parts) {
+                if (NamedWatermarks.ContainsKey(w)) {
+                    IEnumerable<Layer> layers = NamedWatermarks[w];
+                    foreach (Layer l in layers) {
+                        if (l.DrawAs == only) {
+                            l.RenderTo(s);
+                        }
+                    }
+                    foundPart = true;
+                }
+            }
+
+            if ( !foundPart && only == Layer.LayerPlacement.Overlay) {
+                //Parse named watermark files
+                ImageLayer layer = this.CreateLayerFromOtherImages(watermark);
+
+                if (layer != null) {
+                    layer.RenderTo(s);
+                } else {
+                    this.LegacyDrawWatermark(s);
+                }
+            }
+
+            return RequestedAction.None;
+        }
+
+        /// <summary>
+        /// Creates an ImageLayer for the watermark based on OtherImages, if
+        /// it exists.  If OtherImages does not exist, the watermark should be
+        /// treated as a legacy one.
+        /// </summary>
+        /// <param name="watermarkPath">The path to the watermark image.</param>
+        /// <returns>Returns a copy of OtherImages, modified to represent the
+        /// watermark passed in <c>watermarkPath</c>, or <c>null</c> if
+        /// OtherImages doesn't exist.</returns>
+        private ImageLayer CreateLayerFromOtherImages(string watermarkPath)
+        {
+            if (watermarkPath.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1 ||
+                watermarkPath.IndexOfAny(new char[] { '\\', '/' }) > -1) {
+                throw new ArgumentException("Watermark value contained invalid file name characters: " + watermarkPath);
+            }
+
+            if (OtherImages != null && OtherImages.Path != null) {
+                ImageLayer layer = OtherImages.Copy();
+
+                //Is the watermark dir a physical path?
+                char slash = layer.Path.Contains("/") ? '/' : '\\';
+                layer.Path = layer.Path.TrimEnd(slash) + slash + watermarkPath.TrimStart(slash);
+
+                //If it's a forward-slash, and we're in asp.net,  verify the file exists
+                if (slash == '/' &&
+                    HttpContext.Current != null &&
+                    !c.Pipeline.FileExists(layer.Path, layer.ImageQuery)) {
+                    return null;
+                }
+
+                return layer;
+            }
+
+            return null;
+        }
+
+        // Watermark images are loaded prior to the main image for performance
+        // reasons.  The logic is thus:
+        //
+        //   1. Overlays tend to be smaller than primary images
+        //
+        //   2. Network/disk latency can cause image processing to 'pause' during
+        //      a render stage, which is catastrophic to RAM use, as 200MB block
+        //      of RAM may be held open for 1-10s instead of 200ms.
+        //
+        //   3. If we have a MemoryStream of overlay images before the primary
+        //      image is even decoded, we theoretically limit the render phase
+        //      time to 20% overhead (overlay JPEG decoding). Locking on a cached
+        //      Bitmap instance is OK, as all DrawImage calls are serialized
+        //      anyway. It doesn't address initial latency problems though, which
+        //      can be bad during startup for concurrent similar requests.
+        protected override void PreLoadImage(ref object source, ref string path, ref bool disposeSource, ref ResizeSettings settings) {
+            // We can only cache in ASP.NET.
+            if (HttpContext.Current == null) return;
+
+            // We don't actually touch source, path, or disposeSource, since
+            // we're not actually doing anything about the source image itself.
+            string watermark;
+            string[] parts = WatermarksToUse(settings, out watermark);
+            if (parts == null) return;
+
+            bool foundPart = false;
+
+            foreach (string w in parts) {
+                if (NamedWatermarks.ContainsKey(w)) {
+                    IEnumerable<Layer> layers = NamedWatermarks[w];
+                    foreach (Layer l in layers) {
+                        ImageLayer il = l as ImageLayer;
+                        if (il != null) {
+                            il.PreFetchImage();
+                        }
+                        foundPart = true;
+                    }
+                }
+            }
+
+            if (!foundPart) {
+                ImageLayer layer = this.CreateLayerFromOtherImages(watermark);
+
+                if (layer != null) {
+                    layer.PreFetchImage();
+                } else {
+                    this.LegacyPreFetchWatermark(settings);
+                }
+            }
+        }
+
+        protected override RequestedAction PostRenderBackground(ImageState s) {
+            return RenderLayersForLevel(s, Layer.LayerPlacement.Background);
+        }
+
+        protected override RequestedAction RenderOverlays(ImageState s) {
+            return RenderLayersForLevel(s, Layer.LayerPlacement.Overlay);
+        }
+
+
+        private static string[] WatermarksToUse(NameValueCollection nvc) {
+            string watermark;
+            return WatermarksToUse(nvc, out watermark);
+        }
+
+        private static string[] WatermarksToUse(NameValueCollection nvc, out string watermark) {
+            watermark = nvc["watermark"];
+            if (string.IsNullOrEmpty(watermark)) return null;
+
+            string[] parts = watermark.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            return parts;
+        }
+        /// <summary>
+        /// Returns the license key feature codes that are able to activate this plugins.
+        /// </summary>
+        public IEnumerable<string> LicenseFeatureCodes
+        {
+            get { yield return "R_Creative"; yield return "R4Creative"; yield return "R4Watermark"; }
+        }
+    }
+}
+
+
+
+
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/resizer/refs/heads/support/v4/Plugins/Watermark/TextLayer.cs
+// =========================================
+// Copyright (c) Imazen LLC.
+// No part of this project, including this file, may be copied, modified,
+// propagated, or distributed except as permitted in COPYRIGHT.txt.
+// Licensed under the GNU Affero General Public License, Version 3.0.
+// Commercial licenses available at http://imageresizing.net/
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.Specialized;
+using System.Drawing;
+using ImageResizer.Util;
+using System.Text.RegularExpressions;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using ImageResizer.ExtensionMethods;
+
+namespace ImageResizer.Plugins.Watermark {
+    public class TextLayer:Layer {
+
+        public TextLayer(){}
+        public TextLayer(NameValueCollection attrs)
+            : base(attrs) {
+                Text = attrs["text"];
+                Vertical = attrs.Get("vertical",false);
+                TextColor = ParseUtils.ParseColor(attrs["color"], TextColor);
+                OutlineColor = ParseUtils.ParseColor(attrs["outlineColor"], OutlineColor);
+                GlowColor = ParseUtils.ParseColor(attrs["glowColor"], GlowColor);
+                Font = attrs["font"];
+                Angle = attrs.Get("angle", Angle);
+                FontSize = attrs.Get("fontSize", FontSize);
+                Style = attrs.Get("style", this.Style);
+                OutlineWidth = attrs.Get("outlineWidth", OutlineWidth);
+                GlowWidth = attrs.Get("glowWidth", GlowWidth);
+                Rendering = attrs.Get("rendering", this.Rendering);
+        }
+
+
+        public override object[] GetHashBasis()
+        {
+            var b = new object[] {Text, Vertical, TextColor,OutlineColor,GlowColor,Font,Angle,FontSize,Style,OutlineWidth,GlowWidth,Rendering };
+            var o = base.GetHashBasis();
+            object[] combined = new object[b.Length + o.Length];
+            Array.Copy(b, combined, b.Length);
+            Array.Copy(o, 0, combined, b.Length, o.Length);
+            return combined;
+        }
+
+        private TextRenderingHint _rendering = TextRenderingHint.AntiAliasGridFit;
+
+        public TextRenderingHint Rendering {
+            get { return _rendering; }
+            set { _rendering = value; }
+        }
+
+        private string _text = "";
+        /// <summary>
+        /// The text to display
+        /// </summary>
+        public string Text {
+            get { return _text; }
+            set { _text = value; }
+        }
+
+        private bool _vertical = false;
+        /// <summary>
+        /// If true, text will be displayed vertically
+        /// </summary>
+        public bool Vertical {
+            get { return _vertical; }
+            set { _vertical = value; }
+        }
+
+
+        private double _angle = 0;
+        /// <summary>
+        /// Angle of clockwise rotation
+        /// </summary>
+        public double Angle {
+            get { return _angle; }
+            set { _angle = value; }
+        }
+
+        private Color _textColor = Color.Black;
+        /// <summary>
+        /// The color to draw the text
+        /// </summary>
+        public Color TextColor {
+            get { return _textColor; }
+            set { _textColor = value; }
+        }
+
+        private int _outlineWidth = 0;
+        /// <summary>
+        /// The width of the text outline (OutlineColor)
+        /// </summary>
+        public int OutlineWidth {
+            get { return _outlineWidth; }
+            set { _outlineWidth = value; }
+        }
+        private int _glowWidth = 0;
+        /// <summary>
+        /// The width of the glow effect (GlowColor)
+        /// </summary>
+        public int GlowWidth {
+            get { return _glowWidth; }
+            set { _glowWidth = value; }
+        }
+
+        private Color _outlineColor = Color.White;
+
+        /// <summary>
+        /// The color of the outline
+        /// </summary>
+        public Color OutlineColor {
+            get { return _outlineColor; }
+            set { _outlineColor = value; }
+        }
+        private Color _glowColor;
+        /// <summary>
+        /// The color of the glow effect. 
+        /// </summary>
+        public Color GlowColor {
+            get { return _glowColor; }
+            set { _glowColor = value; }
+        }
+
+        private string _font = null;
+
+        /// <summary>
+        /// The name of the font
+        /// </summary>
+        public string Font {
+            get { return _font; }
+            set { _font = value; }
+        }
+
+        private int _fontSize = 48;
+        /// <summary>
+        /// The size of the font in pixels
+        /// </summary>  
+        public int FontSize {
+            get { return _fontSize; }
+            set { _fontSize = value; }
+        }
+
+
+        private FontStyle _style = FontStyle.Bold;
+        /// <summary>
+        /// The font style
+        /// </summary>
+        public FontStyle Style {
+            get { return _style; }
+            set { _style = value; }
+        }
+
+        /// <summary>
+        /// Sets the font for the text layer. Default is Generic Sans Serif.
+        /// </summary>
+        /// <returns></returns>
+        public Font GetFont() {
+            FontFamily ff = string.IsNullOrEmpty(Font) ? FontFamily.GenericSansSerif : new FontFamily(Font);
+            
+            return new Font(ff, FontSize, Style, GraphicsUnit.Pixel);
+
+        }
+        public StringFormat GetFormat() {
+            System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
+            if (Vertical) drawFormat.FormatFlags = StringFormatFlags.DirectionVertical;
+            
+            return drawFormat;
+        }
+        public Brush GetBrush() {
+            return new SolidBrush(TextColor);
+        }
+
+        public override void RenderTo(Resizing.ImageState s) {
+            if (string.IsNullOrEmpty(Text)) return;
+
+            string finalText = Text;
+
+            if (finalText.IndexOf('#') > -1) {
+                Regex r = new Regex("\\#\\{([^}]+)\\}");
+                finalText = r.Replace(finalText, delegate(Match m){
+                    string val =  s.settings[m.Groups[1].Value];
+                    if (val == null) return "";
+                    else return val;
+                });
+            }
+
+            SizeF naturalSize = SizeF.Empty;
+            SizeF unrotatedSize = SizeF.Empty;
+             RectangleF bounds = this.CalculateLayerCoordinates(s, delegate(double maxwidth, double maxheight) {
+                 using (Font f= GetFont())
+                 using (StringFormat sf = GetFormat()){
+                    naturalSize = s.destGraphics.MeasureString(finalText, f, new PointF(), sf);
+                     SizeF size = naturalSize;
+
+                     unrotatedSize = Fill ? PolygonMath.ScaleInside(size, new SizeF((float)maxwidth, (float)maxheight)) : size;
+
+                     if (Angle != 0) size = PolygonMath.GetBoundingBox(PolygonMath.RotatePoly(PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), size)), Angle)).Size;
+                     if (Fill) {
+                         size = PolygonMath.ScaleInside(size, new SizeF((float)maxwidth, (float)maxheight));
+                     }
+                     f.FontFamily.Dispose();
+                     return PolygonMath.RoundPoints(size);
+                     
+                 }
+             }, true);
+             using (Font f = GetFont()) {
+
+                 s.destGraphics.SmoothingMode = SmoothingMode.HighQuality;
+                 s.destGraphics.TextRenderingHint = Rendering; // Utils.parseEnum<TextRenderingHint>(s.settings["watermark.rendering"], this.Rendering); ;
+                 s.destGraphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                 s.destGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                 s.destGraphics.CompositingMode = CompositingMode.SourceOver;
+                 s.destGraphics.CompositingQuality = CompositingQuality.HighQuality;
+
+                 s.destGraphics.ResetTransform();
+                 if (Angle != 0) s.destGraphics.RotateTransform((float)Angle);
+                 s.destGraphics.ScaleTransform(unrotatedSize.Width / naturalSize.Width, unrotatedSize.Height / naturalSize.Height);
+                 s.destGraphics.TranslateTransform(bounds.X, bounds.Y, MatrixOrder.Append);
+                 using (StringFormat sf = GetFormat()) {
+                     DrawString(s.destGraphics, finalText, f, new Point(0, 0), sf);
+                 }
+                 s.destGraphics.ResetTransform();
+
+                 f.FontFamily.Dispose();
+             }
+        }
+
+        public void DrawString(Graphics g, string text, Font f, Point point, StringFormat fmt) {
+            if (GlowWidth == 0 && OutlineWidth == 0) {
+                using (Brush b = GetBrush()) {
+                    g.DrawString(text, f, b, new PointF(0, 0), fmt);
+                }
+                return;
+            }
+
+            using (GraphicsPath path = new GraphicsPath()) {
+                path.AddString(text, f.FontFamily, (int)f.Style, (float)(f.SizeInPoints / 72 * g.DpiY), point, fmt);
+
+                Color c = GlowColor;
+                if (GlowWidth > 0 && c.A == 255) c = Color.FromArgb(Math.Max(64, Math.Min(24, 255 / GlowWidth)), c);
+                //Draw glow
+                for (int i = 1; i <= GlowWidth; ++i) {
+                    using (Pen pen = new Pen(c, i + OutlineWidth)) {
+                        pen.LineJoin = LineJoin.Round;
+                        g.DrawPath(pen, path);
+                    }
+                }
+                //Draw outline
+                if (OutlineWidth > 0) {
+                    using (Pen pen = new Pen(OutlineColor, OutlineWidth)) {
+                        pen.LineJoin = LineJoin.Round;
+                        g.DrawPath(pen, path);
+                    }
+                }
+                //Draw inner text
+                using (Brush b = GetBrush()) {
+                    g.FillPath(b, path);
+                }
+
+            }
+
+        }
+    }
+}
+
+
+
+
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/resizer/refs/heads/support/v4/Plugins/Watermark/Layer.cs
+// =========================================
+// Copyright (c) Imazen LLC.
+// No part of this project, including this file, may be copied, modified,
+// propagated, or distributed except as permitted in COPYRIGHT.txt.
+// Licensed under the GNU Affero General Public License, Version 3.0.
+// Commercial licenses available at http://imageresizing.net/
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.Specialized;
+using ImageResizer.Resizing;
+using System.Drawing;
+using ImageResizer.Util;
+using ImageResizer.ExtensionMethods;
+
+namespace ImageResizer.Plugins.Watermark {
+    public class Layer {
+
+        public Layer() {
+        }
+
+        public Layer(NameValueCollection settings) {
+            Top = DistanceUnit.TryParse(settings["top"]);
+            Left = DistanceUnit.TryParse(settings["left"]);
+            Bottom = DistanceUnit.TryParse(settings["bottom"]);
+            Right = DistanceUnit.TryParse(settings["right"]);
+            Width = DistanceUnit.TryParse(settings["width"]);
+            Height = DistanceUnit.TryParse(settings["height"]);
+            if (!string.IsNullOrEmpty(settings["relativeTo"])) RelativeTo = settings["relativeTo"];
+            DrawAs = settings.Get( "drawAs", DrawAs);
+            Align = settings.Get("align", Align);
+            Fill = settings.Get("fill", false);
+        }
+
+        public virtual void CopyTo(Layer other) {
+            other.Top = this.Top;
+            other.Left = this.Left;
+            other.Bottom = Bottom;
+            other.Right = Right;
+            other.Width = Width;
+            other.Height = Height;
+            other.RelativeTo = RelativeTo;
+            other.DrawAs = DrawAs;
+            other.Align = Align;
+        }
+
+        public virtual object[] GetHashBasis()
+        {
+            return new object[] { Top, Left, Bottom, Right, Width, Height, RelativeTo, DrawAs, Align };
+        }
+
+        public int GetDataHash()
+        {
+            var sb = new StringBuilder();
+            foreach (object o in GetHashBasis())
+            {
+                if (o == null) sb.Append("null");
+                else sb.Append(o.ToString());
+                sb.Append("||");
+            }
+            return sb.ToString().GetHashCode();
+        }
+
+        private DistanceUnit _top = null;
+        /// <summary>
+        /// The offset from the top of the container. Percentages are relative to the container height. Defines the upper boundary for the layer. 
+        /// If null, Bottom will be used to calculate the value based on the height. If Bottom is not specified, defaults to 0.
+        /// Positive values are inside the container, negative values outside it.
+        /// </summary>
+        public DistanceUnit Top {
+            get { return _top; }
+            set { _top = value; }
+        }
+
+        private DistanceUnit _left = null;
+        /// <summary>
+        /// The offset from the left of the container. Percentages are relative to the container width. Defines the leftmost boundary for the layer. 
+        /// If null, Right will be used to calculate the value based on the width. If Right is not specified, defaults to 0.
+        /// Positive values are inside the container, negative values outside it.
+        /// </summary>
+        public DistanceUnit Left {
+            get { return _left; }
+            set { _left = value; }
+        }
+
+        private DistanceUnit _right = null;
+
+        /// <summary>
+        /// The offset relative to the right side of the container. Percentages are relative to the container width. Defines the rightmost boundary for the layer.
+        /// If null, Top will be used to calculate the value based on the height. If Top is not specified, defaults to 0.
+        /// Positive values are inside the container, negative values outside it.
+        /// </summary>
+        public DistanceUnit Right {
+            get { return _right; }
+            set { _right = value; }
+        }
+        private DistanceUnit _bottom = null;
+        /// <summary>
+        /// The offset relative to the bottom of the container. Percentages are relative to the container height. Defines the bottom-most boundary for the layer.
+        /// If null, Top will be used to calculate the value based on the height. If Top is not specified, defaults to 0.
+        /// Positive values are inside the container, negative values outside it.
+        /// </summary>
+        public DistanceUnit Bottom {
+            get { return _bottom; }
+            set { _bottom = value; }
+        }
+        private DistanceUnit _width = null;
+        /// <summary>
+        /// The width of the layer. If used with both Left and Right, the smaller result wins. I.e, with a 100px container, width=50, left=30, right=30, the resulting width will be 40.
+        /// If null, Left and Right will be used to calculate the value. If both Left and Right are not specified, the natural width of the layer's contents will be used.
+        /// Percentages are relative to the container width. 
+        /// </summary>
+        public DistanceUnit Width {
+            get { return _width; }
+            set { _width = value; }
+        }
+        private DistanceUnit _height = null;
+
+        /// <summary>
+        /// The height of the layer. If used with both Top and Bottom, the smaller result wins. I.e, with a 100px container, height=50, top=30, top=30, the resulting height will be 40.
+        /// If null, Top and Bottom will be used to calculate the value. If both Top and Bottom are not specified, the natural height of the layer's contents will be used.
+        /// Percentages are relative to the container height. 
+        /// </summary>
+        public DistanceUnit Height {
+            get { return _height; }
+            set { _height = value; }
+        }
+
+        private string _relativeTo = "image";
+
+        /// <summary>
+        /// Specifies the container that the position values (top,left,right,bottom,width,height) are relative to. 
+        /// The default is 'image' (the innermost square, which contains the original photo). Additional valid values include 'imageArea' (includes whitespace added to preserve aspect ratio), 'padding', 'border', 'margin', and 'canvas'. 
+        /// </summary>
+        public string RelativeTo {
+            get { return _relativeTo; }
+            set { _relativeTo = value; }
+        }
+        //top, left, bottom, right = px or percentages (relative to container)
+        //relativeTo = image|imageArea|padding|border|margin|canvas
+        //drawAs overlay|background
+
+        private ContentAlignment _align = ContentAlignment.MiddleCenter;
+
+        /// <summary>
+        /// The alignment to use when 
+        /// (a) all 3 horizontal or vertical values are specified, and they need to be resolved,
+        /// (b) when only width/height are specified, 
+        /// (c) when no positioning values are specified, or 
+        /// (d) when the content doesn't precisely fill they layer bounds.
+        /// </summary>
+        public ContentAlignment Align {
+            get { return _align; }
+            set { _align = value; }
+        }
+
+
+        private bool _fill = false;
+        /// <summary>
+        /// (defaults false). When true, the image or text will attempt to fill 1 of the layer's bounds, even if upscaling is required. 
+        /// When Width is not specified, and both left and right are not specified, this causes the image to fill the container width (if possible).
+        /// When Height is not specified, and both top and bottom are not specified, this causes the image to fill the container height (if possible).
+        /// This causes &amp;scale=both to be used on images unless another setting is specified in imageQuery.
+        /// </summary>
+        public bool Fill {
+            get { return _fill; }
+            set { _fill = value; }
+        }
+
+        public enum LayerPlacement { Overlay, Background }
+
+        private LayerPlacement _drawAs = LayerPlacement.Overlay;
+        /// <summary>
+        /// The z-order at which to draw the layer. Current options are Overlay (over everything) and Background (over the background color).
+        /// </summary>
+        public LayerPlacement DrawAs {
+            get { return _drawAs; }
+            set { _drawAs = value; }
+        }
+
+
+        public delegate Size CalculateLayerContentSize(double maxwidth, double maxheight);
+        /// <summary>
+        /// Returns a rectangle with canvas-relative coordinates. A callback is required to calculate the actual size of the content based on the specified bounds. 
+        /// The callback may be passed double.NaN for one or more parameters to indicate that they are not specified.
+        /// 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="actualSizeCalculator"></param>
+        /// <param name="forceInsideCanvas"></param>
+        /// <returns></returns>
+        public RectangleF CalculateLayerCoordinates(ImageState s, CalculateLayerContentSize actualSizeCalculator, bool forceInsideCanvas) {
+            //Find container 
+            RectangleF cont;
+            if (s.layout.ContainsRing(RelativeTo))
+                cont = PolygonMath.GetBoundingBox(s.layout[RelativeTo]);
+            else if ("canvas".Equals(RelativeTo, StringComparison.OrdinalIgnoreCase)) 
+                cont = new RectangleF(new PointF(), s.destSize);
+            else 
+                cont = PolygonMath.GetBoundingBox(s.layout["image"]);
+            
+            //Calculate layer coords
+            RectangleF rect = new RectangleF();
+
+            //Resolve all values to the same coordinate plane, null values will be transformed to NaN
+            double left = Resolve(Left, cont.X, cont.Width, false);
+            double top = Resolve(Top, cont.Y, cont.Height, false);
+            double right = Resolve(Right, cont.Right, cont.Width, true);
+            double bottom = Resolve(Bottom, cont.Bottom, cont.Height, true);
+            double width = Resolve(Width, 0, cont.Width, false);
+            double height = Resolve(Height, 0, cont.Height, false);
+
+            //Force all values to be within the canvas area.
+            if (forceInsideCanvas) {
+                SizeF canvas = s.destSize;
+                if (!double.IsNaN(left)) left = Math.Min(Math.Max(0, left), canvas.Width);
+                if (!double.IsNaN(right)) right = Math.Min(Math.Max(0, right), canvas.Width);
+                if (!double.IsNaN(width)) width = Math.Min(Math.Max(0, width), canvas.Width);
+                if (!double.IsNaN(bottom)) bottom = Math.Min(Math.Max(0, bottom), canvas.Height);
+                if (!double.IsNaN(top)) top = Math.Min(Math.Max(0, top), canvas.Height);
+                if (!double.IsNaN(height)) height = Math.Min(Math.Max(0, height), canvas.Height);
+            }
+
+            //If right and left (or top and bottom) are inverted, avg them and set them equal.
+            if (!double.IsNaN(left) && !double.IsNaN(right) && right < left) left = right = ((left + right) / 2);
+            if (!double.IsNaN(top) && !double.IsNaN(bottom) && bottom < top) bottom = top = ((bottom + top) / 2);
+
+
+            //Fill in width/height if enough stuff is specified
+            if (!double.IsNaN(left) && !double.IsNaN(right) && double.IsNaN(width))  width = Math.Max(right - left,0);
+            if (!double.IsNaN(top) && !double.IsNaN(bottom) && double.IsNaN(height)) height = Math.Max(bottom - top,0);
+
+  
+            //Execute the callback to get the actual size. Update the width and height values if the actual size is smaller. 
+            SizeF normalSize = actualSizeCalculator((double.IsNaN(width) && Fill) ? cont.Width : width, (double.IsNaN(height) && Fill) ? cont.Height : height);
+            if (double.IsNaN(width) || width > normalSize.Width) width = normalSize.Width;
+            if (double.IsNaN(height) || height > normalSize.Height) height = normalSize.Height;
+
+
+
+            //If only width and height are specified, set the other values to match the container, and let alignment sort it out.
+            if (double.IsNaN(left) && double.IsNaN(right)) { left = cont.X; right = cont.Right; }//Handle situations where neither left nor right is specified, pretend left=0
+            if (double.IsNaN(top) && double.IsNaN(bottom)) { top = cont.X; bottom = cont.Bottom; } //Handle situations where neither top nor bottom is specified, pretend top=0
+
+
+            //When all 3 values are specified in either direction, we must use the alignment setting to determine which direction to snap to.
+            if (!double.IsNaN(left) && !double.IsNaN(right) && !double.IsNaN(width)) {
+                if (width > right - left) width = right - left; //Use the smaller value in this case, no need to align.
+                else {
+                    if (Align == ContentAlignment.BottomLeft || Align == ContentAlignment.MiddleLeft || Align == ContentAlignment.TopLeft)
+                        right = left + width;
+                    if (Align == ContentAlignment.BottomCenter || Align == ContentAlignment.MiddleCenter || Align == ContentAlignment.TopCenter){
+                        left += (right-left-width) /2;
+                        right = left + width;
+                    }
+                    if (Align == ContentAlignment.BottomRight || Align == ContentAlignment.MiddleRight || Align == ContentAlignment.TopRight)
+                        left = right - width;
+                }
+            }
+
+            //When all 3 values are specified in either direction, we must use the alignment setting to determine which direction to snap to.
+            if (!double.IsNaN(top) && !double.IsNaN(bottom) && !double.IsNaN(height)) {
+                if (height > bottom - top) height = bottom - top; //Use the smaller value in this case, no need to align.
+                else {
+                    if (Align == ContentAlignment.TopLeft || Align == ContentAlignment.TopCenter || Align == ContentAlignment.TopRight)
+                        bottom = top + height;
+                    if (Align == ContentAlignment.MiddleLeft || Align == ContentAlignment.MiddleCenter || Align == ContentAlignment.MiddleRight) {
+                        top += (bottom - top - height) / 2;
+                        bottom = top + height;
+                    }
+                    if (Align == ContentAlignment.BottomLeft || Align == ContentAlignment.BottomCenter || Align == ContentAlignment.BottomRight)
+                        top = bottom - height;
+                }
+            }
+
+
+            //Calculate values for top and left based off bottom and right
+            if (double.IsNaN(left)) left = right - width;
+            if (double.IsNaN(top)) top = bottom - height;
+
+            //Calculate values for bottom and right based off top and left
+            if (double.IsNaN(right)) right = left + width;
+            if (double.IsNaN(bottom)) bottom = top + height;
+
+
+            return new RectangleF((float)left, (float)top, (float)width, (float)height);
+
+        }
+
+        public double Resolve(DistanceUnit value, double relativeToValue, double percentRelativeTo, bool invert) {
+            if (value == null) return double.NaN;
+            double val = value.Value;
+            if (value.Type == DistanceUnit.Units.Percentage) val *= percentRelativeTo / 100;
+            if (invert) val = relativeToValue - val;
+            else val = relativeToValue + val;
+            return val;
+        }
+
+        public virtual void RenderTo(ImageState s) { }
+    }
+}
+
+
+
+
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/resizer/refs/heads/support/v4/Plugins/Watermark/ImageLayer.cs
+// =========================================
+// Copyright (c) Imazen LLC.
+// No part of this project, including this file, may be copied, modified,
+// propagated, or distributed except as permitted in COPYRIGHT.txt.
+// Licensed under the GNU Affero General Public License, Version 3.0.
+// Commercial licenses available at http://imageresizing.net/
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.Specialized;
+using System.Drawing;
+using ImageResizer.Util;
+using System.Web;
+using System.Web.Hosting;
+using System.Web.Caching;
+using ImageResizer.Configuration;
+using System.IO;
+
+namespace ImageResizer.Plugins.Watermark {
+    public class ImageLayer:Layer {
+        public ImageLayer(NameValueCollection attrs, ResizeSettings defaultImageQuery, Config c)
+            : base(attrs) {
+            this.c = c;
+
+            var configPath = attrs["path"];
+            var configImageQuery = attrs["imageQuery"];
+
+            if (!string.IsNullOrEmpty(configPath))
+            {
+                this.Path = PathUtils.RemoveQueryString(configPath);
+            }
+
+            // Combine the ResizeSettings from 'path', 'imageQuery', and any
+            // 'defaultImageQuery' settings as well.  Settings from 'imageQuery'
+            // take precedence over 'path', and both take precedence over the
+            // 'defaultImageQuery' settings.
+            var pathSettings = new ResizeSettings(configPath ?? string.Empty);
+            var imageQuerySettings = new ResizeSettings(configImageQuery ?? string.Empty);
+            var mergedSettings = new ResizeSettings(imageQuerySettings, pathSettings);
+
+            this.ImageQuery = new ResizeSettings(mergedSettings, defaultImageQuery);
+        }
+
+        public ImageLayer(Config c)
+        {
+            this.c = c;
+        }
+        protected string _path = null;
+        /// <summary>
+        /// The virtual path to the watermark image
+        /// </summary>
+        public string Path {
+            get { return _path; }
+            set { _path = value; }
+        }
+
+        protected ResizeSettings _imageQuery = new ResizeSettings();
+        protected Config c = null;
+
+        public Config ConfigInstance { get { return c; } set { c = value; } }
+        /// <summary>
+        /// Settings to apply to the watermark before overlaying it on the image. 
+        /// </summary>
+        public ResizeSettings ImageQuery {
+            get { return _imageQuery; }
+            set { _imageQuery = value; }
+        }
+
+        public void CopyTo(ImageLayer other) {
+            base.CopyTo(other);
+            other.Path = Path;
+            other.ImageQuery = new ResizeSettings(ImageQuery);
+        }
+
+        public override object[] GetHashBasis()
+        {
+            var b = new object[]{Path,ImageQuery};
+            var o = base.GetHashBasis();
+            object[] combined = new object[b.Length + o.Length];
+            Array.Copy(b,combined,b.Length);
+            Array.Copy(o,0,combined,b.Length,o.Length);
+            return combined;
+        }
+
+        public ImageLayer Copy() {
+            ImageLayer l = new ImageLayer(this.c);
+            this.CopyTo(l);
+            return l;
+        }
+
+        /// <summary>
+        /// Loads or caches a bitmap, using asp.net's cache (when available)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="virtualPath"></param>
+        /// <param name="onlyLoadIfCacheExists">Whether to load the image when
+        /// no cache is available.  Pass <c>true</c> for pre-fetching, and
+        /// <c>false</c> if the image is needed immediately.</param>
+        /// <returns>Returns the Bitmap.  If no cache is available, and
+        /// <c>onlyLoadIfCacheExists</c> is <c>true</c>, returns <c>null</c>
+        /// rather than loading the Bitmap.</returns>
+        public Bitmap GetMemCachedBitmap(string virtualPath, ResizeSettings query, bool onlyLoadIfCacheExists = false) {
+            //If not ASP.NET, don't cache.
+            if (HttpContext.Current == null) return onlyLoadIfCacheExists ? null : c.CurrentImageBuilder.LoadImage(virtualPath, query);
+
+            string key = virtualPath.ToLowerInvariant() + query.ToString();
+            Bitmap b = HttpContext.Current.Cache[key] as Bitmap;
+            if (b != null) return b;
+            try
+            {
+                b = c.CurrentImageBuilder.LoadImage(virtualPath, query);
+            }
+            catch (FileNotFoundException fe)
+            {
+                throw new ImageProcessingException(500, "Failed to located watermark " + virtualPath, "Failed to located a watermarking file", fe);
+            }
+            //Query VPPs for cache dependency. TODO: Add support for IVirtualImageProviders to customize cache dependencies.
+            CacheDependency cd = null;
+            if (HostingEnvironment.VirtualPathProvider != null) cd = HostingEnvironment.VirtualPathProvider.GetCacheDependency(virtualPath, new string[] { }, DateTime.UtcNow);
+
+            HttpContext.Current.Cache.Insert(key, b, cd);
+            return b;
+        }
+
+        public void PreFetchImage() {
+            if (this.ShouldLoadAsOriginalSize()) {
+                GetMemCachedBitmap(this.Path, this.ImageQuery, onlyLoadIfCacheExists: true);
+            }
+        }
+
+        public override void RenderTo(Resizing.ImageState s) {
+            if (string.IsNullOrEmpty(Path)) return;
+
+            s.destGraphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+            s.destGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            s.destGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+            Bitmap img = null;
+            if (this.ShouldLoadAsOriginalSize()) {
+                img = GetMemCachedBitmap(Path, ImageQuery);
+            }
+           
+            //Calculate the location for the bitmap
+            RectangleF imgBounds = this.CalculateLayerCoordinates(s, delegate(double maxwidth, double maxheight) {
+                ResizeSettings opts = new ResizeSettings(ImageQuery);
+                if (Fill && string.IsNullOrEmpty(opts["scale"])) opts.Scale = ScaleMode.Both;
+                if (!double.IsNaN(maxwidth)) opts.MaxWidth = (int)Math.Floor(maxwidth);
+                if (!double.IsNaN(maxheight)) opts.MaxHeight = (int)Math.Floor(maxheight);
+
+                if (img == null) img = GetMemCachedBitmap(Path, opts); //Delayed creation allows the maxwidth/maxheight to be used in gradient plugin
+                lock (img) {
+                    return c.CurrentImageBuilder.GetFinalSize(img.Size, opts);
+                }
+            }, true);
+
+            lock (img) { //Only one reader from the cached bitmap at a time.
+                //Skip rendering unless we have room to work with.
+                if (imgBounds.Width <2 || imgBounds.Height < 2) return;
+
+
+                if (ImageQuery.Keys.Count > 0 || Fill) {
+                    ResizeSettings settings = new ResizeSettings(ImageQuery);
+                    if (Fill && string.IsNullOrEmpty(settings["scale"])) settings.Scale = ScaleMode.Both;
+
+                    settings.MaxWidth = (int)Math.Floor(imgBounds.Width);
+                    settings.MaxHeight = (int)Math.Floor(imgBounds.Height);
+
+                    using (Bitmap final = c.CurrentImageBuilder.Build(img, settings,false)) {
+                        s.destGraphics.DrawImage(final, PolygonMath.ToRectangle(PolygonMath.CenterInside(PolygonMath.DownScaleInside(final.Size,imgBounds.Size), imgBounds)));
+                    }
+                } else {
+
+                    s.destGraphics.DrawImage(img, PolygonMath.ToRectangle(PolygonMath.CenterInside(PolygonMath.DownScaleInside(img.Size,imgBounds.Size), imgBounds)));
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Whether the image should be loaded in its original size.  If it can,
+        /// it can also be pre-fetched.
+        /// </summary>
+        /// <returns></returns>
+        private bool ShouldLoadAsOriginalSize() {
+            if (string.IsNullOrEmpty(this.Path)) return false;
+
+            // If the image is a virtual gradient, we don't load in its "original
+            // size".  Instead, we allow later-estimated width/height values to
+            // be used to create it at the actual needed size.
+            var file = c.Pipeline.GetFile(this.Path, this.ImageQuery);
+            if (file != null && (file is ImageResizer.Plugins.Basic.Gradient.GradientVirtualFile)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+}
+
+
+
+
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/resizer/refs/heads/support/v4/Plugins/Watermark/DistanceUnit.cs
+// =========================================
+// Copyright (c) Imazen LLC.
+// No part of this project, including this file, may be copied, modified,
+// propagated, or distributed except as permitted in COPYRIGHT.txt.
+// Licensed under the GNU Affero General Public License, Version 3.0.
+// Commercial licenses available at http://imageresizing.net/
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using ImageResizer.Util;
+using System.Globalization;
+
+namespace ImageResizer.Plugins.Watermark {
+    /// <summary>
+    /// Represents either a number of pixels or a percentage
+    /// </summary>
+    public class DistanceUnit {
+        /// <summary>
+        /// Creates DistanceUnit instance based on provided floating point value and type of unit
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="type"></param>
+        public DistanceUnit(double value, Units type) {
+            this.Type = type;
+            this.Value = value;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        public DistanceUnit(string value) {
+            DistanceUnit u = TryParse(value);
+            if (u == null) throw new ArgumentException("The specified value \"" + value + "\" could not be parsed.");
+            this.Type = u.Type;
+            this.Value = u.Value;
+
+        }
+        /// <summary>
+        ///  var a = new DistanceUnit();
+        ///  a.TryParse() 
+        ///  DistanceUnit.TryParse("3px") 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static DistanceUnit TryParse(string value) {
+            if (string.IsNullOrEmpty(value)) return null;
+            double val = 0;
+            Units type = Units.Pixels;
+            if (value.EndsWith("px", StringComparison.OrdinalIgnoreCase)) {
+                value = value.Substring(0, value.Length - 2); type = Units.Pixels;
+            } else if (value.EndsWith("%")) {
+                value = value.Substring(0, value.Length - 1); type = Units.Percentage;
+            } else if (value.EndsWith("percent", StringComparison.OrdinalIgnoreCase)) {
+                value = value.Substring(0, value.Length - 7); type = Units.Percentage;
+            } else if (value.EndsWith("pct", StringComparison.OrdinalIgnoreCase)) {
+                value = value.Substring(0, value.Length - 3); type = Units.Percentage;
+            }
+
+            if (!double.TryParse(value, ParseUtils.FloatingPointStyle, NumberFormatInfo.InvariantInfo, out val)) return null;
+            return new DistanceUnit(val, type);
+        }
+
+
+
+        public enum Units { Pixels, Percentage }
+
+        protected Units _type = Units.Pixels;
+        public Units Type { get { return _type; } set { _type = value; } }
+
+        protected double _value = 0;
+        /// <summary>
+        /// A number of pixels, or a percentage value between 0 and 100
+        /// </summary>
+        public double Value { get { return _value; } set { _value = value; } }
+
+        public override string ToString() {
+            if (Type == Units.Pixels) return Value.ToString(NumberFormatInfo.InvariantInfo) + "px";
+            else return Value.ToString(NumberFormatInfo.InvariantInfo) + "percent";
+
+        }
+    }
+}
+
+
+
+

@@ -53,6 +53,48 @@
           "xunit": "1.9.0"
         }
       },
+      "Imageflow.AllPlatforms": {
+        "type": "Transitive",
+        "resolved": "0.10.2",
+        "contentHash": "xBE1ob69E4z4Qg3v18RJe81J9rXXWvxpUyYiOZLcZZuOnbIF35t+ToPBQIYFDNgc39NFisf1iru3NnytOGM6tg==",
+        "dependencies": {
+          "Imageflow.NativeRuntime.osx-x86_64": "2.0.0-preview8",
+          "Imageflow.NativeRuntime.ubuntu-x86_64": "2.0.0-preview8",
+          "Imageflow.NativeRuntime.win-x86": "2.0.0-preview8",
+          "Imageflow.NativeRuntime.win-x86_64": "2.0.0-preview8",
+          "Imageflow.Net": "0.10.2"
+        }
+      },
+      "Imageflow.NativeRuntime.osx-x86_64": {
+        "type": "Transitive",
+        "resolved": "2.0.0-preview8",
+        "contentHash": "3wEglrMqVzlnAVBTdK6qcRySdo/4ajBP5ASRuK3yHfBqPp3ld4ke6guxuSZbgDTObIxai7KTLlsIvQZhusymUA=="
+      },
+      "Imageflow.NativeRuntime.ubuntu-x86_64": {
+        "type": "Transitive",
+        "resolved": "2.0.0-preview8",
+        "contentHash": "H8K5kZqcM3IliDRZD3H8BN6TbeLgcW+6FsDZ3EvlqBvu41s+Lv9vxE+c3m1cUQhsYBs76udUhgJFNR1D6x3U5g=="
+      },
+      "Imageflow.NativeRuntime.win-x86": {
+        "type": "Transitive",
+        "resolved": "2.0.0-preview8",
+        "contentHash": "WunIva5NZ2iMPKCyz8ZTkN7SRaW3szBijMg5YK7jaSFZHw8Xiky/GFfghc0XgWTuILxwO4YbY86e8QvW8CBigQ=="
+      },
+      "Imageflow.NativeRuntime.win-x86_64": {
+        "type": "Transitive",
+        "resolved": "2.0.0-preview8",
+        "contentHash": "1rY6C9Hjj7U9toa7FlnveiSBKccZlvCaHwdxPRQS0vDpAZZCJrTA/H7VYdreifpnIDInYcf0i/3oEKzEnj884w=="
+      },
+      "Imageflow.Net": {
+        "type": "Transitive",
+        "resolved": "0.10.2",
+        "contentHash": "4KtF92PRHCU8Gm3wYEGJd+Uk0YBqXUY2CFe2P3N3P8UiG6vSIQRDKUV9LjgstEsis95/9OE4ItfJTpMessJIRQ==",
+        "dependencies": {
+          "Microsoft.CSharp": "4.7.0",
+          "Microsoft.IO.RecyclableMemoryStream": "[1.2.2, 3.0.0)",
+          "Newtonsoft.Json": "[13.0.3, 14.0.0)"
+        }
+      },
       "Imazen.Common": {
         "type": "Transitive",
         "resolved": "0.8.2",
@@ -70,6 +112,11 @@
         "type": "Transitive",
         "resolved": "17.7.2",
         "contentHash": "ntbkwIqwszkfCRjxVZOyEQiHauiYsY9NtYjw9ASsoxDSiG8YtV6AGcOAwrAk3TZv2UOq4MrpX+3MYEeMHSb03w=="
+      },
+      "Microsoft.CSharp": {
+        "type": "Transitive",
+        "resolved": "4.7.0",
+        "contentHash": "pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA=="
       },
       "Microsoft.Extensions.Configuration.Abstractions": {
         "type": "Transitive",
@@ -117,10 +164,20 @@
           "System.Runtime.CompilerServices.Unsafe": "4.5.1"
         }
       },
+      "Microsoft.IO.RecyclableMemoryStream": {
+        "type": "Transitive",
+        "resolved": "1.2.2",
+        "contentHash": "LA4RBTStohA0hAAs6oKchmIC5M5Mjd5MwfB7vbbl+312N5kXj8abTGOgwZy6ASJYLCiqiiK5kHS0hDGEgfkB8g=="
+      },
       "Microsoft.SourceLink.Common": {
         "type": "Transitive",
         "resolved": "1.1.1",
         "contentHash": "WMcGpWKrmJmzrNeuaEb23bEMnbtR/vLmvZtkAP5qWu7vQsY59GqfRJd65sFpBszbd2k/bQ8cs8eWawQKAabkVg=="
+      },
+      "Newtonsoft.Json": {
+        "type": "Transitive",
+        "resolved": "13.0.3",
+        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
       "System.Buffers": {
         "type": "Transitive",
@@ -192,6 +249,14 @@
         "dependencies": {
           "Imazen.Common": "[0.8.2, )",
           "System.Buffers": "[4.5.1, )"
+        }
+      },
+      "imageresizer.plugins.imageflow": {
+        "type": "Project",
+        "dependencies": {
+          "ImageResizer": "[0.1.0--notset, )",
+          "Imageflow.AllPlatforms": "[0.10.2, )",
+          "Imageflow.Net": "[0.10.2, )"
         }
       }
     }

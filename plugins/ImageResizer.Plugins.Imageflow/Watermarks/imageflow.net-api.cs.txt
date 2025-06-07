@@ -1,0 +1,684 @@
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/imageflow-dotnet/refs/heads/main/src/Imageflow/Fluent/WatermarkOptions.cs
+// =========================================
+using System.Text.Json.Nodes;
+
+namespace Imageflow.Fluent;
+
+public class WatermarkOptions
+{
+
+    public ConstraintGravity? Gravity { get; set; }
+    public IWatermarkConstraintBox? FitBox { get; set; }
+    public WatermarkConstraintMode? FitMode { get; set; }
+
+    /// <summary>
+    /// Range 0..1, where 1 is fully opaque and 0 is transparent.
+    /// </summary>
+    public float? Opacity { get; set; }
+    public ResampleHints? Hints { get; set; }
+
+    public uint? MinCanvasWidth { get; set; }
+    public uint? MinCanvasHeight { get; set; }
+
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions WithHints(ResampleHints hints)
+    {
+        Hints = hints;
+        return this;
+    }
+
+    /// <summary>
+    /// Set the opacity to a value between 0 and 1
+    /// </summary>
+    /// <param name="opacity"></param>
+    /// <returns></returns>
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions WithOpacity(float opacity)
+    {
+        Opacity = opacity;
+        return this;
+    }
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions WithMargins(WatermarkMargins margins)
+    {
+        FitBox = margins;
+        return this;
+    }
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions WithFitBox(WatermarkFitBox fitBox)
+    {
+        FitBox = fitBox;
+        return this;
+    }
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions WithFitMode(WatermarkConstraintMode fitMode)
+    {
+        FitMode = fitMode;
+        return this;
+    }
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions WithGravity(ConstraintGravity gravity)
+    {
+        Gravity = gravity;
+        return this;
+    }
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions LayoutWithFitBox(WatermarkFitBox fitBox, WatermarkConstraintMode fitMode,
+        ConstraintGravity gravity)
+    {
+        FitBox = fitBox;
+        FitMode = fitMode;
+        Gravity = gravity;
+        return this;
+    }
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions LayoutWithMargins(WatermarkMargins margins, WatermarkConstraintMode fitMode,
+        ConstraintGravity gravity)
+    {
+        FitBox = margins;
+        FitMode = fitMode;
+        Gravity = gravity;
+        return this;
+    }
+
+    /// <summary>
+    /// Hide the watermark if the canvas is smaller in either dimension
+    /// </summary>
+    /// <param name="minWidth"></param>
+    /// <param name="minHeight"></param>
+    /// <returns></returns>
+    [Obsolete("Use Set___ methods instead")]
+    public WatermarkOptions WithMinCanvasSize(uint? minWidth, uint? minHeight)
+    {
+        MinCanvasWidth = minWidth;
+        MinCanvasHeight = minHeight;
+        return this;
+    }
+
+    public WatermarkOptions SetHints(ResampleHints hints)
+    {
+        Hints = hints;
+        return this;
+    }
+
+    /// <summary>
+    /// Set the opacity to a value between 0 and 1
+    /// </summary>
+    /// <param name="opacity"></param>
+    /// <returns></returns>
+    public WatermarkOptions SetOpacity(float opacity)
+    {
+        Opacity = opacity;
+        return this;
+    }
+
+    public WatermarkOptions SetMargins(WatermarkMargins margins)
+    {
+        FitBox = margins;
+        return this;
+    }
+
+    public WatermarkOptions SetFitBox(WatermarkFitBox fitBox)
+    {
+        FitBox = fitBox;
+        return this;
+    }
+
+    public WatermarkOptions SetFitMode(WatermarkConstraintMode fitMode)
+    {
+        FitMode = fitMode;
+        return this;
+    }
+
+    public WatermarkOptions SetGravity(ConstraintGravity gravity)
+    {
+        Gravity = gravity;
+        return this;
+    }
+
+    public WatermarkOptions SetFitBoxLayout(WatermarkFitBox fitBox, WatermarkConstraintMode fitMode,
+        ConstraintGravity gravity)
+    {
+        FitBox = fitBox;
+        FitMode = fitMode;
+        Gravity = gravity;
+        return this;
+    }
+
+    public WatermarkOptions SetMarginsLayout(WatermarkMargins margins, WatermarkConstraintMode fitMode,
+        ConstraintGravity gravity)
+    {
+        FitBox = margins;
+        FitMode = fitMode;
+        Gravity = gravity;
+        return this;
+    }
+
+    /// <summary>
+    /// Hide the watermark if the canvas is smaller in either dimension
+    /// </summary>
+    /// <param name="minWidth"></param>
+    /// <param name="minHeight"></param>
+    /// <returns></returns>
+    public WatermarkOptions SetMinCanvasSize(uint? minWidth, uint? minHeight)
+    {
+        MinCanvasWidth = minWidth;
+        MinCanvasHeight = minHeight;
+        return this;
+    }
+
+    [Obsolete("Use ToJsonNode() instead")]
+    public object ToImageflowDynamic(int? ioId)
+    {
+        return new
+        {
+            io_id = ioId,
+            gravity = Gravity?.ToImageflowDynamic(),
+            fit_box = FitBox?.ToImageflowDynamic(),
+            fit_mode = FitMode?.ToString().ToLowerInvariant(),
+            min_canvas_width = MinCanvasWidth,
+            min_canvas_height = MinCanvasWidth,
+            opacity = Opacity,
+            hints = Hints?.ToImageflowDynamic()
+        };
+    }
+
+    internal JsonNode ToJsonNode(int? ioId)
+    {
+        var node = new JsonObject { { "io_id", ioId } };
+        if (Gravity != null)
+        {
+            node.Add("gravity", Gravity.ToJsonNode());
+        }
+
+        if (FitBox != null)
+        {
+            node.Add("fit_box", FitBox.ToJsonNode());
+        }
+
+        if (FitMode != null)
+        {
+            node.Add("fit_mode", FitMode?.ToString().ToLowerInvariant());
+        }
+
+        if (MinCanvasWidth != null)
+        {
+            node.Add("min_canvas_width", MinCanvasWidth);
+        }
+
+        if (MinCanvasHeight != null)
+        {
+            node.Add("min_canvas_height", MinCanvasHeight);
+        }
+
+        if (Opacity != null)
+        {
+            node.Add("opacity", Opacity);
+        }
+
+        if (Hints != null)
+        {
+            node.Add("hints", Hints.ToJsonNode());
+        }
+
+        return node;
+    }
+}
+
+
+
+
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/imageflow-dotnet/refs/heads/main/src/Imageflow/Fluent/WatermarkMargins.cs
+// =========================================
+using System.Text.Json.Nodes;
+
+namespace Imageflow.Fluent;
+
+/// <summary>
+/// Defines a set of margins in terms of pixels inward from the edges of the canvas or image
+/// </summary>
+public class WatermarkMargins : IWatermarkConstraintBox
+{
+    public WatermarkMargins()
+    {
+    }
+
+    /// <summary>
+    /// Apply margins in terms of pixels from the edge of the canvas or image
+    /// </summary>
+    /// <param name="relativeTo"></param>
+    /// <param name="left"></param>
+    /// <param name="top"></param>
+    /// <param name="right"></param>
+    /// <param name="bottom"></param>
+    public WatermarkMargins(WatermarkAlign relativeTo, uint left, uint top, uint right, uint bottom)
+    {
+        RelativeTo = relativeTo;
+        Left = left;
+        Top = top;
+        Right = right;
+        Bottom = bottom;
+    }
+
+    public WatermarkAlign RelativeTo { get; set; } = WatermarkAlign.Image;
+    public uint Left { get; set; }
+    public uint Top { get; set; }
+    public uint Right { get; set; }
+    public uint Bottom { get; set; }
+
+    public WatermarkMargins SetRelativeTo(WatermarkAlign relativeTo)
+    {
+        RelativeTo = relativeTo;
+        return this;
+    }
+
+    public WatermarkMargins SetLeft(uint pixels)
+    {
+        Left = pixels;
+        return this;
+    }
+    public WatermarkMargins SetTop(uint pixels)
+    {
+        Top = pixels;
+        return this;
+    }
+    public WatermarkMargins SetRight(uint pixels)
+    {
+        Right = pixels;
+        return this;
+    }
+    public WatermarkMargins SetBottom(uint pixels)
+    {
+        Bottom = pixels;
+        return this;
+    }
+
+    [Obsolete("Use ToJsonNode() instead")]
+    public object ToImageflowDynamic()
+    {
+        switch (RelativeTo)
+        {
+            case WatermarkAlign.Canvas:
+                return new
+                {
+                    canvas_margins = new
+                    {
+                        left = Left,
+                        top = Top,
+                        right = Right,
+                        bottom = Bottom
+                    }
+
+                };
+            case WatermarkAlign.Image:
+                return new
+                {
+                    image_margins = new
+                    {
+                        left = Left,
+                        top = Top,
+                        right = Right,
+                        bottom = Bottom
+                    }
+
+                };
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    public JsonNode ToJsonNode()
+    {
+        var node = new JsonObject();
+        switch (RelativeTo)
+        {
+            case WatermarkAlign.Canvas:
+                node.Add("canvas_margins", new JsonObject
+                {
+                    {"left", Left},
+                    {"top", Top},
+                    {"right", Right},
+                    {"bottom", Bottom}
+                });
+                break;
+            case WatermarkAlign.Image:
+                node.Add("image_margins", new JsonObject
+                {
+                    {"left", Left},
+                    {"top", Top},
+                    {"right", Right},
+                    {"bottom", Bottom}
+                });
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        return node;
+    }
+}
+
+
+
+
+// =========================================
+// Source: https://raw.githubusercontent.com/imazen/imageflow-dotnet/refs/heads/main/src/Imageflow/Fluent/WatermarkFitBox.cs
+// =========================================
+using System.Text.Json.Nodes;
+
+namespace Imageflow.Fluent;
+
+/// <summary>
+/// Defines 
+/// </summary>
+public class WatermarkFitBox : IWatermarkConstraintBox
+{
+    public WatermarkFitBox() { }
+
+    public WatermarkFitBox(WatermarkAlign relativeTo, float x1, float y1, float x2, float y2)
+    {
+        RelativeTo = relativeTo;
+        X1 = x1;
+        Y1 = y1;
+        X2 = x2;
+        Y2 = y2;
+    }
+    public WatermarkAlign RelativeTo { get; set; } = WatermarkAlign.Image;
+
+    public float X1 { get; set; }
+    public float Y1 { get; set; }
+    public float X2 { get; set; } = 100;
+    public float Y2 { get; set; } = 100;
+
+    public WatermarkFitBox SetRelativeTo(WatermarkAlign relativeTo)
+    {
+        RelativeTo = relativeTo;
+        return this;
+    }
+
+    public WatermarkFitBox SetTopLeft(float x1, float y1)
+    {
+        X1 = x1;
+        Y1 = y1;
+        return this;
+    }
+    public WatermarkFitBox SetBottomRight(float x2, float y2)
+    {
+        X2 = x2;
+        Y2 = y2;
+        return this;
+    }
+    [Obsolete("Use ToJsonNode() instead")]
+    public object ToImageflowDynamic()
+    {
+        switch (RelativeTo)
+        {
+            case WatermarkAlign.Canvas:
+                return new
+                {
+                    canvas_percentage = new
+                    {
+                        x1 = X1,
+                        y1 = Y1,
+                        x2 = X2,
+                        y2 = Y2
+                    }
+
+                };
+            case WatermarkAlign.Image:
+                return new
+                {
+                    image_percentage = new
+                    {
+                        x1 = X1,
+                        y1 = Y1,
+                        x2 = X2,
+                        y2 = Y2
+                    }
+
+                };
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    public JsonNode ToJsonNode()
+    {
+        var node = new JsonObject();
+        switch (RelativeTo)
+        {
+            case WatermarkAlign.Canvas:
+                node.Add("canvas_percentage", new JsonObject
+                {
+                    {"x1", X1},
+                    {"y1", Y1},
+                    {"x2", X2},
+                    {"y2", Y2}
+                });
+                break;
+            case WatermarkAlign.Image:
+                node.Add("image_percentage", new JsonObject
+                {
+                    {"x1", X1},
+                    {"y1", Y1},
+                    {"x2", X2},
+                    {"y2", Y2}
+                });
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        return node;
+    }
+}
+
+
+
+
+using System.Text.Json.Nodes;
+
+namespace Imageflow.Fluent;
+
+public class ResampleHints
+{
+    public SharpenWhen? SharpenWhen { get; set; }
+    public ResampleWhen? ResampleWhen { get; set; }
+
+    public ScalingFloatspace? InterpolationColorspace { get; set; }
+    public InterpolationFilter? UpFilter { get; set; }
+    public InterpolationFilter? DownFilter { get; set; }
+    public float? SharpenPercent { get; set; }
+
+    public ResampleHints(float? sharpenPercent, SharpenWhen? sharpenWhen, ResampleWhen? resampleWhen, InterpolationFilter? downFilter, InterpolationFilter? upFilter, ScalingFloatspace? interpolationColorspace)
+    {
+        SharpenPercent = sharpenPercent;
+        DownFilter = downFilter;
+        UpFilter = upFilter;
+        InterpolationColorspace = interpolationColorspace;
+        ResampleWhen = resampleWhen;
+        SharpenWhen = sharpenWhen;
+    }
+
+    public ResampleHints()
+    {
+
+    }
+
+    [Obsolete("Use SetSharpen instead")]
+    public ResampleHints Sharpen(float? sharpenPercent, SharpenWhen? sharpenWhen)
+        => SetSharpen(sharpenPercent, sharpenWhen);
+    public ResampleHints SetSharpen(float? sharpenPercent, SharpenWhen? sharpenWhen)
+    {
+        SharpenPercent = sharpenPercent;
+        SharpenWhen = sharpenWhen;
+        return this;
+    }
+
+    public ResampleHints SetSharpenPercent(float? sharpenPercent)
+    {
+        SharpenPercent = sharpenPercent;
+        return this;
+    }
+    public ResampleHints SetSharpenWhen(SharpenWhen? sharpenWhen)
+    {
+        SharpenWhen = sharpenWhen;
+        return this;
+    }
+
+    [Obsolete("Use SetResampleFilters instead")]
+    public ResampleHints ResampleFilter(InterpolationFilter? downFilter, InterpolationFilter? upFilter)
+    {
+        DownFilter = downFilter;
+        UpFilter = upFilter;
+        return this;
+    }
+
+    public ResampleHints SetResampleFilters(InterpolationFilter? downFilter, InterpolationFilter? upFilter)
+    {
+        DownFilter = downFilter;
+        UpFilter = upFilter;
+        return this;
+    }
+
+    public ResampleHints SetUpSamplingFilter(InterpolationFilter? upFilter)
+    {
+        UpFilter = upFilter;
+        return this;
+    }
+    public ResampleHints SetDownSamplingFilter(InterpolationFilter? downFilter)
+    {
+        DownFilter = downFilter;
+        return this;
+    }
+
+    [Obsolete("Use SetResampleWhen instead")]
+    public ResampleHints Resample(ResampleWhen? resampleWhen)
+    {
+
+        ResampleWhen = resampleWhen;
+        return this;
+    }
+    public ResampleHints SetResampleWhen(ResampleWhen? resampleWhen)
+    {
+
+        ResampleWhen = resampleWhen;
+        return this;
+    }
+
+    [Obsolete("Use SetInterpolationColorspace instead")]
+    public ResampleHints ResampleColorspace(ScalingFloatspace? interpolationColorspace)
+    {
+        InterpolationColorspace = interpolationColorspace;
+        return this;
+    }
+
+    public ResampleHints SetInterpolationColorspace(ScalingFloatspace? interpolationColorspace)
+    {
+        InterpolationColorspace = interpolationColorspace;
+        return this;
+    }
+
+    [Obsolete("Use ToJsonNode() instead")]
+    public object ToImageflowDynamic()
+    {
+        return new
+        {
+            sharpen_percent = SharpenPercent,
+            down_filter = DownFilter?.ToString().ToLowerInvariant(),
+            up_filter = UpFilter?.ToString().ToLowerInvariant(),
+            scaling_colorspace = InterpolationColorspace?.ToString().ToLowerInvariant(),
+            resample_when = ResampleWhen?.ToString().ToLowerInvariant(),
+            sharpen_when = SharpenWhen?.ToString().ToLowerInvariant()
+        };
+    }
+
+    public JsonNode ToJsonNode()
+    {
+        var obj = new JsonObject();
+        if (SharpenPercent != null)
+        {
+            obj.Add("sharpen_percent", SharpenPercent);
+        }
+
+        if (DownFilter != null)
+        {
+            obj.Add("down_filter", DownFilter?.ToString().ToLowerInvariant());
+        }
+
+        if (UpFilter != null)
+        {
+            obj.Add("up_filter", UpFilter?.ToString().ToLowerInvariant());
+        }
+
+        if (InterpolationColorspace != null)
+        {
+            obj.Add("scaling_colorspace", InterpolationColorspace?.ToString().ToLowerInvariant());
+        }
+
+        if (ResampleWhen != null)
+        {
+            obj.Add("resample_when", ResampleWhen?.ToString().ToLowerInvariant());
+        }
+
+        if (SharpenWhen != null)
+        {
+            obj.Add("sharpen_when", SharpenWhen?.ToString().ToLowerInvariant());
+        }
+
+        return obj;
+    }
+}
+using System.Text.Json.Nodes;
+
+namespace Imageflow.Fluent;
+
+public class ConstraintGravity
+{
+    /// <summary>
+    /// Centers the gravity (the default)
+    /// </summary>
+    public ConstraintGravity()
+    {
+        XPercent = 50;
+        YPercent = 50;
+    }
+    /// <summary>
+    /// Aligns the watermark so xPercent of free space is on the left and yPercent of free space is on the top
+    /// </summary>
+    /// <param name="xPercent"></param>
+    /// <param name="yPercent"></param>
+    public ConstraintGravity(float xPercent, float yPercent)
+    {
+        XPercent = xPercent;
+        YPercent = yPercent;
+    }
+
+    public float XPercent { get; }
+    public float YPercent { get; }
+
+    [Obsolete("Use ToJsonNode() instead")]
+    public object ToImageflowDynamic()
+    {
+        return new
+        {
+            percentage = new
+            {
+                x = XPercent,
+                y = YPercent
+            }
+
+        };
+    }
+
+    public JsonNode ToJsonNode()
+    {
+        var obj = new JsonObject
+        { { "percentage", new JsonObject()
+        {
+            {"x", XPercent},
+            {"y", YPercent}
+        } } };
+        return obj;
+    }
+}

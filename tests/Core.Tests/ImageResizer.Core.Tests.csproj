@@ -11,9 +11,13 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\plugins\ImageResizer.Plugins.Imageflow\ImageResizer.Plugins.Imageflow.csproj">
+      <Name>ImageResizer.Plugins.Imageflow</Name>
     </ProjectReference>
   </ItemGroup>
   
