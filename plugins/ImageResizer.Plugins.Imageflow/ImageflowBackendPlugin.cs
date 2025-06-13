@@ -105,9 +105,10 @@ namespace ImageResizer.Plugins.Imageflow
             return Enumerable.Empty<IIssue>();
         }
 
+        private static readonly string[] FileExtensions = {"webp", "jpg", "jpeg", "png", "gif", "jfif"};
         public IEnumerable<string> GetSupportedFileExtensions()
         {
-            return Enumerable.Empty<string>();
+            return FileExtensions;
         }
 
         private bool ShouldBuild(string builderString)
