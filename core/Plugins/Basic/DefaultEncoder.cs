@@ -11,7 +11,7 @@ using System.Globalization;
 using System.IO;
 using ImageResizer.Configuration;
 using ImageResizer.Resizing;
-
+#pragma warning disable CS0618
 namespace ImageResizer.Plugins.Basic
 {
     /// <summary>

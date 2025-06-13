@@ -15,8 +15,10 @@ using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic
 {
+    #pragma warning disable CS0618
     public class DiagnoseRequest : BuilderExtension, IPlugin, IQuerystringPlugin
     {
+        #pragma warning restore CS0618
         private Config c;
 
         public IPlugin Install(Config c)

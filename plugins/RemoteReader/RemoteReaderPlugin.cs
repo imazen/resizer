@@ -22,6 +22,7 @@ using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.RemoteReader
 {
+    #pragma warning disable CS0618
     public class RemoteReaderPlugin : BuilderExtension, IPlugin, IVirtualImageProvider, IIssueProvider,
         IRedactDiagnostics, IVirtualImageProviderAsync
     {
