@@ -46,7 +46,10 @@ namespace ImageResizer.Plugins.S3Reader2
             else if (!string.IsNullOrEmpty(args["useProfile"]) && args["useProfile"] == "true")
                 S3Client = new AmazonS3Client(s3config);
             else
-                S3Client = new AmazonS3Client(null, s3config);
+            {
+                var credentials = new Amazon.Runtime.AnonymousAWSCredentials();
+                S3Client = new AmazonS3Client(credentials, s3config);
+            }
         }
 
         /// <summary>
