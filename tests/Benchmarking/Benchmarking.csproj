@@ -25,5 +25,10 @@
       <Name>Imazen.Profiling</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Imazen.Common">
+      <Version>0.8.3</Version>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>

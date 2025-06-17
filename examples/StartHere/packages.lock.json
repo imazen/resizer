@@ -10,9 +10,9 @@
       },
       "Imageflow.AllPlatforms": {
         "type": "Direct",
-        "requested": "[0.9.0, 0.9.0]",
-        "resolved": "0.9.0",
-        "contentHash": "tjrshyaqg4U5O2gw8WJjdDJa1dkRivxmOIQFgaKGwCI3q6LDDQGUnlBQNHDMZsrIliInhjmpGFm9xWQMDJ0BHA=="
+        "requested": "[0.13.2, 0.13.2]",
+        "resolved": "0.13.2",
+        "contentHash": "RAvdU2qaqP+orATtDoy0C1e5ZmxECNkO4LPyYAcRNM4E1p86zyPh3H1mlmnncBrgU0799aXsvginm8/m3IoLBw=="
       },
       "Imageflow.NativeRuntime.osx-x86_64": {
         "type": "Direct",
@@ -40,39 +40,39 @@
       },
       "Imageflow.Net": {
         "type": "Direct",
-        "requested": "[0.9.0, 0.9.0]",
-        "resolved": "0.9.0",
-        "contentHash": "IOZ49Bt9I3i6CQ9u/ZmVxVDC0CBY8gKjidDf2vzkIHuLokym39XPJo8AbBGftlLbQ5r7kfZ3ezaD+v6PjzE6CA=="
+        "requested": "[0.14.0-rc01, 0.14.0-rc01]",
+        "resolved": "0.14.0-rc01",
+        "contentHash": "e8HF8cI+Ny033da/w6fIfZQOkDCvCVhNryMoNBZjUOs6+5Qw5+1NboNLVfuFYApFBUM2ePMROTf0mRQWz74pbA=="
       },
       "ImageResizer": {
         "type": "Direct",
-        "requested": "[5.0.8-preview05, 5.0.8-preview05]",
-        "resolved": "5.0.8-preview05",
-        "contentHash": "cw6mUe5mJHC05J6Ckw5GOFGkjlYFJ3s4KMA+RzS1LhF07RjyiYS7Y9K+Wq//MaLlPNdzxm+JBxn0sVCPkBjQag=="
+        "requested": "[5.0.13-preview09, 5.0.13-preview09]",
+        "resolved": "5.0.13-preview09",
+        "contentHash": "5g51yspsLfClT6YA49aswlTjkTpWvvt+V2yR3KQhOFcvKNyUJ3FP63X5RX9CLZTXV3HdQadlJHIBRwZP5eiMDg=="
       },
       "ImageResizer.Plugins.Imageflow": {
         "type": "Direct",
-        "requested": "[5.0.8-preview05, 5.0.8-preview05]",
-        "resolved": "5.0.8-preview05",
-        "contentHash": "ieDZ8RIQL2sWuqGvl4F9Xx7BLJPVO7H3mli6TFUmp/vs/S3QS9XPkBgUddxyZGhCi3vrmbgeS+rBzUcsvtFDUQ=="
+        "requested": "[5.0.13-preview09, 5.0.13-preview09]",
+        "resolved": "5.0.13-preview09",
+        "contentHash": "SGqGS3GzrQE3f+SgY3GCMJgY04P/Y/NegOqxgusk7klSm0eAR+RFdIwBE58mN3mE+XzNWE5pRfBF76cfzjJ80A=="
       },
       "ImageResizer.WebConfig": {
         "type": "Direct",
-        "requested": "[5.0.8-preview05, 5.0.8-preview05]",
-        "resolved": "5.0.8-preview05",
-        "contentHash": "AOnx4tvy/SJjwZvASHyxQOmzopMuNw6O2zDLCEI7FAikC8IuYoKuO+EF3RDAWT3Vzh0RzuutHC2kVGrpXPHBwg=="
+        "requested": "[5.0.13-preview09, 5.0.13-preview09]",
+        "resolved": "5.0.13-preview09",
+        "contentHash": "XHE6ruAGdSBLd0Pc1Q8+COX/7HjVJBONpjJs/duIzkbBc6aIVB0XG1bbLYKtFRmTsEmb1c3p+tAcvuvGGR36NA=="
       },
       "Imazen.Common": {
         "type": "Direct",
-        "requested": "[0.7.7, 0.7.7]",
-        "resolved": "0.7.7",
-        "contentHash": "Wuk4GU3BiOxWxeTPXEGdBmuCBuY9QgYTNsuaZ5HJIyTO7jqVW31KjcyaKOuHiPX2DXMnYDLCrV6aCuSQcqCRkw=="
+        "requested": "[0.8.3, 0.8.3]",
+        "resolved": "0.8.3",
+        "contentHash": "fV0lMNq/NFUfQQchwt8lE2vwwXZz/0t6Pacwpup/esZtU1idWnQE1OCnJeC0u7iIwSy1uLNWR9UPoTiSYstIdg=="
       },
       "Imazen.HybridCache": {
         "type": "Direct",
-        "requested": "[0.7.7, 0.7.7]",
-        "resolved": "0.7.7",
-        "contentHash": "GcmFmvqqhX/YCjjUY64ZFIjU4SPdyChKxX7YFDgbQmZaaBWKCcstB2HZwJ/JAE1sM4ETM94obI27We7UHkYogw=="
+        "requested": "[0.8.3, 0.8.3]",
+        "resolved": "0.8.3",
+        "contentHash": "9MJEgXZjxTxSWxjmM7UH2iMxy2+V4zhj7yt9BQ5nc+aJ/Fwokrrgt+/+kk9SCGXk+gvGQUwV9MDty/Y5nc6mJQ=="
       },
       "Microsoft.AspNet.Mvc": {
         "type": "Direct",
@@ -97,6 +97,12 @@
         "requested": "[3.2.9, 3.2.9]",
         "resolved": "3.2.9",
         "contentHash": "yByb721lwv8YFsx1oKA5CLKXa89XVbVMkPafS4bg/bPelBEgChq/coFBQEkA4kwcabG7AR56w3vapnoZUfr2Cw=="
+      },
+      "Microsoft.Bcl.AsyncInterfaces": {
+        "type": "Direct",
+        "requested": "[10.0.0-preview.5.25277.114, 10.0.0-preview.5.25277.114]",
+        "resolved": "10.0.0-preview.5.25277.114",
+        "contentHash": "gUzoymrGaDgHQCvKE/Bb3ONLmqDrfg6YZ0xgNYousdRA/OSeSSzirzdM9X/ThRgKphSqJGlasMs36roTBM/T0w=="
       },
       "Microsoft.CodeDom.Providers.DotNetCompilerPlatform": {
         "type": "Direct",
@@ -148,9 +154,9 @@
       },
       "Microsoft.IO.RecyclableMemoryStream": {
         "type": "Direct",
-        "requested": "[1.2.2, 1.2.2]",
-        "resolved": "1.2.2",
-        "contentHash": "LA4RBTStohA0hAAs6oKchmIC5M5Mjd5MwfB7vbbl+312N5kXj8abTGOgwZy6ASJYLCiqiiK5kHS0hDGEgfkB8g=="
+        "requested": "[3.0.1, 3.0.1]",
+        "resolved": "3.0.1",
+        "contentHash": "s/s20YTVY9r9TPfTrN5g8zPF1YhwxyqO6PxUkrYTGI2B+OGPe9AdajWZrLhFqXIvqIW23fnUE4+ztrUWNU1+9g=="
       },
       "Microsoft.Web.Infrastructure": {
         "type": "Direct",
@@ -166,27 +172,57 @@
       },
       "System.Buffers": {
         "type": "Direct",
-        "requested": "[4.5.1, 4.5.1]",
-        "resolved": "4.5.1",
-        "contentHash": "Rw7ijyl1qqRS0YQD/WycNst8hUUMgrMH4FCn1nNm27M4VxchZ1js3fVjQaANHO5f3sN4isvP4a+Met9Y4YomAg=="
+        "requested": "[4.6.1, 4.6.1]",
+        "resolved": "4.6.1",
+        "contentHash": "N8GXpmiLMtljq7gwvyS+1QvKT/W2J8sNAvx+HVg4NGmsG/H+2k/y9QI23auLJRterrzCiDH+IWAw4V/GPwsMlw=="
+      },
+      "System.IO.Pipelines": {
+        "type": "Direct",
+        "requested": "[10.0.0-preview.5.25277.114, 10.0.0-preview.5.25277.114]",
+        "resolved": "10.0.0-preview.5.25277.114",
+        "contentHash": "Xd+uPek1ffzLcPqRVS1N2SLOsHb+5mcP+Tv/+WgHLYQDiYYD7vJXXg+UPbSfiehY1rIh26nlOYkBDux2m9NNqA=="
       },
       "System.Memory": {
         "type": "Direct",
-        "requested": "[4.5.1, 4.5.1]",
-        "resolved": "4.5.1",
-        "contentHash": "sDJYJpGtTgx+23Ayu5euxG5mAXWdkDb4+b0rD0Cab0M1oQS9H0HXGPriKcqpXuiJDTV7fTp/d+fMDJmnr6sNvA=="
+        "requested": "[4.6.3, 4.6.3]",
+        "resolved": "4.6.3",
+        "contentHash": "qdcDOgnFZY40+Q9876JUHnlHu7bosOHX8XISRoH94fwk6hgaeQGSgfZd8srWRZNt5bV9ZW2TljcegDNxsf+96A=="
       },
       "System.Numerics.Vectors": {
         "type": "Direct",
-        "requested": "[4.4.0, 4.4.0]",
-        "resolved": "4.4.0",
-        "contentHash": "UiLzLW+Lw6HLed1Hcg+8jSRttrbuXv7DANVj0DkL9g6EnnzbL75EB7EWsw5uRbhxd/4YdG8li5XizGWepmG3PQ=="
+        "requested": "[4.6.1, 4.6.1]",
+        "resolved": "4.6.1",
+        "contentHash": "sQxefTnhagrhoq2ReR0D/6K0zJcr9Hrd6kikeXsA1I8kOCboTavcUC4r7TSfpKFeE163uMuxZcyfO1mGO3EN8Q=="
       },
       "System.Runtime.CompilerServices.Unsafe": {
         "type": "Direct",
-        "requested": "[4.5.1, 4.5.1]",
-        "resolved": "4.5.1",
-        "contentHash": "Zh8t8oqolRaFa9vmOZfdQm/qKejdqz0J9kr7o2Fu0vPeoH3BL1EOXipKWwkWtLT1JPzjByrF19fGuFlNbmPpiw=="
+        "requested": "[6.1.2, 6.1.2]",
+        "resolved": "6.1.2",
+        "contentHash": "2hBr6zdbIBTDE3EhK7NSVNdX58uTK6iHW/P/Axmm9sl1xoGSLqDvMtpecn226TNwHByFokYwJmt/aQQNlO5CRw=="
+      },
+      "System.Text.Encodings.Web": {
+        "type": "Direct",
+        "requested": "[10.0.0-preview.5.25277.114, 10.0.0-preview.5.25277.114]",
+        "resolved": "10.0.0-preview.5.25277.114",
+        "contentHash": "ASQHCXde2eAzl94/F8s4i7jv9cp1zL5cpQ4FflSxx4H7MIwaAZPBS37NTL7zybBrY8r//ClslI2bHlIEmSraRg=="
+      },
+      "System.Text.Json": {
+        "type": "Direct",
+        "requested": "[10.0.0-preview.5.25277.114, 10.0.0-preview.5.25277.114]",
+        "resolved": "10.0.0-preview.5.25277.114",
+        "contentHash": "3Wsrsr1j5kEiCdqysf354fN2+0y+r4Gc94F5VLcPL59a+brREk7Vv4kFQj23ZwvoPUml/qvlPkwqc5QlsBqvkg=="
+      },
+      "System.Threading.Tasks.Extensions": {
+        "type": "Direct",
+        "requested": "[4.6.3, 4.6.3]",
+        "resolved": "4.6.3",
+        "contentHash": "7sCiwilJLYbTZELaKnc7RecBBXWXA+xMLQWZKWawBxYjp6DBlSE3v9/UcvKBvr1vv2tTOhipiogM8rRmxlhrVA=="
+      },
+      "System.ValueTuple": {
+        "type": "Direct",
+        "requested": "[4.6.1, 4.6.1]",
+        "resolved": "4.6.1",
+        "contentHash": "+RJT4qaekpZ7DDLhf+LTjq+E48jieKiY9ulJ+BoxKmZblIJfIJT8Ufcaa/clQqnYvWs8jugfGSMu8ylS0caG0w=="
       },
       "WebGrease": {
         "type": "Direct",

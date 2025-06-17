@@ -3,9 +3,10 @@
   "dependencies": {
     ".NETFramework,Version=v4.7.2": {
       "Imazen.Common": {
-        "type": "Transitive",
-        "resolved": "0.8.2",
-        "contentHash": "EAnfbEUy2vnyFQYRV75/AZYwy6z4vhEkSQXXqM77ksO5NqL0sIUcGX9cb51lqTfhHS0Dxu0YQC05fMsBtxhiew==",
+        "type": "Direct",
+        "requested": "[0.8.3, )",
+        "resolved": "0.8.3",
+        "contentHash": "fV0lMNq/NFUfQQchwt8lE2vwwXZz/0t6Pacwpup/esZtU1idWnQE1OCnJeC0u7iIwSy1uLNWR9UPoTiSYstIdg==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
@@ -58,8 +59,8 @@
       },
       "System.Buffers": {
         "type": "Transitive",
-        "resolved": "4.5.1",
-        "contentHash": "Rw7ijyl1qqRS0YQD/WycNst8hUUMgrMH4FCn1nNm27M4VxchZ1js3fVjQaANHO5f3sN4isvP4a+Met9Y4YomAg=="
+        "resolved": "4.6.1",
+        "contentHash": "N8GXpmiLMtljq7gwvyS+1QvKT/W2J8sNAvx+HVg4NGmsG/H+2k/y9QI23auLJRterrzCiDH+IWAw4V/GPwsMlw=="
       },
       "System.Memory": {
         "type": "Transitive",
@@ -84,8 +85,8 @@
       "imageresizer": {
         "type": "Project",
         "dependencies": {
-          "Imazen.Common": "[0.8.2, )",
-          "System.Buffers": "[4.5.1, )"
+          "Imazen.Common": "[0.8.3, )",
+          "System.Buffers": "[4.6.1, )"
         }
       }
     }

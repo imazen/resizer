@@ -4,9 +4,9 @@
     ".NETFramework,Version=v4.7.2": {
       "Imazen.Common": {
         "type": "Direct",
-        "requested": "[0.8.2, )",
-        "resolved": "0.8.2",
-        "contentHash": "EAnfbEUy2vnyFQYRV75/AZYwy6z4vhEkSQXXqM77ksO5NqL0sIUcGX9cb51lqTfhHS0Dxu0YQC05fMsBtxhiew==",
+        "requested": "[0.8.3, )",
+        "resolved": "0.8.3",
+        "contentHash": "fV0lMNq/NFUfQQchwt8lE2vwwXZz/0t6Pacwpup/esZtU1idWnQE1OCnJeC0u7iIwSy1uLNWR9UPoTiSYstIdg==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }

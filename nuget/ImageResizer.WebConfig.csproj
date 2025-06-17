@@ -27,5 +27,10 @@
     <ItemGroup>
       <ProjectReference Include="..\Core\ImageResizer.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Imazen.Common">
+        <Version>0.8.3</Version>
+      </PackageReference>
+    </ItemGroup>
 
 </Project>
