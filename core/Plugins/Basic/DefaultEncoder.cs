@@ -452,7 +452,7 @@ namespace ImageResizer.Plugins.Basic
         }
 
         /// <summary>
-        ///     Returns signatures for JPEG, BMP, GIF, PNG, WMF, ICO, and TIFF
+        ///     Returns signatures for JPEG, BMP, GIF, PNG, WMF, ICO, WEBP, and TIFF
         /// </summary>
         /// <returns></returns>
         public IEnumerable<FileSignature> GetSignatures()
@@ -470,7 +470,12 @@ namespace ImageResizer.Plugins.Basic
                 new FileSignature(new byte[] { 0x49, 0x20, 0x49 }, "tif", "image/tiff"),
                 new FileSignature(new byte[] { 0x49, 0x49, 0x2A, 0x00 }, "tif", "image/tiff"),
                 new FileSignature(new byte[] { 0x4D, 0x4D, 0x00, 0x2A }, "tif", "image/tiff"),
-                new FileSignature(new byte[] { 0x4D, 0x4D, 0x00, 0x2B }, "tif", "image/tiff")
+                new FileSignature(new byte[] { 0x4D, 0x4D, 0x00, 0x2B }, "tif", "image/tiff"),
+                //There are actually lots of formats that use this
+                //The real test (which filesignature doesn't support)
+                // is 52 49 46 46 ?? ?? ?? ?? 57 45 42 50
+                new FileSignature(new byte[] { 0x52, 0x49, 0x46, 0x46 }, "webp", "image/webp"),
+
             };
         }
     }
