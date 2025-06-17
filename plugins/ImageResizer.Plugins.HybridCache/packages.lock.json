@@ -156,7 +156,8 @@
         "type": "Project",
         "dependencies": {
           "Imazen.Common": "[0.8.3, )",
-          "System.Buffers": "[4.6.1, )"
+          "System.Buffers": "[4.6.1, )",
+          "System.Memory": "[4.6.3, )"
         }
       }
     }

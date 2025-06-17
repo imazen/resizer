@@ -37,5 +37,6 @@
       <PackageReference Include="Microsoft.Azure.ConfigurationManager" Version="4.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+      <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
 </Project>

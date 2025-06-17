@@ -41,5 +41,8 @@
       <Version>0.8.3</Version>
     </PackageReference>
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+    <PackageReference Include="System.Memory">
+      <Version>4.6.3</Version>
+    </PackageReference>
   </ItemGroup>
 </Project>
