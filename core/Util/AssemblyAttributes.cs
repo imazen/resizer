@@ -95,7 +95,7 @@ namespace ImageResizer.Util
 
 
     [AttributeUsage(AttributeTargets.Assembly)]
-    [Obsolete("Use Imazen.Common.Licesning.EditionAttribute instead, this will not be recognized")]
+    [Obsolete("Use Imazen.Common.Licensing.EditionAttribute instead, this will not be recognized")]
     public class EditionAttribute : Attribute
     {
         private string type;

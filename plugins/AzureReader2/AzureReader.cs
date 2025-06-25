@@ -1,6 +1,7 @@
 ﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Diagnostics;
@@ -13,6 +14,7 @@ using ImageResizer.Storage;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using ImageResizer.Plugins.Licensing;
 using Imazen.Common.Storage;
 using Microsoft.Azure;
 
@@ -40,13 +42,14 @@ namespace ImageResizer.Plugins.AzureReader2
         }
     }
     
-    public class AzureReader2Plugin : BlobProviderBase, IMultiInstancePlugin
+    public class AzureReader2Plugin : BlobProviderBase, IMultiInstancePlugin, ILicensedPlugin
     {
         private BlobServiceClient BlobServiceClient { get; set; }
         private string blobStorageConnection;
         private string blobStorageEndpoint;
-
-
+        
+        
+        IEnumerable<string> ILicensedPlugin.LicenseFeatureCodes => new[] { "R_Performance", "All_Products_Pack", "R_AzureReader" };
         public bool RedirectToBlobIfUnmodified { get; set; }
 
         public AzureReader2Plugin()
@@ -129,6 +132,7 @@ namespace ImageResizer.Plugins.AzureReader2
 
         public override IPlugin Install(Config c)
         {
+            LicenseEnforcer.EnsureInstalled(c);
             if (string.IsNullOrEmpty(blobStorageConnection))
                 throw new InvalidOperationException(
                     "AzureReader2 requires a named connection string or a connection string to be specified with the 'connectionString' attribute.");

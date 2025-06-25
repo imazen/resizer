@@ -26,16 +26,16 @@
       <Version>0.14.0-rc01</Version>
     </PackageReference>
     <PackageReference Include="Imageflow.NativeRuntime.win-x86">
-      <Version>2.1.1-rc09</Version>
+      <Version>2.1.1-rc10</Version>
     </PackageReference>
     <PackageReference Include="Imageflow.NativeRuntime.win-x86_64">
-      <Version>2.1.1-rc09</Version>
+      <Version>2.1.1-rc10</Version>
     </PackageReference>
     <PackageReference Include="Imageflow.Net">
       <Version>0.13.2</Version>
     </PackageReference>
     <PackageReference Include="Imazen.Common">
-      <Version>0.8.3</Version>
+      <Version>0.9.0-rc01</Version>
     </PackageReference>
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageReference Include="System.Memory">
@@ -44,10 +44,14 @@
     <PackageReference Include="System.Numerics.Vectors">
       <Version>4.6.1</Version>
     </PackageReference>
+    <PackageReference Include="System.Text.Json">
+      <Version>8.0.5</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Name>ImageResizer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ImageResizer.Plugins.Licensing\ImageResizer.Plugins.Licensing.csproj" />
   </ItemGroup>
 </Project>

@@ -86,7 +86,9 @@ namespace ImageResizer
         public LicenseException(string message) : base(402, message, message)
         {
         }
-
+        public LicenseException(int httpCode, string message) : base(httpCode, message, message)
+        {
+        }
         public LicenseException(string message, Exception innerException) : base(402, message, message, innerException)
         {
         }

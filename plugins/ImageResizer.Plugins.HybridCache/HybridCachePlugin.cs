@@ -11,6 +11,7 @@ using System.Web;
 using System.Web.Hosting;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Performance;
+using ImageResizer.Plugins.Licensing;
 using ImageResizer.Util;
 using Imazen.Common.Extensibility.StreamCache;
 using Imazen.Common.Instrumentation.Support.InfoAccumulators;
@@ -21,7 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ImageResizer.Plugins.HybridCache
 {
-    public class HybridCachePlugin : IAsyncTyrantCache, IPlugin, IPluginInfo, IPluginRequiresShutdown
+    public class HybridCachePlugin : IAsyncTyrantCache, IPlugin, IPluginInfo, IPluginRequiresShutdown, ILicensedPlugin
     {
         public HybridCachePlugin()
         {
@@ -134,6 +135,7 @@ namespace ImageResizer.Plugins.HybridCache
         }
         public IPlugin Install(Config c)
         {
+            LicenseEnforcer.EnsureInstalled(c);
             _c = c;
             LoadSettings(c);
             
@@ -320,5 +322,6 @@ namespace ImageResizer.Plugins.HybridCache
         }
 
 
+        public IEnumerable<string> LicenseFeatureCodes => new string[] { "R_Performance", "All_Products_Pack", "R_HybridCache" };
     }
 }

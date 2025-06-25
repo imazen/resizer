@@ -17,6 +17,7 @@ using ImageResizer.Configuration;
 using Imazen.Common.Issues;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Plugins.Licensing;
 using ImageResizer.Resizing;
 using ImageResizer.Util;
 
@@ -24,7 +25,7 @@ namespace ImageResizer.Plugins.RemoteReader
 {
     #pragma warning disable CS0618
     public class RemoteReaderPlugin : BuilderExtension, IPlugin, IVirtualImageProvider, IIssueProvider,
-        IRedactDiagnostics, IVirtualImageProviderAsync
+        IRedactDiagnostics, IVirtualImageProviderAsync, ILicensedPlugin
     {
         public Node RedactFrom(Node resizer)
         {
@@ -78,6 +79,7 @@ namespace ImageResizer.Plugins.RemoteReader
         /// <returns></returns>
         public IPlugin Install(Config c)
         {
+            LicenseEnforcer.EnsureInstalled(c);
             this.c = c;
             c.Plugins.add_plugin(this);
             c.Pipeline.PostAuthorizeRequestStart += Pipeline_PostAuthorizeRequestStart;
@@ -465,6 +467,9 @@ namespace ImageResizer.Plugins.RemoteReader
 
             return Task.FromResult<IVirtualFileAsync>(new RemoteSiteFile(virtualPath, request, this));
         }
+
+        public IEnumerable<string> LicenseFeatureCodes => 
+            new[] { "R_Performance", "All_Products_Pack", "R_RemoteReader" };
     }
 
     public class RemoteSiteFile : IVirtualFile, IVirtualFileSourceCacheKey, IVirtualFileAsync

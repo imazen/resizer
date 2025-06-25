@@ -253,18 +253,20 @@ namespace ImageResizer.Configuration.Performance
             return versions;
         }
 
-        private readonly Dictionary<string, string> friendlyEditionNames =
+        private readonly Dictionary<string, string> _friendlyEditionNames =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                { "R4Elite", "Elite Edition" },
-                { "R4Creative", "Creative Edition" },
-                { "R4Performance", "Performance Edition" },
-                { "R_Elite", "Elite Edition" },
-                { "R_Creative", "Creative Edition" },
-                { "R_Performance", "Performance Edition" }
+                
+                { "All_Products_Pack", "Imazen All Products Pack" },
+                { "R_Elite", "ImageResizer Elite Edition" },
+                { "R_Creative", "ImageResizer Creative Edition" },
+                { "R_Performance", "ImageResizer Performance Edition" },
+                { "R4Elite", "ImageResizer 4 Elite Edition" },
+                { "R4Creative", "ImageResizer 4 Creative Edition" },
+                { "R4Performance", "ImageResizer 4 Performance Edition" },
             };
 
-        internal string GetEdition()
+        private string GetEdition()
         {
             //What edition is used?
             var largestEdition = c.Plugins.GetAll<ILicensedPlugin>()
@@ -272,12 +274,11 @@ namespace ImageResizer.Configuration.Performance
                 .Concat(
                     c.Plugins.AllPlugins.Select(p => p
                         .GetType()
-                        .Assembly.GetFirstAttribute<EditionAttribute>()
+                        .Assembly.GetFirstAttribute<Imazen.Common.Licensing.EditionAttribute>() // No assemblies use this
                         ?.Value))
                 .FirstOrDefault(
-                    s => friendlyEditionNames.Keys.Contains(s, StringComparer.OrdinalIgnoreCase));
+                    s => _friendlyEditionNames.Keys.Contains(s, StringComparer.OrdinalIgnoreCase));
             ;
-
             return LookupEdition(largestEdition);
         }
 
@@ -285,8 +286,8 @@ namespace ImageResizer.Configuration.Performance
         {
             return editionCode == null
                 ? null
-                : friendlyEditionNames.ContainsKey(editionCode)
-                    ? friendlyEditionNames[editionCode]
+                : _friendlyEditionNames.ContainsKey(editionCode)
+                    ? _friendlyEditionNames[editionCode]
                     : editionCode;
         }
 

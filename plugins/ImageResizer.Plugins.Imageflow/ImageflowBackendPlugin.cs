@@ -9,10 +9,11 @@ using Imazen.Common.Issues;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Resizing;
 using ImageResizer.Plugins.Imageflow.Watermarks;
+using ImageResizer.Plugins.Licensing;
 
 namespace ImageResizer.Plugins.Imageflow
 {
-    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin, IQuerystringPlugin, IPluginModifiesRequestCacheKey, IPluginSupportsOutputFileTypes
+    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin, IQuerystringPlugin, IPluginModifiesRequestCacheKey, IPluginSupportsOutputFileTypes, ILicensedPlugin
     {
 
         /// <summary>
@@ -78,6 +79,7 @@ namespace ImageResizer.Plugins.Imageflow
 
         public IPlugin Install(Config c)
         {
+            LicenseEnforcer.EnsureInstalled(c);
             c.Plugins.add_plugin(this);
             this.c = c;
             
@@ -391,5 +393,7 @@ namespace ImageResizer.Plugins.Imageflow
             return currentKey + "|imageflow" + ImageflowCacheVersionKey; //TODO: combine with a cache key breaker returned from imageflow.dll itself.
             // Simply by being installed it invalidates the old GDI results. This is very good. 
         }
+
+        public IEnumerable<string> LicenseFeatureCodes => new[] { "R_Performance", "All_Products_Pack", "R_Imageflow" };
     }
 }

@@ -24,9 +24,9 @@
       },
       "Imazen.Common": {
         "type": "Direct",
-        "requested": "[0.8.3, )",
-        "resolved": "0.8.3",
-        "contentHash": "fV0lMNq/NFUfQQchwt8lE2vwwXZz/0t6Pacwpup/esZtU1idWnQE1OCnJeC0u7iIwSy1uLNWR9UPoTiSYstIdg==",
+        "requested": "[0.9.0-rc01, )",
+        "resolved": "0.9.0-rc01",
+        "contentHash": "Zbkh2XBLxZ688CvZSnrPYsQyyFTR93G9cCgwYNHQ1zOzz38rV5Np2+2x+sJNiFvUsKC7sFeT78uHbvPzyQtgaA==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
@@ -171,16 +171,26 @@
       "imageresizer": {
         "type": "Project",
         "dependencies": {
-          "Imazen.Common": "[0.8.3, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
           "System.Buffers": "[4.6.1, )",
           "System.Memory": "[4.6.3, )"
+        }
+      },
+      "imageresizer.plugins.licensing": {
+        "type": "Project",
+        "dependencies": {
+          "ImageResizer": "[0.1.0--notset, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
+          "System.Memory": "[4.6.3, )",
+          "System.Numerics.Vectors": "[4.6.1, )"
         }
       },
       "imageresizer.storage": {
         "type": "Project",
         "dependencies": {
           "ImageResizer": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.8.3, )",
+          "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
           "System.Memory": "[4.6.3, )"
         }
       }

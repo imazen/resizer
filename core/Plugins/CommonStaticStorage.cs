@@ -6,6 +6,7 @@ namespace ImageResizer.Plugins
     /// <summary>
     ///     For when plugins need communal static storage
     /// </summary>
+    [Obsolete("Wil be removed in a future version.")]
     public class CommonStaticStorage
     {
         private static ConcurrentDictionary<string, object> dict = new ConcurrentDictionary<string, object>();

@@ -4,9 +4,9 @@
     ".NETFramework,Version=v4.7.2": {
       "Imazen.Common": {
         "type": "Direct",
-        "requested": "[0.8.3, )",
-        "resolved": "0.8.3",
-        "contentHash": "fV0lMNq/NFUfQQchwt8lE2vwwXZz/0t6Pacwpup/esZtU1idWnQE1OCnJeC0u7iIwSy1uLNWR9UPoTiSYstIdg==",
+        "requested": "[0.9.0-rc01, )",
+        "resolved": "0.9.0-rc01",
+        "contentHash": "Zbkh2XBLxZ688CvZSnrPYsQyyFTR93G9cCgwYNHQ1zOzz38rV5Np2+2x+sJNiFvUsKC7sFeT78uHbvPzyQtgaA==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
@@ -121,13 +121,13 @@
       },
       "Imageflow.NativeRuntime.win-x86": {
         "type": "Transitive",
-        "resolved": "2.1.1-rc09",
-        "contentHash": "kCeELMbMq5FbDszlLKPKHw7FFpPbQwOPJqciv952JjYtBEyCaSInoEDrA1CEFlmYQQiObYIr2d9adg7m7J+3lQ=="
+        "resolved": "2.1.1-rc10",
+        "contentHash": "3GndGoWvhDGxpYrT3t1SlSzFYIs35CyRU0NdgiZeg4NMrjMjXJHTUnLBdOIjQ8gYHLP42tW1FS4DNFnu8/idMg=="
       },
       "Imageflow.NativeRuntime.win-x86_64": {
         "type": "Transitive",
-        "resolved": "2.1.1-rc09",
-        "contentHash": "RO7NNbSkZKsfFiuHz/QV88ZaTZqXq9mmIbgLlb0ZocyE1B7TejBkz3pa6djSWs1dOjRlUDRh7U3tbi5Ey5kHJw=="
+        "resolved": "2.1.1-rc10",
+        "contentHash": "cikOC8JCISfy+ycrBNKBxNVFLuZc+EED12lbIwJw0VthBECJrOnXLUtNFYEsLWLXrEn5OtCULZTPBIRM5o0UnA=="
       },
       "Imageflow.Net": {
         "type": "Transitive",
@@ -142,10 +142,10 @@
       },
       "Imazen.HybridCache": {
         "type": "Transitive",
-        "resolved": "0.8.3",
-        "contentHash": "9MJEgXZjxTxSWxjmM7UH2iMxy2+V4zhj7yt9BQ5nc+aJ/Fwokrrgt+/+kk9SCGXk+gvGQUwV9MDty/Y5nc6mJQ==",
+        "resolved": "0.9.0-rc01",
+        "contentHash": "qUMkRTjm6ymKRCcfdOxYCrhdFPw2y1NyRIx8RxB7cJvzmVAgLJj3kVnPBI6Of6qAiDzvGaHMinZEFlK/WT5NBg==",
         "dependencies": {
-          "Imazen.Common": "0.8.3"
+          "Imazen.Common": "0.9.0-rc01"
         }
       },
       "Microsoft.Azure.ConfigurationManager": {
@@ -384,7 +384,7 @@
       "imageresizer": {
         "type": "Project",
         "dependencies": {
-          "Imazen.Common": "[0.8.3, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
           "System.Buffers": "[4.6.1, )",
           "System.Memory": "[4.6.3, )"
         }
@@ -394,19 +394,22 @@
         "dependencies": {
           "Azure.Storage.Blobs": "[12.24.1, )",
           "ImageResizer": "[0.1.0--notset, )",
+          "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
           "ImageResizer.Storage": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.8.3, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
           "Microsoft.Azure.ConfigurationManager": "[4.0.0, )",
           "Newtonsoft.Json": "[13.0.3, )",
-          "System.Memory": "[4.6.3, )"
+          "System.Memory": "[4.6.3, )",
+          "System.Text.Json": "[8.0.5, )"
         }
       },
       "imageresizer.plugins.hybridcache": {
         "type": "Project",
         "dependencies": {
           "ImageResizer": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.8.3, )",
-          "Imazen.HybridCache": "[0.8.3, )",
+          "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
+          "Imazen.HybridCache": "[0.9.0-rc01, )",
           "Microsoft.Extensions.Configuration.Abstractions": "[7.0.0, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[7.0.0, )",
           "Microsoft.Extensions.FileProviders.Abstractions": "[7.0.0, )",
@@ -423,10 +426,21 @@
         "type": "Project",
         "dependencies": {
           "ImageResizer": "[0.1.0--notset, )",
-          "Imageflow.NativeRuntime.win-x86": "[2.1.1-rc09, )",
-          "Imageflow.NativeRuntime.win-x86_64": "[2.1.1-rc09, )",
+          "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
+          "Imageflow.NativeRuntime.win-x86": "[2.1.1-rc10, )",
+          "Imageflow.NativeRuntime.win-x86_64": "[2.1.1-rc10, )",
           "Imageflow.Net": "[0.14.0-rc01, )",
-          "Imazen.Common": "[0.8.3, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
+          "System.Memory": "[4.6.3, )",
+          "System.Numerics.Vectors": "[4.6.1, )",
+          "System.Text.Json": "[8.0.5, )"
+        }
+      },
+      "imageresizer.plugins.licensing": {
+        "type": "Project",
+        "dependencies": {
+          "ImageResizer": "[0.1.0--notset, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
           "System.Memory": "[4.6.3, )",
           "System.Numerics.Vectors": "[4.6.1, )"
         }
@@ -435,7 +449,8 @@
         "type": "Project",
         "dependencies": {
           "ImageResizer": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.8.3, )",
+          "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
           "System.Memory": "[4.6.3, )"
         }
       },
@@ -445,8 +460,9 @@
           "AWSSDK.Core": "[4.0.0.11, )",
           "AWSSDK.S3": "[4.0.1.7, )",
           "ImageResizer": "[0.1.0--notset, )",
+          "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
           "ImageResizer.Storage": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.8.3, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
           "System.Memory": "[4.6.3, )"
         }
       },
@@ -454,7 +470,8 @@
         "type": "Project",
         "dependencies": {
           "ImageResizer": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.8.3, )",
+          "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
+          "Imazen.Common": "[0.9.0-rc01, )",
           "System.Memory": "[4.6.3, )"
         }
       }

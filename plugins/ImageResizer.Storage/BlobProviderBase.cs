@@ -18,6 +18,7 @@ using ImageResizer.Configuration.Xml;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
 using ImageResizer.Util;
+using ImageResizer.Plugins.Licensing;
 
 namespace ImageResizer.Storage
 {
@@ -43,9 +44,7 @@ namespace ImageResizer.Storage
         {
             get
             {
-                yield return "R_Performance";
-                yield return "R4Performance";
-                yield return "R4BlobProviders";
+                return new[] { "R_Performance", "All_Products_Pack" };
             }
         }
 
@@ -282,6 +281,7 @@ namespace ImageResizer.Storage
 
         public virtual IPlugin Install(Config c)
         {
+            LicenseEnforcer.EnsureInstalled(c);
             this.c = c;
             c.Plugins.add_plugin(this);
 

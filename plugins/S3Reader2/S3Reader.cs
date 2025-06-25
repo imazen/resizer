@@ -15,12 +15,15 @@ using ImageResizer.Configuration;
 using Imazen.Common.Issues;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Plugins.Licensing;
 using ImageResizer.Storage;
 
 namespace ImageResizer.Plugins.S3Reader2
 {
-    public class S3Reader2 : BlobProviderBase, IMultiInstancePlugin, IRedactDiagnostics
+    public class S3Reader2 : BlobProviderBase, IMultiInstancePlugin, IRedactDiagnostics, ILicensedPlugin
     {
+        IEnumerable<string> ILicensedPlugin.LicenseFeatureCodes => new[] { "R_Performance", "All_Products_Pack", "R_S3Reader" };
+        
         private AmazonS3Config s3config = null;
 
         public S3Reader2() : base()
@@ -197,6 +200,7 @@ namespace ImageResizer.Plugins.S3Reader2
 
         public override IPlugin Install(Config c)
         {
+            LicenseEnforcer.EnsureInstalled(c);
             if (AllowedBuckets.Length < 1)
                 c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader",
                     "S3Reader cannot function without a list of permitted bucket names.",

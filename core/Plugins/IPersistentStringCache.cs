@@ -4,7 +4,9 @@ namespace ImageResizer.Plugins
 {
     /// <summary>
     ///     The result of the cache write
+    ///     Use Imazen.Common.Persistence.StringCachePutResult
     /// </summary>
+    [Obsolete("Use Imazen.Common.Persistence.StringCachePutResult instead.")]
     public enum StringCachePutResult
     {
         /// <summary>
@@ -24,8 +26,10 @@ namespace ImageResizer.Plugins
     }
 
     /// <summary>
-    ///     Implementations must not be tied or reliant on a specific Config instance
+    ///     Implementations must not be tied or reliant on a specific Config instance.
+    ///     Use Imazen.Common.Persistence.IPersistentStringCache instead.
     /// </summary>
+    [Obsolete("Use Imazen.Common.Persistence.IPersistentStringCache instead.")]
     public interface IPersistentStringCache
     {
         StringCachePutResult TryPut(string key, string value);
