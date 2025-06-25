@@ -12,7 +12,7 @@ namespace ImageResizer.Plugins.Basic
         public LicenseDisplay()
         {
             EndpointMatchMethod = EndpointMatching.FilePathEndsWithOrdinalIgnoreCase;
-            Endpoints = new[] { "/resizer.license", "/resizer.license.ashx" };
+            Endpoints = new[] { "/resizer.license", "/resizer.license.ashx", "imageflow.license"};
         }
 
         protected override string GenerateOutput(HttpContext context, Config c)

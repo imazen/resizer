@@ -44,7 +44,7 @@ namespace ImageResizer.Plugins.Basic
         public Diagnostic()
         {
             EndpointMatchMethod = EndpointMatching.FilePathEndsWithOrdinalIgnoreCase;
-            Endpoints = new[] { "/resizer.debug", "/resizer.debug.ashx" };
+            Endpoints = new[] { "/resizer.debug", "/resizer.debug.ashx", "/imageflow.debug" };
         }
 
 
