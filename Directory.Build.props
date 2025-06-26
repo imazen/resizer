@@ -1,7 +1,7 @@
 ﻿<Project>
-    <ItemGroup>
-        <SourceRoot Include="$(MSBuildThisFileDirectory)/"/>
-    </ItemGroup>
+<!--    <ItemGroup>-->
+<!--        <SourceRoot Include="$(MSBuildThisFileDirectory)/"/>-->
+<!--    </ItemGroup>-->
     
     <PropertyGroup>
         <Copyright>Copyright © 2025 Imazen LLC</Copyright>
@@ -42,5 +42,10 @@
         <NoWarn>NU1603</NoWarn>
         <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     </PropertyGroup>
- 
+
+    <PropertyGroup>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    </PropertyGroup>
+
 </Project>
