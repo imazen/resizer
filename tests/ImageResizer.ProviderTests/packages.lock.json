@@ -4,9 +4,9 @@
     ".NETFramework,Version=v4.7.2": {
       "Imazen.Common": {
         "type": "Direct",
-        "requested": "[0.9.0-rc01, )",
-        "resolved": "0.9.0-rc01",
-        "contentHash": "Zbkh2XBLxZ688CvZSnrPYsQyyFTR93G9cCgwYNHQ1zOzz38rV5Np2+2x+sJNiFvUsKC7sFeT78uHbvPzyQtgaA==",
+        "requested": "[0.9.0-rc02, )",
+        "resolved": "0.9.0-rc02",
+        "contentHash": "jrAiQZFKA6QL2JFF/y6k8P06RkY4miRP4NTEUPvcw/NOZ1G9/rzDXdSWNnaHVHgkFSepHLrUj+sxNsVXvI2NPg==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
         }
@@ -101,8 +101,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "4.0.0.11",
-        "contentHash": "y7J/hTTtCaOFtcuHKmcNyiB6SUpOU7hH9N0HLa6ajvZoF0QdCOmOlY3r3pbddVWpZoFttOBng064HEvKOX7rtw==",
+        "resolved": "4.0.0.13",
+        "contentHash": "AXofl5oANEHo9B61yi6rpu/JazjwqkuHY9JmJfdf8+FSmkFPbOmKoEb6kUgO2On8PCtBeUOEIfhZdzjJbxRAyg==",
         "dependencies": {
           "System.Buffers": "4.5.1",
           "System.Memory": "4.5.5",
@@ -111,10 +111,10 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "4.0.1.7",
-        "contentHash": "wZvlAVLgTPNQlFvHhacE3EOgoATx+hPKYijbubxoY5zdKm2EjKd8ucMZTvGJIzsbV7lr4aRfuu8dALCI52CH1Q==",
+        "resolved": "4.0.3",
+        "contentHash": "xSl7a7q8sBcBftAzwLZDKo7V73xq8To58C9nO3T6yR5vD6guIfbi3K978iY1AZ1Q0hrR/bOkgtlhQbuih16O0Q==",
         "dependencies": {
-          "AWSSDK.Core": "[4.0.0.11, 5.0.0)"
+          "AWSSDK.Core": "[4.0.0.13, 5.0.0)"
         }
       },
       "Azure.Core": {
@@ -413,7 +413,7 @@
       "imageresizer": {
         "type": "Project",
         "dependencies": {
-          "Imazen.Common": "[0.9.0-rc01, )",
+          "Imazen.Common": "[0.9.0-rc02, )",
           "System.Buffers": "[4.6.1, )",
           "System.Memory": "[4.6.3, )"
         }
@@ -425,7 +425,7 @@
           "ImageResizer": "[0.1.0--notset, )",
           "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
           "ImageResizer.Storage": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.9.0-rc01, )",
+          "Imazen.Common": "[0.9.0-rc02, )",
           "Microsoft.Azure.ConfigurationManager": "[4.0.0, )",
           "Newtonsoft.Json": "[13.0.3, )",
           "System.Memory": "[4.6.3, )",
@@ -440,7 +440,7 @@
           "Imageflow.NativeRuntime.win-x86": "[2.1.1-rc10, )",
           "Imageflow.NativeRuntime.win-x86_64": "[2.1.1-rc10, )",
           "Imageflow.Net": "[0.14.0-rc01, )",
-          "Imazen.Common": "[0.9.0-rc01, )",
+          "Imazen.Common": "[0.9.0-rc02, )",
           "System.Memory": "[4.6.3, )",
           "System.Numerics.Vectors": "[4.6.1, )",
           "System.Text.Json": "[8.0.5, )"
@@ -450,7 +450,7 @@
         "type": "Project",
         "dependencies": {
           "ImageResizer": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.9.0-rc01, )",
+          "Imazen.Common": "[0.9.0-rc02, )",
           "System.Memory": "[4.6.3, )",
           "System.Numerics.Vectors": "[4.6.1, )"
         }
@@ -460,19 +460,19 @@
         "dependencies": {
           "ImageResizer": "[0.1.0--notset, )",
           "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.9.0-rc01, )",
+          "Imazen.Common": "[0.9.0-rc02, )",
           "System.Memory": "[4.6.3, )"
         }
       },
       "imageresizer.plugins.s3reader2": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "[4.0.0.11, )",
-          "AWSSDK.S3": "[4.0.1.7, )",
+          "AWSSDK.Core": "[4.0.0.13, )",
+          "AWSSDK.S3": "[4.0.3, )",
           "ImageResizer": "[0.1.0--notset, )",
           "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
           "ImageResizer.Storage": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.9.0-rc01, )",
+          "Imazen.Common": "[0.9.0-rc02, )",
           "System.Memory": "[4.6.3, )"
         }
       },
@@ -481,7 +481,7 @@
         "dependencies": {
           "ImageResizer": "[0.1.0--notset, )",
           "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
-          "Imazen.Common": "[0.9.0-rc01, )",
+          "Imazen.Common": "[0.9.0-rc02, )",
           "System.Memory": "[4.6.3, )"
         }
       }

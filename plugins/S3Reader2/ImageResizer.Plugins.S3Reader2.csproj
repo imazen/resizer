@@ -33,13 +33,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.Core">
-      <Version>4.0.0.11</Version>
+      <Version>4.0.0.13</Version>
     </PackageReference>
     <PackageReference Include="AWSSDK.S3">
-      <Version>4.0.1.7</Version>
+      <Version>4.0.3</Version>
     </PackageReference>
     <PackageReference Include="Imazen.Common">
-      <Version>0.9.0-rc01</Version>
+      <Version>0.9.0-rc02</Version>
     </PackageReference>
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageReference Include="System.Memory">

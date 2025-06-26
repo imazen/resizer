@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <PackageReference Include="Imazen.Common">
-      <Version>0.9.0-rc01</Version>
+      <Version>0.9.0-rc02</Version>
     </PackageReference>
     <PackageReference Include="Imazen.HybridCache">
       <Version>0.9.0-rc01</Version>
