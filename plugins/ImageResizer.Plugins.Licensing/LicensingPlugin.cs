@@ -39,7 +39,7 @@ namespace ImageResizer.Plugins.Licensing
     // ReSharper disable once UnusedTypeParameter
 #pragma warning disable CS0618
     internal class LicenseEnforcer : BuilderExtension, IPlugin, IIssueProvider,
-        ILicenseDiagnosticsProvider, ILicenseConfig, IIssueReceiver, IDiagnosticsHeaderProvider
+        ILicenseDiagnosticsProvider, ILicenseConfig, IIssueReceiver, IDiagnosticsHeaderProvider, IDiagnosticsProvider, IDiagnosticsProviderFactory
     {
 
         public static void EnsureInstalled(Configuration.Config c)
@@ -257,10 +257,10 @@ namespace ImageResizer.Plugins.Licensing
 
         void Pipeline_PostRewrite(IHttpModule sender, HttpContext? context, ImageResizer.Configuration.IUrlEventArgs e)
         {
-            // Server-side cache-breaker
-            if (e.QueryString["red_dot"] != "true" && ShouldWatermark(context?.Request))
+            // Server-side cache-breaker (and, for Imageflow, causes the red dot to be drawn)
+            if (e.QueryString["watermark_red_dot"] != "true" && ShouldWatermark(context?.Request))
             {
-                e.QueryString["red_dot"] = "true";
+                e.QueryString["watermark_red_dot"] = "true";
             }
             ThrowLicenseException(context?.Request);
             this.FireHeartbeat();
@@ -284,11 +284,13 @@ namespace ImageResizer.Plugins.Licensing
                 // No watermarking requested, or no bitmap to draw on
                 return RequestedAction.None;
             }
+            // We're using the System.Drawing system, so we draw the red dot watermark here. 
+            // Not called when Imageflow is used, as it has its own watermarking system.
             _watermark.EnsureDrawn(s.destBitmap);
             return RequestedAction.None;
         }
 
-        public object GetDiagnosticsProvider() => Result;
+        public object GetDiagnosticsProvider() => this;
 
 
         public void AcceptIssue(IIssue i)
@@ -383,11 +385,11 @@ namespace ImageResizer.Plugins.Licensing
                 return LicenseEnforcement switch
                 {
                     Imazen.Common.Licensing.LicenseErrorAction.Watermark =>
-                        "You are using EnforceLicenseWith.RedDotWatermark. If there is a licensing error, an red dot will be drawn on the bottom-right corner of each image. This can be set to EnforceLicenseWith.Http402Error instead (valuable if you are externally caching or storing result images.)",
+                        "You are using licenseError=\"watermark\" / EnforceLicenseWith.RedDotWatermark . If there is a licensing error, a red dot will be drawn on the bottom-right corner of each image. This can be set to EnforceLicenseWith.Http402Error instead (valuable if you are externally caching or storing result images.)",
                     Imazen.Common.Licensing.LicenseErrorAction.Http422 =>
-                        "You are using EnforceLicenseWith.Http422Error. If there is a licensing error, HTTP status code 422 will be returned instead of serving the image. This can also be set to EnforceLicenseWith.RedDotWatermark.",
+                        "You are using licenseError=\"exception\" / EnforceLicenseWith.Http422Error. If there is a licensing error, HTTP status code 422 will be returned instead of serving the image. This can also be set to licenseError=\"watermark\" or EnforceLicenseWith.RedDotWatermark.",
                     Imazen.Common.Licensing.LicenseErrorAction.Http402 =>
-                        "You are using EnforceLicenseWith.Http402Error. If there is a licensing error, HTTP status code 402 will be returned instead of serving the image. This can also be set to EnforceLicenseWith.RedDotWatermark.",
+                        "You are using licenseError=\"exception\" / EnforceLicenseWith.Http402Error. If there is a licensing error, HTTP status code 402 will be returned instead of serving the image. This can also be set to licenseError=\"watermark\" or EnforceLicenseWith.RedDotWatermark.",
                     _ => throw new ArgumentOutOfRangeException()
                 };
             }
@@ -437,6 +439,11 @@ namespace ImageResizer.Plugins.Licensing
         }
         
         public string ProvideDiagnosticsHeader()
+        {
+            return Result.ProvidePublicLicensesPage();  //Result.GetPublicLicenseHeader();
+        }
+
+        public string ProvideDiagnostics()
         {
             return Result.ProvideDiagnostics();
         }
