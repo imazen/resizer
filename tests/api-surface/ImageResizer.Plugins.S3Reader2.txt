@@ -19,7 +19,7 @@ namespace ImageResizer.Plugins.S3Reader2
         public void ThrowException() { }
         public void ThrowInvalidCaseException() { }
     }
-    public class S3Reader2 : ImageResizer.Storage.BlobProviderBase, ImageResizer.Plugins.IMultiInstancePlugin, ImageResizer.Plugins.IRedactDiagnostics
+    public class S3Reader2 : ImageResizer.Storage.BlobProviderBase, ImageResizer.Plugins.ILicensedPlugin, ImageResizer.Plugins.IMultiInstancePlugin, ImageResizer.Plugins.IRedactDiagnostics
     {
         public S3Reader2() { }
         public S3Reader2(System.Collections.Specialized.NameValueCollection args) { }

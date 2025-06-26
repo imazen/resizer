@@ -4,11 +4,12 @@
 [assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
 namespace ImageResizer.Plugins.RemoteReader
 {
-    public class RemoteReaderPlugin : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IRedactDiagnostics, ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderAsync, Imazen.Common.Issues.IIssueProvider
+    public class RemoteReaderPlugin : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.ILicensedPlugin, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IRedactDiagnostics, ImageResizer.Plugins.IVirtualImageProvider, ImageResizer.Plugins.IVirtualImageProviderAsync, Imazen.Common.Issues.IIssueProvider
     {
         protected string remotePrefix;
         public RemoteReaderPlugin() { }
         public int AllowedRedirects { get; set; }
+        public System.Collections.Generic.IEnumerable<string> LicenseFeatureCodes { get; }
         public bool SkipUriValidation { get; set; }
         public string UserAgent { get; set; }
         public static string Base64UrlKey { get; }

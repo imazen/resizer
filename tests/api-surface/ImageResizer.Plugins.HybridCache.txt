@@ -14,10 +14,11 @@ namespace ImageResizer.Plugins.HybridCache
         public System.TimeSpan MinAgeToDelete { get; set; }
         public long WriteQueueMemoryMb { get; set; }
     }
-    public class HybridCachePlugin : ImageResizer.Plugins.IAsyncTyrantCache, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IPluginInfo, ImageResizer.Plugins.IPluginRequiresShutdown
+    public class HybridCachePlugin : ImageResizer.Plugins.IAsyncTyrantCache, ImageResizer.Plugins.ILicensedPlugin, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IPluginInfo, ImageResizer.Plugins.IPluginRequiresShutdown
     {
         public HybridCachePlugin() { }
         public HybridCachePlugin(ImageResizer.Plugins.HybridCache.HybridCacheOptions options, Microsoft.Extensions.Logging.ILogger logger) { }
+        public System.Collections.Generic.IEnumerable<string> LicenseFeatureCodes { get; }
         public bool CanProcess(System.Web.HttpContext current, ImageResizer.Plugins.IAsyncResponsePlan e) { }
         public System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetInfoPairs() { }
         public System.Collections.Generic.IEnumerable<Imazen.Common.Issues.IIssue> GetIssues() { }

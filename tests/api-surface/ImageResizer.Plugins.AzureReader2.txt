@@ -4,7 +4,7 @@
 [assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
 namespace ImageResizer.Plugins.AzureReader2
 {
-    public class AzureReader2Plugin : ImageResizer.Storage.BlobProviderBase, ImageResizer.Plugins.IMultiInstancePlugin
+    public class AzureReader2Plugin : ImageResizer.Storage.BlobProviderBase, ImageResizer.Plugins.ILicensedPlugin, ImageResizer.Plugins.IMultiInstancePlugin
     {
         public AzureReader2Plugin() { }
         public AzureReader2Plugin(System.Collections.Specialized.NameValueCollection args) { }
