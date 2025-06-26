@@ -353,6 +353,7 @@ namespace ImageResizer
     public class LicenseException : ImageResizer.ImageProcessingException
     {
         public LicenseException(string message) { }
+        public LicenseException(int httpCode, string message) { }
         public LicenseException(string message, System.Exception innerException) { }
     }
     public enum OutputFormat
@@ -1420,6 +1421,7 @@ namespace ImageResizer.Plugins.Basic
 }
 namespace ImageResizer.Plugins
 {
+    [System.Obsolete("Wil be removed in a future version.")]
     public class CommonStaticStorage
     {
         public CommonStaticStorage() { }
@@ -1430,9 +1432,9 @@ namespace ImageResizer.Plugins
     public class FileSignature
     {
         public FileSignature(byte[] signature, string ext, string mime) { }
-        public string MimeType { get; set; }
-        public string PrimaryFileExtension { get; set; }
-        public byte[] Signature { get; set; }
+        public string MimeType { get; protected set; }
+        public string PrimaryFileExtension { get; protected set; }
+        public byte[] Signature { get; protected set; }
     }
     public interface IAsyncResponsePlan
     {
@@ -1483,6 +1485,7 @@ namespace ImageResizer.Plugins
         System.Collections.Generic.IEnumerable<string> LicenseFeatureCodes { get; }
     }
     public interface IMultiInstancePlugin { }
+    [System.Obsolete("Use Imazen.Common.Persistence.IPersistentStringCache instead.")]
     public interface IPersistentStringCache
     {
         string Get(string key);
@@ -1583,6 +1586,8 @@ namespace ImageResizer.Plugins
         System.Web.Caching.CacheDependency VppGetCacheDependency(string virtualPath, System.Collections.IEnumerable virtualPathDependencies, System.DateTime utcStart);
         string VppGetFileHash(string virtualPath, System.Collections.IEnumerable virtualPathDependencies);
     }
+    [System.Obsolete("Use internal Imazen.Common.Persistence.PersistentGlobalStringCache instead. This " +
+        "class is not thread-safe and will be removed in a future version.")]
     public class PersistentGlobalStringCache : ImageResizer.Plugins.IPersistentStringCache, Imazen.Common.Issues.IIssueProvider
     {
         public PersistentGlobalStringCache() { }
@@ -1592,6 +1597,7 @@ namespace ImageResizer.Plugins
         public ImageResizer.Plugins.StringCachePutResult TryPut(string key, string value) { }
     }
     public delegate System.Threading.Tasks.Task<System.IO.Stream> ReadStreamAsyncDelegate();
+    [System.Obsolete("Use Imazen.Common.Persistence.StringCachePutResult instead.")]
     public enum StringCachePutResult
     {
         Duplicate = 0,
@@ -1622,58 +1628,6 @@ namespace ImageResizer.Plugins
         protected string normalizeVirtualPath(string path) { }
     }
     public delegate System.Threading.Tasks.Task WriteResultAsyncDelegate(System.IO.Stream outputStream, ImageResizer.Plugins.IAsyncResponsePlan plan);
-}
-namespace ImageResizer.Plugins.Licensing
-{
-    public interface ILicenseBlob
-    {
-        byte[] Data { get; }
-        ImageResizer.Plugins.Licensing.ILicenseDetails Fields { get; }
-        string Original { get; }
-        byte[] Signature { get; }
-    }
-    public interface ILicenseChain
-    {
-        string Id { get; }
-        bool IsRemote { get; }
-        bool Shared { get; }
-        ImageResizer.Plugins.Licensing.ILicenseBlob CachedLicense();
-        ImageResizer.Plugins.Licensing.ILicenseBlob FetchedLicense();
-        string LastFetchUrl();
-        System.Collections.Generic.IEnumerable<ImageResizer.Plugins.Licensing.ILicenseBlob> Licenses();
-        string ToPublicString();
-    }
-    public interface ILicenseClock
-    {
-        long TicksPerSecond { get; }
-        System.DateTimeOffset? GetAssemblyWriteDate();
-        System.DateTimeOffset? GetBuildDate();
-        long GetTimestampTicks();
-        System.DateTimeOffset GetUtcNow();
-    }
-    public interface ILicenseDetails
-    {
-        System.DateTimeOffset? Expires { get; }
-        string Id { get; }
-        System.DateTimeOffset? Issued { get; }
-        System.Collections.Generic.IReadOnlyDictionary<string, string> Pairs { get; }
-        System.DateTimeOffset? SubscriptionExpirationDate { get; }
-        string Get(string key);
-    }
-    public interface ILicenseManager : Imazen.Common.Issues.IIssueProvider
-    {
-        ImageResizer.Plugins.IPersistentStringCache Cache { get; set; }
-        System.DateTimeOffset? FirstHeartbeat { get; }
-        ImageResizer.Plugins.Licensing.LicenseManagerEvent AddLicenseChangeHandler<TTarget>(TTarget target, System.Action<TTarget, ImageResizer.Plugins.Licensing.ILicenseManager> action);
-        System.Collections.Generic.IReadOnlyCollection<ImageResizer.Plugins.Licensing.ILicenseChain> GetAllLicenses();
-        ImageResizer.Plugins.Licensing.ILicenseChain GetOrAdd(string license, ImageResizer.Configuration.LicenseAccess access);
-        System.Collections.Generic.IReadOnlyCollection<ImageResizer.Plugins.Licensing.ILicenseChain> GetSharedLicenses();
-        void Heartbeat();
-        void MonitorHeartbeat(ImageResizer.Configuration.Config c);
-        void MonitorLicenses(ImageResizer.Configuration.Config c);
-        void RemoveLicenseChangeHandler(ImageResizer.Plugins.Licensing.LicenseManagerEvent handler);
-    }
-    public delegate void LicenseManagerEvent(ImageResizer.Plugins.Licensing.ILicenseManager mgr);
 }
 namespace ImageResizer.Resizing
 {
@@ -1917,8 +1871,7 @@ namespace ImageResizer.Util
         public override string ToString() { }
     }
     [System.AttributeUsage(System.AttributeTargets.Assembly)]
-    [System.Obsolete("Use Imazen.Common.Licesning.EditionAttribute instead, this will not be recognized" +
-        "")]
+    [System.Obsolete("Use Imazen.Common.Licensing.EditionAttribute instead, this will not be recognized")]
     public class EditionAttribute : System.Attribute
     {
         public EditionAttribute() { }
@@ -2011,8 +1964,8 @@ namespace ImageResizer.Util
         public static bool FitsInside(System.Drawing.SizeF inner, System.Drawing.SizeF outer) { }
         public static void ForEach(System.Array a, ImageResizer.Util.PolygonMath.ForEachFunction func) { }
         public static System.Drawing.Brush GenerateRadialBrush(System.Drawing.Color inner, System.Drawing.Color outer, System.Drawing.PointF pt, float width) { }
-        public static System.Drawing.RectangleF GetBoundingBox(double[] flattenedPoints) { }
         public static System.Drawing.RectangleF GetBoundingBox(System.Drawing.PointF[] points) { }
+        public static System.Drawing.RectangleF GetBoundingBox(double[] flattenedPoints) { }
         public static System.Drawing.PointF[] GetCorners(System.Drawing.PointF[] poly, float width) { }
         public static System.Drawing.PointF[] GetCorners(System.Drawing.PointF[] poly, float[] widths) { }
         public static System.Drawing.RectangleF GetCroppingRectangle(double[] cropValues, double xunits, double yunits, System.Drawing.SizeF imageSize) { }
