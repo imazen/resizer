@@ -4,9 +4,9 @@
     ".NETFramework,Version=v4.7.2": {
       "AWSSDK.Core": {
         "type": "Direct",
-        "requested": "[4.0.0.13, )",
-        "resolved": "4.0.0.13",
-        "contentHash": "AXofl5oANEHo9B61yi6rpu/JazjwqkuHY9JmJfdf8+FSmkFPbOmKoEb6kUgO2On8PCtBeUOEIfhZdzjJbxRAyg==",
+        "requested": "[4.0.3.3, )",
+        "resolved": "4.0.3.3",
+        "contentHash": "YQv10JuxnciWh0QwnkarSbge4gXQV1qTURf5jkBjNUH/3jYS9QrbxopA4TK1qdjfOfP37tqiJkLSrRRNqX81aw==",
         "dependencies": {
           "System.Buffers": "4.5.1",
           "System.Memory": "4.5.5",
@@ -29,6 +29,15 @@
         "contentHash": "jrAiQZFKA6QL2JFF/y6k8P06RkY4miRP4NTEUPvcw/NOZ1G9/rzDXdSWNnaHVHgkFSepHLrUj+sxNsVXvI2NPg==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "2.2.0"
+        }
+      },
+      "Microsoft.NETFramework.ReferenceAssemblies": {
+        "type": "Direct",
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "vUc9Npcs14QsyOD01tnv/m8sQUnGTGOw1BCmKcv77LBJY7OxhJ+zJF7UD/sCL3lYNFuqmQEVlkfS4Quif6FyYg==",
+        "dependencies": {
+          "Microsoft.NETFramework.ReferenceAssemblies.net472": "1.0.3"
         }
       },
       "Microsoft.SourceLink.GitHub": {
@@ -111,6 +120,11 @@
           "System.Runtime.CompilerServices.Unsafe": "4.5.1"
         }
       },
+      "Microsoft.NETFramework.ReferenceAssemblies.net472": {
+        "type": "Transitive",
+        "resolved": "1.0.3",
+        "contentHash": "0E7evZXHXaDYYiLRfpyXvCh+yzM2rNTyuZDI+ZO7UUqSc6GfjePiXTdqJGtgIKUwdI81tzQKmaWprnUiPj9hAw=="
+      },
       "Microsoft.SourceLink.Common": {
         "type": "Transitive",
         "resolved": "8.0.0",
@@ -168,18 +182,9 @@
         "resolved": "4.5.0",
         "contentHash": "okurQJO6NRE/apDIP23ajJ0hpiNmJ+f0BwOlB/cSqTLQlw5upkf+5+96+iG2Jw40G1fCVCyPz/FhIABUjMR+RQ=="
       },
-      "imageresizer": {
-        "type": "Project",
-        "dependencies": {
-          "Imazen.Common": "[0.9.0-rc02, )",
-          "System.Buffers": "[4.6.1, )",
-          "System.Memory": "[4.6.3, )"
-        }
-      },
       "imageresizer.plugins.licensing": {
         "type": "Project",
         "dependencies": {
-          "ImageResizer": "[0.1.0--notset, )",
           "Imazen.Common": "[0.9.0-rc02, )",
           "System.Memory": "[4.6.3, )",
           "System.Numerics.Vectors": "[4.6.1, )"
@@ -188,7 +193,6 @@
       "imageresizer.storage": {
         "type": "Project",
         "dependencies": {
-          "ImageResizer": "[0.1.0--notset, )",
           "ImageResizer.Plugins.Licensing": "[0.1.0--notset, )",
           "Imazen.Common": "[0.9.0-rc02, )",
           "System.Memory": "[4.6.3, )"
