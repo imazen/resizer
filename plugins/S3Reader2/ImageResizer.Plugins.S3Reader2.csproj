@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.Core">
-      <Version>4.0.0.13</Version>
+      <Version>4.0.3.3</Version>
     </PackageReference>
     <PackageReference Include="AWSSDK.S3">
       <Version>4.0.3</Version>
