@@ -62,9 +62,9 @@ jobs:
           $xunit = "Packages\xunit.runner.console.2.0.0\tools\xunit.console.exe"
 
           # Discover AnyCPU test DLLs (mirrors Build.fsx glob)
-          # Exclude: CoreFSharp (F# test), ProviderTests (needs Azure Emulator + MongoDB)
+          # Exclude: CoreFSharp (F#), ProviderTests (needs Azure/MongoDB), FakeBuilder (needs FSharp.Core)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|ProviderTests" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|ProviderTests|FakeBuilder" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x64 managed tests
@@ -89,9 +89,9 @@ jobs:
 
           # Discover AnyCPU test DLLs, excluding some that don't work under x86
           # (mirrors Build.fsx exclusions for x86 run)
-          # Also exclude ProviderTests (needs Azure Emulator + MongoDB)
+          # Also exclude ProviderTests (needs Azure/MongoDB), FakeBuilder (needs FSharp.Core)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|ProviderTests" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|ProviderTests|FakeBuilder" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x86 managed tests
