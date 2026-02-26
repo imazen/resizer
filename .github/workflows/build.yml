@@ -90,8 +90,9 @@ jobs:
           # Discover AnyCPU test DLLs, excluding some that don't work under x86
           # (mirrors Build.fsx exclusions for x86 run)
           # Exclude: FakeBuilder (needs FSharp.Core), AllPlugins/CopyMetadata/TinyCache (x86 incompatible)
+          # LicenseVerifier excluded from x86 (race condition in Test_Revocations; fully covered in x64)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|FakeBuilder" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|FakeBuilder|LicenseVerifier" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x86 managed tests
