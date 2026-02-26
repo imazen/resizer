@@ -88,7 +88,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\dlls\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>.\obj\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>E:\Plugins\FastScaling\NativeFastScaling;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)NativeFastScaling;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

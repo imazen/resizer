@@ -1,0 +1,151 @@
+name: Build ImageResizer v4
+
+on:
+  push:
+    branches: [support/v4, develop]
+  pull_request:
+    branches: [support/v4, develop]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git tag detection
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Disable license enforcement
+        # Matches AppVeyor anonymous build: copy LicensingOff.cs over LicensingOn.cs
+        run: copy Plugins\LicenseVerifier\LicensingOff.cs Plugins\LicenseVerifier\LicensingOn.cs
+        shell: cmd
+
+      - name: NuGet restore (main solution)
+        run: nuget restore AppVeyor.sln
+
+      - name: NuGet restore (FastScaling solution)
+        run: nuget restore Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
+
+      - name: Install xunit runner
+        run: nuget install xunit.runner.console -Version 2.0.0 -OutputDirectory Packages
+
+      - name: Patch assembly info
+        id: patch_version
+        shell: pwsh
+        run: scripts/patch-assembly-info.ps1 -BuildNumber ${{ github.run_number }}
+
+      - name: Build main solution
+        run: >
+          msbuild AppVeyor.sln
+          /p:Configuration=Release
+          /p:Platform="Any CPU"
+          /p:Optimize=True
+          /p:DebugSymbols=True
+          /p:NoWarn="1591,1573,0618"
+          /m
+          /verbosity:minimal
+
+      - name: Build FastScaling (Win32)
+        run: >
+          msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
+          /p:Configuration=Release
+          /p:Platform=Win32
+          /p:Optimize=True
+          /p:DebugSymbols=True
+          /m
+          /verbosity:minimal
+
+      - name: Build FastScaling (x64)
+        run: >
+          msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
+          /p:Configuration=Release
+          /p:Platform=x64
+          /p:Optimize=True
+          /p:DebugSymbols=True
+          /m
+          /verbosity:minimal
+
+      # Native FastScaling tests run automatically as a post-build event
+      # in NativeFastScaling.Test.vcxproj (Catch framework)
+
+      - name: Run tests (x64)
+        shell: pwsh
+        run: |
+          $xunit = "Packages\xunit.runner.console.2.0.0\tools\xunit.console.exe"
+
+          # Discover AnyCPU test DLLs (mirrors Build.fsx glob)
+          $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -notmatch "CoreFSharp" } |
+            Select-Object -ExpandProperty FullName)
+
+          # Add FastScaling x64 managed tests
+          $fsTest = "Tests\binaries\release\x64\ImageResizer.Plugins.FastScaling.Tests.dll"
+          if (Test-Path $fsTest) { $testDlls += (Resolve-Path $fsTest).Path }
+
+          if ($testDlls.Count -eq 0) {
+            Write-Warning "No test DLLs found!"
+            exit 1
+          }
+
+          Write-Host "Running $($testDlls.Count) test assemblies (x64):"
+          $testDlls | ForEach-Object { Write-Host "  $_" }
+
+          & $xunit @testDlls -notrait "requiresmongo=true" -nologo
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run tests (x86)
+        shell: pwsh
+        run: |
+          $xunit = "Packages\xunit.runner.console.2.0.0\tools\xunit.console.x86.exe"
+
+          # Discover AnyCPU test DLLs, excluding some that don't work under x86
+          # (mirrors Build.fsx exclusions for x86 run)
+          $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache" } |
+            Select-Object -ExpandProperty FullName)
+
+          # Add FastScaling x86 managed tests
+          $fsTest = "Tests\binaries\release\x86\ImageResizer.Plugins.FastScaling.Tests.dll"
+          if (Test-Path $fsTest) { $testDlls += (Resolve-Path $fsTest).Path }
+
+          if ($testDlls.Count -eq 0) {
+            Write-Warning "No test DLLs found!"
+            exit 1
+          }
+
+          Write-Host "Running $($testDlls.Count) test assemblies (x86):"
+          $testDlls | ForEach-Object { Write-Host "  $_" }
+
+          & $xunit @testDlls -notrait "requiresmongo=true" -nologo
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Pack NuGet packages
+        shell: pwsh
+        run: >
+          scripts/pack-nuget.ps1
+          -Version "${{ steps.patch_version.outputs.nuget_version || '0.0.0-ci' }}"
+          -IncludeFastScaling
+
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: Releases/nuget-packages/*.nupkg
+          if-no-files-found: warn
+
+      - name: Upload build DLLs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-dlls
+          path: |
+            dlls/release/**/*.dll
+            dlls/release/**/*.pdb
+            dlls/release/**/*.xml
+          if-no-files-found: warn
