@@ -25,6 +25,7 @@ namespace ImageResizer.ProviderTests {
     /// implemented by <see cref="SqlReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
+    [Trait("requiresinfra","true")]
     public class SqlReaderTest {
         private IMetadataCache model;
 

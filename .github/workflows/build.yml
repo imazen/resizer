@@ -79,7 +79,7 @@ jobs:
           Write-Host "Running $($testDlls.Count) test assemblies (x64):"
           $testDlls | ForEach-Object { Write-Host "  $_" }
 
-          & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -nologo
+          & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -notrait "requiresinfra=true" -nologo
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run tests (x86)
@@ -106,7 +106,7 @@ jobs:
           Write-Host "Running $($testDlls.Count) test assemblies (x86):"
           $testDlls | ForEach-Object { Write-Host "  $_" }
 
-          & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -nologo
+          & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -notrait "requiresinfra=true" -nologo
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Pack NuGet packages

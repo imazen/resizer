@@ -38,6 +38,7 @@ namespace ImageResizer.ProviderTests {
     /// implemented by <see cref="RemoteReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
+    [Trait("requiresinfra","true")]
     public class RemoteReaderTest : RemoteReaderTestBase {
         /// <summary>
         /// Instantiate a new  <see cref="RemoteReaderPlugin"/> object and test for success.
@@ -354,6 +355,7 @@ namespace ImageResizer.ProviderTests {
     /// implemented by <see cref="RemoteReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFileAsync"/>.
     /// </remarks>
+    [Trait("requiresinfra","true")]
     public class RemoteReaderAsyncTest : RemoteReaderTestBase {
         /// <summary>
         /// Call the GetFile method with the virtual path prefix omitted. 
