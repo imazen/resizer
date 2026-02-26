@@ -42,35 +42,16 @@ jobs:
         run: scripts/patch-assembly-info.ps1 -BuildNumber ${{ github.run_number }}
 
       - name: Build main solution
-        run: >
-          msbuild AppVeyor.sln
-          /p:Configuration=Release
-          /p:Platform="Any CPU"
-          /p:Optimize=True
-          /p:DebugSymbols=True
-          /p:NoWarn="1591,1573,0618"
-          /m
-          /verbosity:minimal
+        shell: cmd
+        run: msbuild AppVeyor.sln /p:Configuration=Release /p:Platform="Any CPU" /p:Optimize=True /p:DebugSymbols=True /p:NoWarn="1591;1573;0618" /m /verbosity:minimal
 
       - name: Build FastScaling (Win32)
-        run: >
-          msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
-          /p:Configuration=Release
-          /p:Platform=Win32
-          /p:Optimize=True
-          /p:DebugSymbols=True
-          /m
-          /verbosity:minimal
+        shell: cmd
+        run: msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln /p:Configuration=Release /p:Platform=Win32 /p:Optimize=True /p:DebugSymbols=True /m /verbosity:minimal
 
       - name: Build FastScaling (x64)
-        run: >
-          msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
-          /p:Configuration=Release
-          /p:Platform=x64
-          /p:Optimize=True
-          /p:DebugSymbols=True
-          /m
-          /verbosity:minimal
+        shell: cmd
+        run: msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln /p:Configuration=Release /p:Platform=x64 /p:Optimize=True /p:DebugSymbols=True /m /verbosity:minimal
 
       # Native FastScaling tests run automatically as a post-build event
       # in NativeFastScaling.Test.vcxproj (Catch framework)
