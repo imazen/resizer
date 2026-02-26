@@ -32,6 +32,7 @@ namespace ImageResizer.ProviderTests {
     /// for any problems.
     /// </para>
     /// </remarks>
+    [Trait("requiresazure","true")]
     public class AzureReaderTest {
         private IMetadataCache model;
 

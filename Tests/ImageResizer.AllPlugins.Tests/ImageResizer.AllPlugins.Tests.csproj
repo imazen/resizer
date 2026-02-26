@@ -68,7 +68,6 @@
   </ItemGroup>
   <PropertyGroup>
     <IntermediateOutputPath>$(SolutionDir)/obj/$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)/bin/$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
