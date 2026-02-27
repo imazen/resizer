@@ -83,16 +83,17 @@ jobs:
           Write-Host "Running $($testDlls.Count) test assemblies (x64):"
           $testDlls | ForEach-Object { Write-Host "  $_" }
 
-          # Debug: check binding redirect config and Unsafe DLL
-          Write-Host "--- Diagnostic: TinyCache config and deps ---"
-          Get-ChildItem "Tests\binaries\release\*TinyCache*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  $($_.Name) ($($_.Length) bytes)" }
-          Get-ChildItem "Tests\binaries\release\System.Runtime.CompilerServices.Unsafe*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  $($_.Name) ($($_.Length) bytes)" }
-          if (Test-Path "Tests\binaries\release\ImageResizer.Plugins.TinyCache.Tests.dll.config") {
-            Write-Host "  .dll.config contents:"
-            Get-Content "Tests\binaries\release\ImageResizer.Plugins.TinyCache.Tests.dll.config"
+          # Debug: check binding redirect config and Unsafe DLL version
+          Write-Host "--- Diagnostic: System.Runtime.CompilerServices.Unsafe ---"
+          $unsafeDll = "Tests\binaries\release\System.Runtime.CompilerServices.Unsafe.dll"
+          if (Test-Path $unsafeDll) {
+            $asm = [System.Reflection.AssemblyName]::GetAssemblyName((Resolve-Path $unsafeDll).Path)
+            Write-Host "  DLL version: $($asm.Version) ($((Get-Item $unsafeDll).Length) bytes)"
           } else {
-            Write-Host "  WARNING: .dll.config NOT found"
+            Write-Host "  WARNING: DLL not found"
           }
+          # Check all *.config files for binding redirects
+          Get-ChildItem "Tests\binaries\release\*.dll.config" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  Config: $($_.Name)" }
           Write-Host "--- End Diagnostic ---"
 
           & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -notrait "requiresinfra=true" -nologo
