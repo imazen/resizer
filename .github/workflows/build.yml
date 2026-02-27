@@ -83,19 +83,6 @@ jobs:
           Write-Host "Running $($testDlls.Count) test assemblies (x64):"
           $testDlls | ForEach-Object { Write-Host "  $_" }
 
-          # Debug: check binding redirect config and Unsafe DLL version
-          Write-Host "--- Diagnostic: System.Runtime.CompilerServices.Unsafe ---"
-          $unsafeDll = "Tests\binaries\release\System.Runtime.CompilerServices.Unsafe.dll"
-          if (Test-Path $unsafeDll) {
-            $asm = [System.Reflection.AssemblyName]::GetAssemblyName((Resolve-Path $unsafeDll).Path)
-            Write-Host "  DLL version: $($asm.Version) ($((Get-Item $unsafeDll).Length) bytes)"
-          } else {
-            Write-Host "  WARNING: DLL not found"
-          }
-          # Check all *.config files for binding redirects
-          Get-ChildItem "Tests\binaries\release\*.dll.config" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  Config: $($_.Name)" }
-          Write-Host "--- End Diagnostic ---"
-
           & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -notrait "requiresinfra=true" -nologo
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
