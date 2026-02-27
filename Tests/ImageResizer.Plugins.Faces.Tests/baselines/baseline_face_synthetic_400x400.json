@@ -1,0 +1,17 @@
+{
+  "TestName": "face_synthetic_400x400",
+  "ImageDescription": "Synthetic face 400x400",
+  "ImageWidth": 400,
+  "ImageHeight": 400,
+  "DetectionTimeMs": 13,
+  "Faces": [
+    {
+      "X": 119.0,
+      "Y": 113.0,
+      "X2": 287.0,
+      "Y2": 281.0,
+      "Accuracy": 24.0
+    }
+  ],
+  "Eyes": null
+}

@@ -1,0 +1,9 @@
+{
+  "TestName": "face_blank_640x480",
+  "ImageDescription": "Solid blue image, expect zero detections",
+  "ImageWidth": 640,
+  "ImageHeight": 480,
+  "DetectionTimeMs": 0,
+  "Faces": [],
+  "Eyes": null
+}

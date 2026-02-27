@@ -1,0 +1,17 @@
+{
+  "TestName": "face_expand_640x480",
+  "ImageDescription": "Synthetic face 640x480, ExpandX=0.1 ExpandY=0.4",
+  "ImageWidth": 640,
+  "ImageHeight": 480,
+  "DetectionTimeMs": 17,
+  "Faces": [
+    {
+      "X": 195.35,
+      "Y": 78.4,
+      "X2": 451.65,
+      "Y2": 404.6,
+      "Accuracy": 29.0
+    }
+  ],
+  "Eyes": null
+}

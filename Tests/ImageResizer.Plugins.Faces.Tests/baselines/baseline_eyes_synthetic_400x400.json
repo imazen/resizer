@@ -1,0 +1,34 @@
+{
+  "TestName": "eyes_synthetic_400x400",
+  "ImageDescription": "Synthetic face oval 400x400",
+  "ImageWidth": 400,
+  "ImageHeight": 400,
+  "DetectionTimeMs": 67,
+  "Faces": null,
+  "Eyes": [
+    {
+      "X": 155.0,
+      "Y": 167.0,
+      "X2": 187.0,
+      "Y2": 199.0,
+      "Accuracy": 0.0,
+      "Feature": "Eye"
+    },
+    {
+      "X": 209.0,
+      "Y": 167.0,
+      "X2": 241.0,
+      "Y2": 199.0,
+      "Accuracy": 0.0,
+      "Feature": "Eye"
+    },
+    {
+      "X": 103.0,
+      "Y": 100.0,
+      "X2": 298.0,
+      "Y2": 295.0,
+      "Accuracy": 0.0,
+      "Feature": "Face"
+    }
+  ]
+}

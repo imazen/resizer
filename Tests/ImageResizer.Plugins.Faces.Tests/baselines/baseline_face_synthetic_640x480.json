@@ -1,0 +1,17 @@
+{
+  "TestName": "face_synthetic_640x480",
+  "ImageDescription": "Synthetic face oval with eyes/nose/mouth on gray background",
+  "ImageWidth": 640,
+  "ImageHeight": 480,
+  "DetectionTimeMs": 22,
+  "Faces": [
+    {
+      "X": 207.0,
+      "Y": 125.0,
+      "X2": 440.0,
+      "Y2": 358.0,
+      "Accuracy": 29.0
+    }
+  ],
+  "Eyes": null
+}

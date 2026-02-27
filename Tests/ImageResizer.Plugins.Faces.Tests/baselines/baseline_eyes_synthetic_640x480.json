@@ -1,0 +1,9 @@
+{
+  "TestName": "eyes_synthetic_640x480",
+  "ImageDescription": "Synthetic face oval 640x480",
+  "ImageWidth": 640,
+  "ImageHeight": 480,
+  "DetectionTimeMs": 120,
+  "Faces": null,
+  "Eyes": []
+}

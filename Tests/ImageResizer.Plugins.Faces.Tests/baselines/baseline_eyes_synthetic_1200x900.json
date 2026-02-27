@@ -1,0 +1,9 @@
+{
+  "TestName": "eyes_synthetic_1200x900",
+  "ImageDescription": "Synthetic face oval 1200x900 (exercises downscale path)",
+  "ImageWidth": 1200,
+  "ImageHeight": 900,
+  "DetectionTimeMs": 184,
+  "Faces": null,
+  "Eyes": []
+}

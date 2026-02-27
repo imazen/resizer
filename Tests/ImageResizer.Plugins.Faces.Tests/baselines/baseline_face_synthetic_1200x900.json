@@ -1,0 +1,17 @@
+{
+  "TestName": "face_synthetic_1200x900",
+  "ImageDescription": "Synthetic face 1200x900 (exercises downscale path)",
+  "ImageWidth": 1200,
+  "ImageHeight": 900,
+  "DetectionTimeMs": 25,
+  "Faces": [
+    {
+      "X": 384.75,
+      "Y": 229.5,
+      "X2": 821.25,
+      "Y2": 666.0,
+      "Accuracy": 28.0
+    }
+  ],
+  "Eyes": null
+}
