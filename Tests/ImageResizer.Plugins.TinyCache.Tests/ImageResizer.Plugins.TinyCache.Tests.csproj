@@ -64,6 +64,9 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="protobuf-net">
+      <Version>3.2.56</Version>
+    </PackageReference>
     <PackageReference Include="xunit">
       <Version>2.9.3</Version>
     </PackageReference>
