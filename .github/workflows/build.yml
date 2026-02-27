@@ -68,7 +68,7 @@ jobs:
           # Discover AnyCPU test DLLs (mirrors Build.fsx glob)
           # Exclude: CoreFSharp (F#), FakeBuilder (needs FSharp.Core), PdfiumRenderer (needs native pdfium.dll)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|FakeBuilder|PdfiumRenderer" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|FakeBuilder|PdfiumRenderer|IISExpressTests" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x64 managed tests
@@ -97,7 +97,7 @@ jobs:
           # LicenseVerifier excluded from x86 (race condition in Test_Revocations; fully covered in x64)
           # PdfiumRenderer excluded (needs native pdfium.dll)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|FakeBuilder|LicenseVerifier|PdfiumRenderer" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|FakeBuilder|LicenseVerifier|PdfiumRenderer|IISExpressTests" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x86 managed tests
@@ -114,6 +114,19 @@ jobs:
 
           & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -notrait "requiresinfra=true" -nologo
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run IIS Express integration tests (x64)
+        shell: pwsh
+        run: |
+          $xunit = "Packages\xunit.runner.console.2.9.3\tools\net472\xunit.console.exe"
+          $dll = "Tests\binaries\release\ImageResizer.IISExpressTests.dll"
+          if (Test-Path $dll) {
+            Write-Host "Running IIS Express integration tests..."
+            & $xunit $dll -trait "requiresiisexpress=true" -nologo
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else {
+            Write-Warning "IIS Express test DLL not found at $dll — skipping"
+          }
 
       - name: Pack NuGet packages
         shell: pwsh
