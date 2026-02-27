@@ -66,9 +66,9 @@ jobs:
           $xunit = "Packages\xunit.runner.console.2.9.3\tools\net472\xunit.console.exe"
 
           # Discover AnyCPU test DLLs (mirrors Build.fsx glob)
-          # Exclude: CoreFSharp (F#), FakeBuilder (needs FSharp.Core)
+          # Exclude: CoreFSharp (F#), FakeBuilder (needs FSharp.Core), PdfiumRenderer (needs native pdfium.dll)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|FakeBuilder" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|FakeBuilder|PdfiumRenderer" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x64 managed tests
@@ -95,8 +95,9 @@ jobs:
           # (mirrors Build.fsx exclusions for x86 run)
           # Exclude: FakeBuilder (needs FSharp.Core), AllPlugins/CopyMetadata/TinyCache (x86 incompatible)
           # LicenseVerifier excluded from x86 (race condition in Test_Revocations; fully covered in x64)
+          # PdfiumRenderer excluded (needs native pdfium.dll)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|FakeBuilder|LicenseVerifier" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|FakeBuilder|LicenseVerifier|PdfiumRenderer" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x86 managed tests
