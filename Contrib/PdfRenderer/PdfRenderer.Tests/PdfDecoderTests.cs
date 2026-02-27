@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using ImageResizer.Configuration.Issues;
-using MbUnit.Framework;
+using Xunit;
 using ImageResizer.Plugins.PdfRenderer;
 using ImageResizer.Plugins.PdfRenderer.Ghostscript;
 
@@ -16,12 +16,12 @@ namespace ImageResizer.Plugins.Pdf.Tests
         private PdfRendererPlugin _decoder;
 
         /// <summary>
-        ///   Name of embedded PDF test document. 
+        ///   Name of embedded PDF test document.
         /// </summary>
         /// <remarks>
         ///   This document was generated in Word and printed to PDF. The page size is 8.5" x 11"
         ///   It has 2 pages:
-        ///   Page 1: Portrait, with large letter 'A' in red box with black border centered vertically and horizontally, 
+        ///   Page 1: Portrait, with large letter 'A' in red box with black border centered vertically and horizontally,
         ///   Page 2: Landscape, with large letter 'B' in green box with black border centered vertically and horizontally.
         /// </remarks>
         private const string TestDocumentFileName = "Test.pdf";
@@ -39,8 +39,7 @@ namespace ImageResizer.Plugins.Pdf.Tests
             }
         }
 
-        [FixtureSetUp]
-        public void FixtureSetUp()
+        public PdfRendererTests()
         {
             _decoder = new PdfRendererPlugin();
 
@@ -48,126 +47,126 @@ namespace ImageResizer.Plugins.Pdf.Tests
             if(issues.Length > 0)
             {
                 string issuesMessage = string.Join(Environment.NewLine, issues.Select(x => x.Summary).ToArray());
-                Assert.Fail("Expecting there are no plugin issues reported: {0}", issuesMessage);
+                Assert.Fail(string.Format("Expecting there are no plugin issues reported: {0}", issuesMessage));
             }
         }
 
-        [Test]
+        [Fact]
         public void GetSupportedFileExtensions_ExpectPdf()
         {
             // Act
             IEnumerable<string> supportedFileExtensions = _decoder.GetSupportedFileExtensions();
 
             // Assert
-            Assert.Contains(supportedFileExtensions, ".pdf");
+            Assert.Contains(".pdf", supportedFileExtensions);
         }
 
         #region Page1 (Portrait)
 
-        [Test]
+        [Fact]
         public void DecodeStream_WhenHeightSpecified_ExpectPage1()
         {
             // Arrange
             ResizeSettings settings = new ResizeSettings();
-            settings["height"] = "400";            
+            settings["height"] = "400";
 
             // Act
             Bitmap bitmap = _decoder.DecodeStream(TestDocumentStream, settings, TestDocumentFileName);
 
             // Assert
-            Assert.AreEqual(400, bitmap.Height, "Expect actual height to match requested height");
-            Assert.AreEqual(309, bitmap.Width, "Expect width to be a ratio to height");
+            Assert.Equal(400, bitmap.Height);
+            Assert.Equal(309, bitmap.Width);
         }
 
-        [Test]
+        [Fact]
         public void DecodeStream_WhenWidthSpecified_ExpectPage1()
         {
             // Arrange
             ResizeSettings settings = new ResizeSettings();
-            settings["width"] = "400";            
+            settings["width"] = "400";
 
             // Act
             Bitmap bitmap = _decoder.DecodeStream(TestDocumentStream, settings, TestDocumentFileName);
 
             // Assert
-            Assert.AreEqual(400, bitmap.Width, "Expect actual width to match requested width");
-            Assert.AreEqual(518, bitmap.Height, "Expect height to be a ratio to width");
+            Assert.Equal(400, bitmap.Width);
+            Assert.Equal(518, bitmap.Height);
         }
 
-        [Test]
+        [Fact]
         public void DecodeStream_WhenWidthHeightSpecified_ExpectPage1()
         {
             // Arrange
             ResizeSettings settings = new ResizeSettings();
-            settings["height"] = "400";            
-            settings["width"] = "400";            
+            settings["height"] = "400";
+            settings["width"] = "400";
 
             // Act
             Bitmap bitmap = _decoder.DecodeStream(TestDocumentStream, settings, TestDocumentFileName);
 
             // Assert
-            Assert.AreEqual(400, bitmap.Height, "Expect actual height to match requested height");
-            Assert.AreEqual(309, bitmap.Width, "Expect actual width to be limited by height");
+            Assert.Equal(400, bitmap.Height);
+            Assert.Equal(309, bitmap.Width);
         }
 
         #endregion
 
         #region Page2 (Landscape)
 
-        [Test]
+        [Fact]
         public void DecodeStream_WhenHeightSpecified_ExpectPage2()
         {
             // Arrange
             ResizeSettings settings = new ResizeSettings();
             settings["height"] = "400";
-            settings["page"] = "2";            
+            settings["page"] = "2";
 
             // Act
             Bitmap bitmap = _decoder.DecodeStream(TestDocumentStream, settings, TestDocumentFileName);
 
             // Assert
-            Assert.AreEqual(400, bitmap.Height, "Expect actual height to match requested height");
-            Assert.AreEqual(518, bitmap.Width, "Expect width to be a ratio to height");
+            Assert.Equal(400, bitmap.Height);
+            Assert.Equal(518, bitmap.Width);
         }
 
-        [Test]
+        [Fact]
         public void DecodeStream_WhenWidthSpecified_ExpectPage2()
         {
             // Arrange
             ResizeSettings settings = new ResizeSettings();
             settings["width"] = "400";
-            settings["page"] = "2";            
+            settings["page"] = "2";
 
             // Act
             Bitmap bitmap = _decoder.DecodeStream(TestDocumentStream, settings, TestDocumentFileName);
 
             // Assert
-            Assert.AreEqual(400, bitmap.Width, "Expect actual width to match requested width");
-            Assert.AreEqual(309, bitmap.Height, "Expect height to be a ratio to width");
+            Assert.Equal(400, bitmap.Width);
+            Assert.Equal(309, bitmap.Height);
         }
 
-        [Test]
+        [Fact]
         public void DecodeStream_WhenWidthHeightSpecified_ExpectPage2()
         {
             // Arrange
             ResizeSettings settings = new ResizeSettings();
-            settings["height"] = "400";            
-            settings["width"] = "400";            
-            settings["page"] = "2";            
+            settings["height"] = "400";
+            settings["width"] = "400";
+            settings["page"] = "2";
 
             // Act
             Bitmap bitmap = _decoder.DecodeStream(TestDocumentStream, settings, TestDocumentFileName);
 
             // Assert
-            Assert.AreEqual(309, bitmap.Height, "Expect actual height to match requested height");
-            Assert.AreEqual(400, bitmap.Width, "Expect actual width to be limited by height");
+            Assert.Equal(309, bitmap.Height);
+            Assert.Equal(400, bitmap.Width);
         }
 
         #endregion
 
         #region Page3 (Does not exist)
 
-        [Test]
+        [Fact]
         public void DecodeStream_WhenInvalidPageSpecified_ExpectNull()
         {
             // Arrange
@@ -178,7 +177,7 @@ namespace ImageResizer.Plugins.Pdf.Tests
             Bitmap bitmap = _decoder.DecodeStream(TestDocumentStream, settings, TestDocumentFileName);
 
             // Assert
-            Assert.IsNull(bitmap, "Do not expect rendered image if request page exceeds number of pages available");
+            Assert.Null(bitmap);
         }
 
         #endregion

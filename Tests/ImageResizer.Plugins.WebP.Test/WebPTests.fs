@@ -5,7 +5,6 @@
 ﻿namespace ImageResizer.Plugins.WebP.Test
 
 open Xunit
-open FsUnit.Xunit
 open ImageResizer
 open ImageResizer.Configuration
 open ImageResizer.Plugins.WebPDecoder

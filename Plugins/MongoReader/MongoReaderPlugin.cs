@@ -3,7 +3,7 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿#region Using
+#region Using
 
 using System;
 using System.Collections.Specialized;
@@ -26,24 +26,21 @@ namespace ImageResizer.Plugins.MongoReader
     /// </summary>
     public class MongoReaderPlugin : BlobProviderBase, IMultiInstancePlugin
     {
-        private readonly MongoDatabase _db;
-        private readonly MongoGridFS _grid;
-        private readonly MongoGridFSSettings _gridSettings;
+        private readonly IMongoDatabase _db;
+        private readonly GridFSBucket _bucket;
 
         /// <summary>
-        ///     Create a MongoReaderPlugin with an existing MongoDatabase and specific settings for GridFS
+        ///     Create a MongoReaderPlugin with an existing IMongoDatabase and optional GridFS bucket name
         /// </summary>
         /// <param name="prefix">The virtual folder representing GridFS assets</param>
-        /// <param name="db">An existing MongoDatabase instance</param>
-        /// <param name="gridSettings">
-        ///     Settings for the GridFS connection
-        ///     <see href="http://api.mongodb.org/csharp/1.8/html/7a3abd48-0532-8e7f-3c05-6c9812eb06f8.htm" />
-        /// </param>
-        public MongoReaderPlugin(string prefix, MongoDatabase db, MongoGridFSSettings gridSettings)
+        /// <param name="db">An existing IMongoDatabase instance</param>
+        /// <param name="bucketName">Optional GridFS bucket name (defaults to "fs")</param>
+        public MongoReaderPlugin(string prefix, IMongoDatabase db, string bucketName = null)
         {
             _db = db;
-            _gridSettings = gridSettings;
-            _grid = _db.GetGridFS(gridSettings);
+            _bucket = bucketName != null
+                ? new GridFSBucket(db, new GridFSBucketOptions { BucketName = bucketName })
+                : new GridFSBucket(db);
             VirtualFilesystemPrefix = prefix;
         }
 
@@ -56,21 +53,17 @@ namespace ImageResizer.Plugins.MongoReader
             VirtualFilesystemPrefix = args.GetAsString("prefix","~/gridfs/");
 
             var mongoUrl = new MongoUrl(args["connectionString"]);
-
-            // Using new client, server database initialization. Wordy but recommended.
             var mongoClient = new MongoClient(mongoUrl);
-            var mongoServer = mongoClient.GetServer();
-            _db = mongoServer.GetDatabase(mongoUrl.DatabaseName);
-            _gridSettings = new MongoGridFSSettings();
-            _grid = _db.GetGridFS(_gridSettings);
+            _db = mongoClient.GetDatabase(mongoUrl.DatabaseName);
+            _bucket = new GridFSBucket(_db);
         }
 
         /// <summary>
-        ///     A reference to the GridFS instance used to retrieve files.
+        ///     A reference to the GridFS bucket used to retrieve files.
         /// </summary>
-        public MongoGridFS GridFS
+        public GridFSBucket GridFSBucket
         {
-            get { return _grid; }
+            get { return _bucket; }
         }
 
         public override Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
@@ -78,7 +71,7 @@ namespace ImageResizer.Plugins.MongoReader
             return Task.FromResult<IBlobMetadata>(new BlobMetadata() { Exists = true });
         }
 
-        public override Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
+        public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
             var _filename = virtualPath.Substring(VirtualFilesystemPrefix.Length);
             //First try to get it by id, next by filename
@@ -91,16 +84,11 @@ namespace ImageResizer.Plugins.MongoReader
 
                 if (ObjectId.TryParse(sid, out id))
                 {
-                    var file = _grid.FindOne(MongoDB.Driver.Builders.Query.EQ("_id", id));
-
-                    if (file == null)
-                        throw new FileNotFoundException("Failed to locate blob " + sid + " on GridFS.");
-
-                    return Task.FromResult<Stream>(file.OpenRead());
+                    return await _bucket.OpenDownloadStreamAsync(id);
                 }
             }
-           
-            return Task.FromResult<Stream>(_grid.OpenRead(_filename));
+
+            return await _bucket.OpenDownloadStreamByNameAsync(_filename);
         }
     }
 }

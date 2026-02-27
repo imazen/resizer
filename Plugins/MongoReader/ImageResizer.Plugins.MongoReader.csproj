@@ -75,8 +75,8 @@
     <None Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="mongocsharpdriver">
-      <Version>2.1.0</Version>
+    <PackageReference Include="MongoDB.Driver">
+      <Version>3.6.0</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

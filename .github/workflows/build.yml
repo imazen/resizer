@@ -34,7 +34,7 @@ jobs:
         run: nuget restore Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
 
       - name: Install xunit runner
-        run: nuget install xunit.runner.console -Version 2.0.0 -OutputDirectory Packages
+        run: nuget install xunit.runner.console -Version 2.9.3 -OutputDirectory Packages
 
       - name: Patch assembly info
         id: patch_version
@@ -63,7 +63,7 @@ jobs:
       - name: Run tests (x64)
         shell: pwsh
         run: |
-          $xunit = "Packages\xunit.runner.console.2.0.0\tools\xunit.console.exe"
+          $xunit = "Packages\xunit.runner.console.2.9.3\tools\net472\xunit.console.exe"
 
           # Discover AnyCPU test DLLs (mirrors Build.fsx glob)
           # Exclude: CoreFSharp (F#), FakeBuilder (needs FSharp.Core)
@@ -89,7 +89,7 @@ jobs:
       - name: Run tests (x86)
         shell: pwsh
         run: |
-          $xunit = "Packages\xunit.runner.console.2.0.0\tools\xunit.console.x86.exe"
+          $xunit = "Packages\xunit.runner.console.2.9.3\tools\net472\xunit.console.x86.exe"
 
           # Discover AnyCPU test DLLs, excluding some that don't work under x86
           # (mirrors Build.fsx exclusions for x86 run)

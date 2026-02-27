@@ -1,13 +1,13 @@
-﻿using System.IO;
+using System.IO;
 using System.Xml.Serialization;
-using MbUnit.Framework;
+using Xunit;
 using ImageResizer.Plugins.PdfRenderer.Ghostscript;
 
 namespace ImageResizer.Plugins.Pdf.Tests.Ghostscript
 {
     public class PdfInfoTests
     {
-        [Test]
+        [Fact]
         public void ExpectDeserialize()
         {
             // Arrange
@@ -16,12 +16,12 @@ namespace ImageResizer.Plugins.Pdf.Tests.Ghostscript
                                       "    <value>60</value>" + // <
                                       "    <value>70</value>" + // F
                                       "    <value>62</value>" + // >
-                                      "  </fileNameData>" + 
+                                      "  </fileNameData>" +
                                       "  <titleData>" +
                                       "    <value>34</value>" + // "
                                       "    <value>84</value>" + // T
                                       "    <value>34</value>" + // "
-                                      "  </titleData>" + 
+                                      "  </titleData>" +
                                       "  <authorData>" +
                                       "    <value>39</value>" + // '
                                       "    <value>65</value>" + // A
@@ -61,7 +61,7 @@ namespace ImageResizer.Plugins.Pdf.Tests.Ghostscript
                                       "    <value>67</value>" + // C (UTF8)
                                       "    <value>100</value>" + // d
                                       "  </creationDateData>" +
-                                      "  <modifiedDateData>" + 
+                                      "  <modifiedDateData>" +
                                       "    <value>77</value>" + // M (ASCII)
                                       "    <value>100</value>" + // d
                                       "  </modifiedDateData>" +
@@ -77,7 +77,6 @@ namespace ImageResizer.Plugins.Pdf.Tests.Ghostscript
                                       "    </page>" +
                                       "  </pages>" +
                                       "</pdf>";
-            const double delta = 0.0001;
             XmlSerializer serializer = new XmlSerializer(typeof(PdfInfo));
 
             // Act
@@ -88,49 +87,49 @@ namespace ImageResizer.Plugins.Pdf.Tests.Ghostscript
             }
 
             // Assert
-            Assert.AreEqual("<F>", pdfInfo.FileName);
-            Assert.AreEqual("\"T\"", pdfInfo.Title);
-            Assert.AreEqual("'A'", pdfInfo.Author);
-            Assert.AreEqual("&S&", pdfInfo.Subject);
-            Assert.AreEqual("K", pdfInfo.Keywords);
-            Assert.AreEqual("C", pdfInfo.Creator);
-            Assert.AreEqual("P", pdfInfo.Producer);
-            Assert.AreEqual("Cd", pdfInfo.CreationDate);
-            Assert.AreEqual("Md", pdfInfo.ModifiedDate);
-            Assert.AreEqual(2, pdfInfo.PageCount);
-            Assert.AreEqual(2, pdfInfo.Pages.Count);
+            Assert.Equal("<F>", pdfInfo.FileName);
+            Assert.Equal("\"T\"", pdfInfo.Title);
+            Assert.Equal("'A'", pdfInfo.Author);
+            Assert.Equal("&S&", pdfInfo.Subject);
+            Assert.Equal("K", pdfInfo.Keywords);
+            Assert.Equal("C", pdfInfo.Creator);
+            Assert.Equal("P", pdfInfo.Producer);
+            Assert.Equal("Cd", pdfInfo.CreationDate);
+            Assert.Equal("Md", pdfInfo.ModifiedDate);
+            Assert.Equal(2, pdfInfo.PageCount);
+            Assert.Equal(2, pdfInfo.Pages.Count);
             // - Pages[0]
-            Assert.AreEqual(1, pdfInfo.Pages[0].Number);
-            Assert.AreEqual(0, pdfInfo.Pages[0].Rotate);
-            Assert.IsFalse(pdfInfo.Pages[0].Transparency);
+            Assert.Equal(1, pdfInfo.Pages[0].Number);
+            Assert.Equal(0, pdfInfo.Pages[0].Rotate);
+            Assert.False(pdfInfo.Pages[0].Transparency);
             // - Pages[0].MediaBox
-            Assert.IsNotNull(pdfInfo.Pages[0].MediaBox);
-            Assert.AreApproximatelyEqual(111.1, pdfInfo.Pages[0].MediaBox.Left, delta);
-            Assert.AreApproximatelyEqual(112.2, pdfInfo.Pages[0].MediaBox.Top, delta);
-            Assert.AreApproximatelyEqual(113.3, pdfInfo.Pages[0].MediaBox.Width, delta);
-            Assert.AreApproximatelyEqual(114.4, pdfInfo.Pages[0].MediaBox.Height, delta);
+            Assert.NotNull(pdfInfo.Pages[0].MediaBox);
+            Assert.Equal(111.1, pdfInfo.Pages[0].MediaBox.Left, 4);
+            Assert.Equal(112.2, pdfInfo.Pages[0].MediaBox.Top, 4);
+            Assert.Equal(113.3, pdfInfo.Pages[0].MediaBox.Width, 4);
+            Assert.Equal(114.4, pdfInfo.Pages[0].MediaBox.Height, 4);
             // - Pages[0].CropBox
-            Assert.IsNotNull(pdfInfo.Pages[0].CropBox);
-            Assert.AreApproximatelyEqual(121.1, pdfInfo.Pages[0].CropBox.Left, delta);
-            Assert.AreApproximatelyEqual(122.2, pdfInfo.Pages[0].CropBox.Top, delta);
-            Assert.AreApproximatelyEqual(123.3, pdfInfo.Pages[0].CropBox.Width, delta);
-            Assert.AreApproximatelyEqual(124.4, pdfInfo.Pages[0].CropBox.Height, delta);
+            Assert.NotNull(pdfInfo.Pages[0].CropBox);
+            Assert.Equal(121.1, pdfInfo.Pages[0].CropBox.Left, 4);
+            Assert.Equal(122.2, pdfInfo.Pages[0].CropBox.Top, 4);
+            Assert.Equal(123.3, pdfInfo.Pages[0].CropBox.Width, 4);
+            Assert.Equal(124.4, pdfInfo.Pages[0].CropBox.Height, 4);
             // - Pages[1]
-            Assert.AreEqual(2, pdfInfo.Pages[1].Number);
-            Assert.AreEqual(90, pdfInfo.Pages[1].Rotate);
-            Assert.IsTrue(pdfInfo.Pages[1].Transparency);
+            Assert.Equal(2, pdfInfo.Pages[1].Number);
+            Assert.Equal(90, pdfInfo.Pages[1].Rotate);
+            Assert.True(pdfInfo.Pages[1].Transparency);
             // - Pages[1].MediaBox
-            Assert.IsNotNull(pdfInfo.Pages[1].MediaBox);
-            Assert.AreApproximatelyEqual(211.1, pdfInfo.Pages[1].MediaBox.Left, delta);
-            Assert.AreApproximatelyEqual(212.2, pdfInfo.Pages[1].MediaBox.Top, delta);
-            Assert.AreApproximatelyEqual(213.3, pdfInfo.Pages[1].MediaBox.Width, delta);
-            Assert.AreApproximatelyEqual(214.4, pdfInfo.Pages[1].MediaBox.Height, delta);
+            Assert.NotNull(pdfInfo.Pages[1].MediaBox);
+            Assert.Equal(211.1, pdfInfo.Pages[1].MediaBox.Left, 4);
+            Assert.Equal(212.2, pdfInfo.Pages[1].MediaBox.Top, 4);
+            Assert.Equal(213.3, pdfInfo.Pages[1].MediaBox.Width, 4);
+            Assert.Equal(214.4, pdfInfo.Pages[1].MediaBox.Height, 4);
             // - Pages[1].CropBox
-            Assert.IsNotNull(pdfInfo.Pages[1].CropBox);
-            Assert.AreApproximatelyEqual(221.1, pdfInfo.Pages[1].CropBox.Left, delta);
-            Assert.AreApproximatelyEqual(222.2, pdfInfo.Pages[1].CropBox.Top, delta);
-            Assert.AreApproximatelyEqual(223.3, pdfInfo.Pages[1].CropBox.Width, delta);
-            Assert.AreApproximatelyEqual(224.4, pdfInfo.Pages[1].CropBox.Height, delta);
+            Assert.NotNull(pdfInfo.Pages[1].CropBox);
+            Assert.Equal(221.1, pdfInfo.Pages[1].CropBox.Left, 4);
+            Assert.Equal(222.2, pdfInfo.Pages[1].CropBox.Top, 4);
+            Assert.Equal(223.3, pdfInfo.Pages[1].CropBox.Width, 4);
+            Assert.Equal(224.4, pdfInfo.Pages[1].CropBox.Height, 4);
         }
     }
 }
