@@ -29,16 +29,6 @@ namespace ImageResizer{
                 public ref class ManagedRenderer
                 {
 
-                    float* CopyFloatArray (array<float, 1>^ a){
-                        if (a == nullptr) return NULL;
-
-                        float * copy = (float *)malloc (sizeof (float) * a->Length);
-                        if (copy == NULL) throw gcnew OutOfMemoryException ();
-                        for (int i = 0; i < a->Length; i++)
-                            copy[i] = a[i];
-                        return copy;
-                    }
-
                     ConvolutionKernel* CopyKernel (ConvKernel^ from){
                         if (from == nullptr) return nullptr;
                         ConvolutionKernel* k = ConvolutionKernel_create (c->GetContext (), from->Radius);

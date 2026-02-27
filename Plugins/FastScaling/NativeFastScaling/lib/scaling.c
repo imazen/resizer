@@ -207,29 +207,28 @@ static bool HALVE_INTERNAL_NAME (
     const int divisor)
 {
 
+    //Validate format before allocating
+    if (from->fmt != to->fmt || (BitmapPixelFormat_bytes_per_pixel (from->fmt) != 3 && BitmapPixelFormat_bytes_per_pixel (from->fmt) != 4)){
+        CONTEXT_error (context, Invalid_internal_state);
+        return false;
+    }
+
     const int to_w_bytes = to_w * BitmapPixelFormat_bytes_per_pixel (to->fmt);
     HALVING_TYPE *buffer = (HALVING_TYPE *)CONTEXT_calloc(context, to_w_bytes, sizeof(HALVING_TYPE));
     if (buffer == NULL) {
         CONTEXT_error(context, Out_of_memory);
         return false;
     }
-    //Force the from and to formate to be the same
-    if (from->fmt != to->fmt || (BitmapPixelFormat_bytes_per_pixel (from->fmt) != 3 && BitmapPixelFormat_bytes_per_pixel (from->fmt) != 4)){
-        CONTEXT_error (context, Invalid_internal_state);
-        return false;
-    }
 
 
     int y, b, d;
-    const unsigned short divisorSqr = divisor * divisor;
+    const unsigned int divisorSqr = divisor * divisor;
 #ifdef ALLOW_SHIFTING_HALVING_TYPE
     const unsigned int shift = isPowerOfTwo (divisorSqr) ? intlog2(divisorSqr) : 0;
 #endif
 
     const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (from->fmt);
 
-    //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
-    //Ensure that shift > 0 && divisorSqr > 0 && divisor > 0
     for (y = 0; y < to_h; y++) {
         memset(buffer, 0, sizeof(HALVING_TYPE) * to_w_bytes);
         for (d = 0; d < divisor; d++) {
@@ -358,29 +357,28 @@ static bool HALVE_INTERNAL_NAME (
     const int divisor)
 {
 
+    //Validate format before allocating
+    if (from->fmt != to->fmt || (BitmapPixelFormat_bytes_per_pixel (from->fmt) != 3 && BitmapPixelFormat_bytes_per_pixel (from->fmt) != 4)){
+        CONTEXT_error (context, Invalid_internal_state);
+        return false;
+    }
+
     const int to_w_bytes = to_w * BitmapPixelFormat_bytes_per_pixel (to->fmt);
     HALVING_TYPE *buffer = (HALVING_TYPE *)CONTEXT_calloc (context, to_w_bytes, sizeof (HALVING_TYPE));
     if (buffer == NULL) {
         CONTEXT_error (context, Out_of_memory);
         return false;
     }
-    //Force the from and to formate to be the same
-    if (from->fmt != to->fmt || (BitmapPixelFormat_bytes_per_pixel (from->fmt) != 3 && BitmapPixelFormat_bytes_per_pixel (from->fmt) != 4)){
-        CONTEXT_error (context, Invalid_internal_state);
-        return false;
-    }
 
 
     int y, b, d;
-    const unsigned short divisorSqr = divisor * divisor;
+    const unsigned int divisorSqr = divisor * divisor;
 #ifdef ALLOW_SHIFTING_HALVING_TYPE
     const unsigned int shift = isPowerOfTwo (divisorSqr) ? intlog2 (divisorSqr) : 0;
 #endif
 
     const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (from->fmt);
 
-    //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
-    //Ensure that shift > 0 && divisorSqr > 0 && divisor > 0
     for (y = 0; y < to_h; y++) {
         memset (buffer, 0, sizeof (HALVING_TYPE) * to_w_bytes);
         for (d = 0; d < divisor; d++) {

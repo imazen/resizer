@@ -58,8 +58,13 @@ const char * Context_stacktrace (Context * context, char * buffer, size_t buffer
 
         //Trim the directory
         const char * file = context->error.callstack[i].file;
-        const char * lastslash = (const char *)umax64((uint64_t)strchr (file, '\\'), (uint64_t)strchr (file, '/'));
-        file = (const char *)umax64((uint64_t)lastslash + 1, (uint64_t)file);
+        const char * bs = strchr (file, '\\');
+        const char * fs = strchr (file, '/');
+        const char * lastslash = NULL;
+        if (bs != NULL && fs != NULL) lastslash = bs > fs ? bs : fs;
+        else if (bs != NULL) lastslash = bs;
+        else lastslash = fs;
+        if (lastslash != NULL) file = lastslash + 1;
 
         uint32_t used = snprintf (line, remaining_space, "%s: line %d\n", file , context->error.callstack[i].line);
         if (used > 0 && used < remaining_space){
@@ -184,9 +189,9 @@ bool Context_enable_profiling(Context * context, uint32_t default_capacity)
 void Context_profiler_start(Context * context, const char * name, bool allow_recursion)
 {
     if (context->log.log == NULL) return;
+    if (context->log.count >= context->log.capacity) return;
     ProfilingEntry * current = &(context->log.log[context->log.count]);
     context->log.count++;
-    if (context->log.count >= context->log.capacity) return;
 
     current->time =get_high_precision_ticks();
     current->name = name;
@@ -196,9 +201,9 @@ void Context_profiler_start(Context * context, const char * name, bool allow_rec
 void Context_profiler_stop(Context * context, const char * name, bool assert_started, bool stop_children)
 {
     if (context->log.log == NULL) return;
+    if (context->log.count >= context->log.capacity) return;
     ProfilingEntry * current = &(context->log.log[context->log.count]);
     context->log.count++;
-    if (context->log.count >= context->log.capacity) return;
 
     current->time =get_high_precision_ticks();
     current->name = name;

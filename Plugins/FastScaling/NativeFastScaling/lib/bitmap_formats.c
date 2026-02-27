@@ -97,6 +97,7 @@ BitmapFloat * BitmapFloat_create_header(Context* context,int sx, int sy, int cha
 
     if (!are_valid_bitmap_dimensions(sx, sy)) {
         CONTEXT_error(context, Invalid_BitmapFloat_dimensions);
+        return NULL;
     }
 
     im = (BitmapFloat *)CONTEXT_calloc(context,1,sizeof(BitmapFloat));

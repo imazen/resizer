@@ -187,6 +187,9 @@ Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace,
         CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
+    r->source = editInPlace;
+    r->destroy_source = false;
+    r->details = details;
     if (details->enable_profiling) {
         uint32_t default_capacity = (r->source->h + r->source->w) * 20 + 5;
         if (!Context_enable_profiling(context, default_capacity)) {
@@ -195,9 +198,6 @@ Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace,
             return NULL;
         }
     }
-    r->source = editInPlace;
-    r->destroy_source = false;
-    r->details = details;
     return r;
 }
 
