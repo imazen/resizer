@@ -12,32 +12,28 @@ using ImageResizer.Configuration.Logging;
 
 namespace ImageResizer.Plugins.DiskCache.Tests {
     /// <summary>
-    /// Migrated from MbUnit parameterized test fixture. Originally used [Row] on the class
-    /// to create fixture instances with different constructor parameters, [ThreadedRepeat]
-    /// for concurrent execution, and [Test(Order=N)] for ordered phases.
+    /// Migrated from MbUnit parameterized test fixture. Tests CustomDiskCache behavior
+    /// for concurrent access (hits) and concurrent writes (misses).
     /// </summary>
     public class CustomDiskCacheTest : ILoggerProvider {
 
-        DateTime defaultDate = new DateTime(2011, 1, 1);
-
-        private CustomDiskCache CreatePopulatedCache(int subfolders, int totalFiles, bool hashModifiedDate) {
+        private CustomDiskCache CreatePopulatedCache(int subfolders, int totalFiles) {
             char c = System.IO.Path.DirectorySeparatorChar;
             string folder = System.IO.Path.GetTempPath().TrimEnd(c) + c + System.IO.Path.GetRandomFileName();
-            var cache = new CustomDiskCache(this, folder, subfolders, hashModifiedDate);
+            var cache = new CustomDiskCache(this, folder, subfolders);
 
             for (int i = 0; i < totalFiles; i++) {
                 cache.GetCachedFile(i.ToString(), "test", delegate(Stream s) {
                     s.WriteByte(32); //Just one space
-                }, defaultDate, 10);
+                }, 10);
             }
             return cache;
         }
 
         [Theory]
-        [InlineData(0, 50, false)]
-        [InlineData(0, 50, true)]
-        public void TestAccess(int subfolders, int totalFiles, bool hashModifiedDate) {
-            var cache = CreatePopulatedCache(subfolders, totalFiles, hashModifiedDate);
+        [InlineData(0, 50)]
+        public void TestAccess(int subfolders, int totalFiles) {
+            var cache = CreatePopulatedCache(subfolders, totalFiles);
             try {
                 // Originally [ThreadedRepeat(10)] — run 10 concurrent threads
                 var threads = new List<Thread>(10);
@@ -45,7 +41,7 @@ namespace ImageResizer.Plugins.DiskCache.Tests {
                     Thread th = new Thread(() => {
                         CacheResult r =
                             cache.GetCachedFile(new Random().Next(0, totalFiles).ToString(), "test",
-                            delegate(Stream s) { Assert.Fail("No files have been modified, this should not execute"); }, defaultDate, 100);
+                            delegate(Stream s) { Assert.Fail("No files have been modified, this should not execute"); }, 100);
 
                         Assert.True(System.IO.File.Exists(r.PhysicalPath));
                         Assert.True(r.Result == CacheQueryResult.Hit);
@@ -61,25 +57,24 @@ namespace ImageResizer.Plugins.DiskCache.Tests {
         }
 
         [Theory]
-        [InlineData(0, 50, false)]
-        [InlineData(0, 50, true)]
-        public void TestUpdate(int subfolders, int totalFiles, bool hashModifiedDate) {
-            var cache = CreatePopulatedCache(subfolders, totalFiles, hashModifiedDate);
+        [InlineData(0, 50)]
+        public void TestMiss(int subfolders, int totalFiles) {
+            var cache = CreatePopulatedCache(subfolders, totalFiles);
             try {
-                int seed = 0;
+                int seed = totalFiles; // Start beyond populated range to ensure misses
                 // Originally [ThreadedRepeat(20)] — run 20 concurrent threads
                 var threads = new List<Thread>(20);
                 for (int i = 0; i < 20; i++) {
                     Thread th = new Thread(() => {
-                        //try to get a unique date time value
-                        DateTime newTime = DateTime.UtcNow.AddDays(Interlocked.Increment(ref seed));
+                        // Use keys outside the populated range to guarantee cache misses
+                        string key = "miss_" + Interlocked.Increment(ref seed).ToString();
                         CacheResult r =
-                            cache.GetCachedFile(new Random().Next(0, totalFiles).ToString(), "test",
+                            cache.GetCachedFile(key, "test",
                             delegate(Stream s) {
                                 s.WriteByte(32); //Just one space
-                            }, newTime, 100);
+                            }, 100);
 
-                        Assert.Equal(newTime, System.IO.File.GetLastWriteTimeUtc(r.PhysicalPath));
+                        Assert.True(System.IO.File.Exists(r.PhysicalPath));
                         Assert.True(r.Result == CacheQueryResult.Miss);
                     });
                     th.Start();
