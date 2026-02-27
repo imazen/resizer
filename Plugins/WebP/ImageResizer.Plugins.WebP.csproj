@@ -67,9 +67,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Native.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
