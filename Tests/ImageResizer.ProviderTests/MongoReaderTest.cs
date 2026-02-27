@@ -88,17 +88,13 @@ namespace ImageResizer.ProviderTests {
             var settings = this.Settings;
             var mongoUrl = new MongoUrl(settings["connectionString"]);
 
-            // Using new client, server database initialization. Wordy but recommended.
             var mongoClient = new MongoClient(mongoUrl);
-            var mongoServer = mongoClient.GetServer();
-            var db = mongoServer.GetDatabase(mongoUrl.DatabaseName);
-            var gridSettings = new MongoGridFSSettings();
+            var db = mongoClient.GetDatabase(mongoUrl.DatabaseName);
 
             // Act
             IVirtualImageProvider target = new MongoReaderPlugin(
                 settings["prefix"],
-                db,
-                gridSettings);
+                db);
 
             // Assert
             Assert.NotNull(target);
@@ -447,8 +443,7 @@ namespace ImageResizer.ProviderTests {
         /// <returns>The id of the record created.</returns>
         private string StoreFile(MemoryStream data, string fileName) {
             data.Seek(0, SeekOrigin.Begin);
-            MongoGridFS g = new MongoReaderPlugin(this.Settings).GridFS;
-            MongoGridFSFileInfo fi;
+            var bucket = new MongoReaderPlugin(this.Settings).GridFSBucket;
 
             // Resize to a memory stream, max 2000x2000 jpeg
             using (MemoryStream temp = new MemoryStream(4096)) {
@@ -457,13 +452,14 @@ namespace ImageResizer.ProviderTests {
                 // Reset the streams
                 temp.Seek(0, SeekOrigin.Begin);
 
-                MongoGridFSCreateOptions opts = new MongoGridFSCreateOptions();
-                opts.ContentType = "image/jpeg";
+                var options = new GridFSUploadOptions {
+                    Metadata = new MongoDB.Bson.BsonDocument("contentType", "image/jpeg")
+                };
 
-                fi = g.Upload(temp, Path.GetFileName(fileName), opts);
+                var id = bucket.UploadFromStream(Path.GetFileName(fileName), temp, options);
+
+                return "id/" + id.ToString() + ".jpg";
             }
-
-            return "id/" + fi.Id.AsObjectId.ToString() + ".jpg";
         }
     }
 }

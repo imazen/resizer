@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\Tests\binaries\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\Tests\binaries\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -74,6 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PdfiumViewer.Native.x86.v8-xfa">
+      <Version>2018.4.8.256</Version>
+    </PackageReference>
+    <PackageReference Include="PdfiumViewer.Native.x86_64.v8-xfa">
       <Version>2018.4.8.256</Version>
     </PackageReference>
     <PackageReference Include="xunit">

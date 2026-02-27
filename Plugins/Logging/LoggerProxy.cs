@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Configuration.Logging;
 using NLog;
+using ILogger = ImageResizer.Configuration.Logging.ILogger;
 
 namespace ImageResizer.Plugins.Logging {
     public class LoggerProxy : ILogger {

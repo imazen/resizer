@@ -9,6 +9,7 @@ using ImageResizer.Configuration.Logging;
 using System.Collections.Specialized;
 using NLog;
 using NLog.Config;
+using ILogger = ImageResizer.Configuration.Logging.ILogger;
 
 namespace ImageResizer.Plugins.Logging {
     public class LoggingPlugin:ILogManager, IPlugin {

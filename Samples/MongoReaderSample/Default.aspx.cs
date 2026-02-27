@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.MongoReader;
+using MongoDB.Bson;
 using MongoDB.Driver.GridFS;
 using System.IO;
 using ImageResizer;
@@ -18,9 +19,7 @@ namespace MongoReaderSample {
     public partial class Upload : System.Web.UI.Page {
         protected void Page_Load(object sender, EventArgs e) {
 
-
-            MongoGridFS g = Config.Current.Plugins.Get<MongoReaderPlugin>().GridFS;
-
+            var bucket = Config.Current.Plugins.Get<MongoReaderPlugin>().GridFSBucket;
 
             //Loop through each uploaded file
             foreach (string fileKey in HttpContext.Current.Request.Files.Keys) {
@@ -33,14 +32,15 @@ namespace MongoReaderSample {
                 //Reset the stream
                 temp.Seek(0, SeekOrigin.Begin);
 
-                MongoGridFSCreateOptions opts = new MongoGridFSCreateOptions();
-                opts.ContentType = file.ContentType;
+                var options = new GridFSUploadOptions {
+                    Metadata = new BsonDocument("contentType", file.ContentType)
+                };
 
-                MongoGridFSFileInfo fi = g.Upload(temp, Path.GetFileName(file.FileName), opts);
+                var id = bucket.UploadFromStream(Path.GetFileName(file.FileName), temp, options);
 
-                lit.Text += "<img src=\"" + ResolveUrl("~/gridfs/id/") + fi.Id + ".jpg?width=100&amp;height=100\" />";
+                lit.Text += "<img src=\"" + ResolveUrl("~/gridfs/id/") + id + ".jpg?width=100&amp;height=100\" />";
             }
-            
+
         }
     }
 }
