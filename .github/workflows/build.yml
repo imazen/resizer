@@ -83,6 +83,18 @@ jobs:
           Write-Host "Running $($testDlls.Count) test assemblies (x64):"
           $testDlls | ForEach-Object { Write-Host "  $_" }
 
+          # Debug: check binding redirect config and Unsafe DLL
+          Write-Host "--- Diagnostic: TinyCache config and deps ---"
+          Get-ChildItem "Tests\binaries\release\*TinyCache*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  $($_.Name) ($($_.Length) bytes)" }
+          Get-ChildItem "Tests\binaries\release\System.Runtime.CompilerServices.Unsafe*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  $($_.Name) ($($_.Length) bytes)" }
+          if (Test-Path "Tests\binaries\release\ImageResizer.Plugins.TinyCache.Tests.dll.config") {
+            Write-Host "  .dll.config contents:"
+            Get-Content "Tests\binaries\release\ImageResizer.Plugins.TinyCache.Tests.dll.config"
+          } else {
+            Write-Host "  WARNING: .dll.config NOT found"
+          }
+          Write-Host "--- End Diagnostic ---"
+
           & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -notrait "requiresinfra=true" -nologo
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
