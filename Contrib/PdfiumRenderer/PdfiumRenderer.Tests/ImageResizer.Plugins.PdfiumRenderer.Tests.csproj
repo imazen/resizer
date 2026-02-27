@@ -69,15 +69,15 @@
     <EmbeddedResource Include="Page2.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\Packages\PdfiumViewer.2.0.0.0\content\x86\pdfium.dll">
-      <Link>pdfium.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <!-- pdfium.dll is auto-copied by PdfiumViewer.Native.x86.v8-xfa PackageReference -->
     <EmbeddedResource Include="TransparencyPage1.png" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="PdfiumViewer.Native.x86.v8-xfa">
+      <Version>2018.4.8.256</Version>
+    </PackageReference>
     <PackageReference Include="xunit">
-      <Version>2.0.0</Version>
+      <Version>2.9.3</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

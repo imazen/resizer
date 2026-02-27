@@ -20,11 +20,13 @@
 - [x] Bumped **WebP.Test** target framework net45 -> net472
 - [x] **Gallio/MbUnit** 3.4.14 -> removed, migrated to xunit 2.9.3 (DiskCache.Tests, HttpTests, PdfRenderer.Tests; `[TestFixture]` removed, `[Test]` -> `[Fact]`, `[Row]` -> `[InlineData]`/`[Theory]`, `[FixtureSetUp/TearDown]` -> constructor/IDisposable, `[ThreadedRepeat]` -> explicit thread loops, `Assert.AreEqual` -> `Assert.Equal`, `Assert.AreApproximatelyEqual` -> `Assert.Equal(e,a,precision)`, `Assert.Contains(coll,item)` -> reversed args; TFMs bumped net40/net35 -> net472)
 
+- [x] **NLog** 3.2.0 -> 6.1.0 (Logging plugin; API stable — `LogManager`, `Logger`, `LogLevel.FromString`, `XmlLoggingConfiguration` all unchanged)
+- [x] **PdfiumViewer** 2.13.0 -> **PdfiumViewer.Updated** 2.14.5 (drop-in maintained fork; same `PdfiumViewer` namespace; PdfiumRenderer.Tests switched to `PdfiumViewer.Native.x86.v8-xfa` PackageReference for native DLL)
+
 ## Abandoned / Deprecated (action needed)
 2. **AForge / AForge.Imaging / AForge.Math** — dead since 2013; `.NetStandard` forks exist
 3. **OpenCvSharp-WithoutDll** — deprecated, replaced by `OpenCvSharp4`
 4. **WindowsAzure.Storage** — deprecated 2018, replaced by `Azure.Storage.Blobs`
-5. **PdfiumViewer** — abandoned 2017; maintained fork `PdfiumViewer.Updated` exists
 
 ## Image Processing (pending)
 
@@ -34,14 +36,12 @@
 | AForge.Imaging | 2.2.5 | 2.2.5 | none | **ABANDONED** (2013) |
 | AForge.Math | 2.2.5 | 2.2.5 | none | **ABANDONED** (2013) |
 | OpenCvSharp-WithoutDll | 2.4.10.x | — | — | **DEPRECATED** -> OpenCvSharp4 4.13.0 |
-| Imazen.WebP | 9.0.1 | 10.0.1 | **MAJOR** | active |
+| Imazen.WebP | 10.0.1 (csproj) | — | — | new release pending |
 
 ## Other (pending)
 
 | Package | In Use | Latest | Gap | Status |
 |---------|--------|--------|-----|--------|
 | WindowsAzure.Storage | 6.0 | 9.3.3 | **MAJOR** | **DEPRECATED** -> Azure.Storage.Blobs |
-| NLog | 3.2.0 | 6.1.0 | **3 MAJOR** | active |
-| PdfiumViewer | 2.7.0 | 2.13.0 | minor | **ABANDONED**; fork: PdfiumViewer.Updated |
 | Microsoft.AspNet.Mvc | 3.0.x | 5.3.0 | **2 MAJOR** | legacy |
 | FAKE | 3.26.1 | 5.16.0 / CLI 6.1.4 | **2-3 MAJOR** | |

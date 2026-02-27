@@ -23,7 +23,7 @@ $plugins$</description>
 		<tags>ImageResizer PdfiumRenderer PDF Imazen Resizer  imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
-		  <dependency id="PdfiumViewer" version="[2.7.0,3)" />
+		  <dependency id="PdfiumViewer.Updated" version="[2.14.5,)" />
 		</dependencies>
 	</metadata>
   	<files>
