@@ -53,6 +53,10 @@ jobs:
         shell: cmd
         run: msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln /p:Configuration=Release /p:Platform=x64 /p:Optimize=True /p:DebugSymbols=True /m /verbosity:minimal
 
+      - name: Build FastScaling (ARM64)
+        shell: cmd
+        run: msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln /p:Configuration=Release /p:Platform=ARM64 /p:Optimize=True /p:DebugSymbols=True /m /verbosity:minimal
+
       # Native FastScaling tests run automatically as a post-build event
       # in NativeFastScaling.Test.vcxproj (Catch framework)
 

@@ -13,6 +13,10 @@ namespace ImageResizer.Configuration.Performance
 
         public static byte[] Invoke(int level)
         {
+            var arch = RuntimeInformation.ProcessArchitecture;
+            if (arch != Architecture.X86 && arch != Architecture.X64)
+                return new byte[16];
+
             var codePointer = IntPtr.Zero;
             try {
                 // compile
