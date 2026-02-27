@@ -3,7 +3,7 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using OpenCvSharp;
@@ -68,7 +68,7 @@ namespace ImageResizer.Plugins.Faces {
 
             ExpandX = 0;
             ExpandY = 0;
-            fileNames = new Dictionary<string, string>(){ 
+            fileNames = new Dictionary<string, string>(){
             {"FaceCascade",@"haarcascade_frontalface_default.xml"},
                 { "FaceCascadeAlt",@"haarcascade_frontalface_alt.xml"},
                 { "FaceCascadeAlt2",@"haarcascade_frontalface_alt2.xml"},
@@ -93,7 +93,7 @@ namespace ImageResizer.Plugins.Faces {
         public float MinSizePercent { get; set; }
 
         /// <summary>
-        /// The minimum number of agreeing matches required for a face rectangle to be returned. 
+        /// The minimum number of agreeing matches required for a face rectangle to be returned.
         /// This rule isn't applied if we don't have [MinFaces] number of faces.
         /// </summary>
         public int ConfidenceLevelThreshold { get; set; }
@@ -119,53 +119,69 @@ namespace ImageResizer.Plugins.Faces {
         /// Detects features on a grayscale image.
         /// </summary>
         /// <param name="img"></param>
-        /// <param name="storage"></param>
         /// <returns></returns>
-        protected override List<Face> DetectFeatures(IplImage img, CvMemStorage storage) {
-            
+        protected override List<Face> DetectFeatures(Mat img) {
+
             //Determine minimum face size
             var minSize = Math.Max(12, (int)Math.Round((double)MinSizePercent / 100.0 * Math.Min(img.Width, img.Height)));
 
-            
-            //Detect faces (frontal). 
-            Stopwatch watch = Stopwatch.StartNew();
-            
 
-            CvAvgComp[] faces = BorrowCascade("FaceCascadeAlt", c => Cv.HaarDetectObjects(img, c, storage, 1.0850, MinConfidenceLevel, HaarDetectionType.DoCannyPruning, new CvSize(minSize, minSize), new CvSize(0,0)).ToArrayAndDispose());
-            
+            //Detect faces (frontal).
+            Stopwatch watch = Stopwatch.StartNew();
+
+            DetectedObject[] faces = BorrowCascade("FaceCascadeAlt", c => {
+                int[] rejectLevels;
+                double[] levelWeights;
+                c.DetectMultiScale(img, out rejectLevels, out levelWeights,
+                    1.0850, MinConfidenceLevel, HaarDetectionTypes.DoCannyPruning,
+                    new OpenCvSharp.Size(minSize, minSize), new OpenCvSharp.Size(0, 0),
+                    true);
+                // When outputRejectLevels is true, DetectMultiScale returns rects via rejectLevels overload
+                // but the rects come from the standard overload - use it as fallback
+                var rects = c.DetectMultiScale(img, 1.0850, MinConfidenceLevel,
+                    HaarDetectionTypes.DoCannyPruning,
+                    new OpenCvSharp.Size(minSize, minSize), new OpenCvSharp.Size(0, 0));
+                var result = new DetectedObject[rects.Length];
+                for (int i = 0; i < rects.Length; i++) {
+                    // Use levelWeights as a proxy for neighbors/confidence
+                    int neighbors = (levelWeights != null && i < levelWeights.Length)
+                        ? Math.Max(1, (int)levelWeights[i])
+                        : MinConfidenceLevel;
+                    result[i] = new DetectedObject(rects[i], neighbors);
+                }
+                return result;
+            });
+
             //Sort by accuracy
-            Array.Sort<CvAvgComp>(faces, CompareByNeighbors);
+            Array.Sort<DetectedObject>(faces, CompareByNeighbors);
 
             //Convert into feature objects list
             List<Face> features = new List<Face>(faces.Length);
-            foreach (CvAvgComp face in faces) features.Add(new Face(PolygonMath.ScaleRect(face.Rect.ToRectangleF(),ExpandX,ExpandY), face.Neighbors));
-
-            // Doesn't add much, and would have to be deduplicated.
-            //CvAvgComp[] profiles = BorrowCascade("FaceProfile", c => Cv.HaarDetectObjects(img, c, storage, 1.2, MinConfidenceLevel + 2, HaarDetectionType.FindBiggestObject | HaarDetectionType.DoRoughSearch | HaarDetectionType.DoCannyPruning, new CvSize(img.Width / 8, img.Height / 8), new CvSize(0, 0)).ToArrayAndDispose());
-            //foreach (CvAvgComp face in profiles) features.Add(new Face(PolygonMath.ScaleRect(face.Rect.ToRectangleF(), ExpandX, ExpandY), face.Neighbors));
-
+            foreach (DetectedObject face in faces) features.Add(new Face(PolygonMath.ScaleRect(face.Rect.ToRectangleF(),ExpandX,ExpandY), face.Neighbors));
 
             // Test for eyes, if faces > 20 pixels
             foreach (var face in features) {
                 var w = (int) (face.X2 - face.X);
                 var h = (int) ((face.Y2 - face.Y) * 0.6);
                 if (w > 20) {
-                    img.SetROI((int) face.X, (int) face.Y, w, h);
-                    storage.Clear(); 
-                    CvAvgComp[] eyes = BorrowCascade("Eye",
-                        c => Cv.HaarDetectObjects(img, c, storage, 1.0850, 4, HaarDetectionType.FindBiggestObject | HaarDetectionType.DoRoughSearch,
-                                   new CvSize(4, 4), new CvSize(img.Width / 2, img.Height / 2))
-                               .ToArrayAndDispose());
-                    if (eyes.Length == 0) {
-                        // Halve the estimated accuracy if there are no eyes detected
-                        face.Accuracy = face.Accuracy / 2;
-                        // We never want to boost accuracy, because the walls have eyes
+                    var roiRect = new Rect((int) face.X, (int) face.Y, w, h);
+                    // Clamp ROI to image bounds
+                    roiRect = ClampRect(roiRect, img.Width, img.Height);
+                    if (roiRect.Width <= 0 || roiRect.Height <= 0) continue;
+
+                    using (var roi = new Mat(img, roiRect)) {
+                        Rect[] eyes = BorrowCascade("Eye",
+                            c => c.DetectMultiScale(roi, 1.0850, 4,
+                                       HaarDetectionTypes.FindBiggestObject | HaarDetectionTypes.DoRoughSearch,
+                                       new OpenCvSharp.Size(4, 4), new OpenCvSharp.Size(roi.Width / 2, roi.Height / 2)));
+                        if (eyes.Length == 0) {
+                            // Halve the estimated accuracy if there are no eyes detected
+                            face.Accuracy = face.Accuracy / 2;
+                            // We never want to boost accuracy, because the walls have eyes
+                        }
                     }
                 }
             }
-
-            
-
 
             //Unless we're below MinFaces, filter out the low confidence matches.
             while (features.Count > MinFaces && features[features.Count - 1].Accuracy < ConfidenceLevelThreshold) features.RemoveAt(features.Count - 1);
@@ -179,6 +195,14 @@ namespace ImageResizer.Plugins.Faces {
 
             //Never return more than [MaxFaces]
             return (features.Count > MaxFaces) ? features.GetRange(0, MaxFaces) : features;
+        }
+
+        static Rect ClampRect(Rect r, int imgWidth, int imgHeight) {
+            int x = Math.Max(0, r.X);
+            int y = Math.Max(0, r.Y);
+            int right = Math.Min(imgWidth, r.X + r.Width);
+            int bottom = Math.Min(imgHeight, r.Y + r.Height);
+            return new Rect(x, y, Math.Max(0, right - x), Math.Max(0, bottom - y));
         }
     }
 }

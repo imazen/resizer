@@ -3,13 +3,14 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using OpenCvSharp;
 using System.Drawing;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using ImageResizer.Plugins.Faces;
 
 
@@ -83,8 +84,11 @@ namespace ImageResizer.Plugins.RedEye {
         /// </summary>
         public EyeDetection()
             : base() {
+                // Register the RedEye assembly for cascade resource extraction
+                FileLocator.ResourceAssemblies.Add(typeof(EyeDetection).Assembly);
+
                 this.fileNames = new Dictionary<string, string>(){
-                        {"FaceCascade",@"haarcascade_frontalface_default.xml"}, 
+                        {"FaceCascade",@"haarcascade_frontalface_default.xml"},
             {"LeftEyeCascade" , @"haarcascade_mcs_lefteye.xml"},
             {"RightEyeCascade" , @"haarcascade_mcs_righteye.xml"},
             {"EyePair45" , @"haarcascade_mcs_eyepair_big.xml"},
@@ -97,14 +101,13 @@ namespace ImageResizer.Plugins.RedEye {
         /// Detects features on a grayscale image.
         /// </summary>
         /// <param name="img"></param>
-        /// <param name="storage"></param>
         /// <returns></returns>
-        protected override List<ObjRect> DetectFeatures(IplImage img, CvMemStorage storage) {
+        protected override List<ObjRect> DetectFeatures(Mat img) {
             List<ObjRect> eyes = new List<ObjRect>();
 
             //Detect faces
             Stopwatch watch = Stopwatch.StartNew();
-            CvAvgComp[] faces = BorrowCascade("FaceCascade", c => Cv.HaarDetectObjects(img, c, storage, 1.0850, 2, 0, new CvSize(30, 30), new CvSize(0, 0)).ToArrayAndDispose());
+            Rect[] faces = BorrowCascade("FaceCascade", c => c.DetectMultiScale(img, 1.0850, 2, 0, new OpenCvSharp.Size(30, 30), new OpenCvSharp.Size(0, 0)));
             watch.Stop();
             Debug.WriteLine("face detection time = " + watch.ElapsedMilliseconds);
 
@@ -112,14 +115,10 @@ namespace ImageResizer.Plugins.RedEye {
 
             //If there are no faces, look for large eye pairs
             if (faces.Length == 0) {
-                CvAvgComp[] pairs = BorrowCascade("EyePair45", c => Cv.HaarDetectObjects(img,c, storage, 1.0850, 2, 0, new CvSize(img.Width / 4, img.Width / 20), new CvSize(0, 0)).ToArrayAndDispose());
+                Rect[] pairs = BorrowCascade("EyePair45", c => c.DetectMultiScale(img, 1.0850, 2, 0, new OpenCvSharp.Size(img.Width / 4, img.Width / 20), new OpenCvSharp.Size(0, 0)));
                 if (pairs.Length > 0) {
-                    //TODO!!! Uncomment and test now that CompareByNeighbors sorts correctly
-                    //Array.Sort<CvAvgComp>(pairs, CompareByNeighbors); 
-                    //Take the 1st most likely that actually contains eyes. We don't want to evaluate multiple eye pairs when there are no faces.
-                    //If there are pairs, evaluate them all. Finding eyes within multiple pairs is unlikely
-                    foreach (CvAvgComp pair in pairs) {
-                        var results = DetectFeaturesInPair(img, storage, pair);
+                    foreach (Rect pair in pairs) {
+                        var results = DetectFeaturesInPair(img, new DetectedObject(pair, 0));
                         eyes.AddRange(results);
                         if (results.Count > 0) break;
                     }
@@ -127,8 +126,8 @@ namespace ImageResizer.Plugins.RedEye {
             }
 
             //For each face...
-            foreach (CvAvgComp face in faces) {
-                eyes.AddRange(DetectFeaturesInFace(img, storage, face));
+            foreach (Rect face in faces) {
+                eyes.AddRange(DetectFeaturesInFace(img, new DetectedObject(face, 0)));
             }
 
             watch.Stop();
@@ -136,76 +135,82 @@ namespace ImageResizer.Plugins.RedEye {
             return eyes;
         }
 
-        private List<ObjRect> DetectFeaturesInFace(IplImage img, CvMemStorage storage, CvAvgComp face) {
+        private List<ObjRect> DetectFeaturesInFace(Mat img, DetectedObject face) {
             List<ObjRect> eyes = new List<ObjRect>();
-            storage.Clear();
             //Take the top 4/8ths of the face as the region of interest
-            CvRect r = face.Rect;
-            r.Height = Cv.Round((double)r.Height / 2);
-            img.SetROI(r);
+            Rect r = face.Rect;
+            r.Height = (int)Math.Round((double)r.Height / 2);
+
+            var clampedR = ClampRect(r, img.Width, img.Height);
+            if (clampedR.Width <= 0 || clampedR.Height <= 0) return eyes;
 
             //Look for pairs there
-            CvAvgComp[] pairs = BorrowCascade("EyePair22", c => Cv.HaarDetectObjects(img, c, storage, 1.0850, 2, 0, new CvSize(r.Width < 50 ? 11 : 22, r.Width < 50 ? 3 : 5), new CvSize(0, 0)).ToArrayAndDispose());
-            //Array.Sort<CvAvgComp>(pairs, CompareByNeighbors);
+            Rect[] pairs;
+            using (var roi = new Mat(img, clampedR)) {
+                pairs = BorrowCascade("EyePair22", c => c.DetectMultiScale(roi, 1.0850, 2, 0, new OpenCvSharp.Size(r.Width < 50 ? 11 : 22, r.Width < 50 ? 3 : 5), new OpenCvSharp.Size(0, 0)));
+            }
 
             //Look for individual eyes if no pairs were found
             if (pairs.Length == 0) {
 
                 //Drop 1/2.75th off the top, leaving us with a full-width rectangle starting at 1/5.5th and stopping at 1/2th of face height.
-                int aFifth = Cv.Round((double)r.Height * 2 / 5.5);
+                int aFifth = (int)Math.Round((double)r.Height * 2 / 5.5);
                 r.Y += aFifth;
                 r.Height -= aFifth;
 
-                eyes.AddRange(DetectEyesInRegion(img, storage, r));
+                eyes.AddRange(DetectEyesInRegion(img, r));
             }
             //If there are pairs, evaluate them all. Finding eyes within multiple pairs is unlikely
             for (var i = 0; i < pairs.Length; i++) {
-                CvAvgComp pair = pairs[i]; //Adjust for ROI
-                pair.Rect.X += r.X;
-                pair.Rect.Y += r.Y;
-                eyes.AddRange(DetectFeaturesInPair(img, storage, pair));
+                Rect pairRect = pairs[i];
+                //Adjust for ROI offset
+                pairRect.X += r.X;
+                pairRect.Y += r.Y;
+                eyes.AddRange(DetectFeaturesInPair(img, new DetectedObject(pairRect, 0)));
             }
             if (eyes.Count > 0) eyes.Add(new ObjRect(face.Rect.ToRectangleF(), FeatureType.Face));
             return eyes;
 
         }
 
-        private List<ObjRect> DetectFeaturesInPair(IplImage img, CvMemStorage storage, CvAvgComp eyePair) {
+        private List<ObjRect> DetectFeaturesInPair(Mat img, DetectedObject eyePair) {
             List<ObjRect> eyes = new List<ObjRect>();
-            CvRect pair = eyePair.Rect;
+            Rect pair = eyePair.Rect;
             //Inflate 100% vertically, centering
-            pair.Top -= pair.Height / 2;
+            int origTop = pair.Y;
+            pair.Y -= pair.Height / 2;
             pair.Height *= 2;
-            if (pair.Top < 0) { pair.Height += pair.Top; pair.Top = 0; }
+            if (pair.Y < 0) { pair.Height += pair.Y; pair.Y = 0; }
             if (pair.Height >= img.Height) pair.Height = img.Height;
-            if (pair.Bottom >= img.Height) pair.Top = img.Height - pair.Height;
+            if (pair.Y + pair.Height > img.Height) pair.Y = img.Height - pair.Height;
 
             //Inflate 20% on each side, centering
-            pair.Left -= pair.Width / 5;
-            pair.Width += pair.Width / 5 * 2;
-            pair.Left = Math.Max(0, pair.Left);
-            pair.Width = Math.Min(img.Width - pair.Left, pair.Width);
+            int widthExpand = pair.Width / 5;
+            pair.X -= widthExpand;
+            pair.Width += widthExpand * 2;
+            pair.X = Math.Max(0, pair.X);
+            pair.Width = Math.Min(img.Width - pair.X, pair.Width);
 
-            eyes.AddRange(DetectEyesInRegion(img, storage, pair));
+            eyes.AddRange(DetectEyesInRegion(img, pair));
 
             if (eyes.Count > 0) eyes.Add(new ObjRect(eyePair.Rect.ToRectangleF(), FeatureType.EyePair));
             return eyes;
         }
 
-        private List<ObjRect> DetectEyesInRegion(IplImage img, CvMemStorage storage, CvRect region) {
+        private List<ObjRect> DetectEyesInRegion(Mat img, Rect region) {
             List<ObjRect> eyes = new List<ObjRect>();
 
             //Split the region into two overlapping rectangles
-            CvRect leftEye = region;
+            Rect leftEye = region;
             leftEye.Width = (int)(leftEye.Width * 0.6);
 
-            CvRect rightEye = region;
+            Rect rightEye = region;
             rightEye.Width = (int)(rightEye.Width * 0.6);
             rightEye.X += (int)(region.Width * 0.4);
 
             //If the eye pair or face is small enough, use 3 instead of 5
             int minEyeLength = region.Width < 80 ? 3 : 5;
-            CvSize minEyeSize = new CvSize(minEyeLength, minEyeLength);
+            OpenCvSharp.Size minEyeSize = new OpenCvSharp.Size(minEyeLength, minEyeLength);
 
             List<object[]> vars = new List<object[]>();
             vars.Add(new object[] { 0, 3, 0.5f });
@@ -224,38 +229,41 @@ namespace ImageResizer.Plugins.RedEye {
             bool foundLeft = false, foundRight = false;
 
             foreach (object[] vals in vars) {
-                CvRect left = leftEye;
+                Rect left = leftEye;
                 left.Y += (int)((float)left.Height * (float)vals[2] / 2.0);
                 left.Height = (int)((float)left.Height * (float)vals[2]);
-                CvRect right = rightEye;
+                Rect right = rightEye;
                 right.Height = left.Height;
                 right.Y = left.Y;
 
                 if (!foundLeft) {
                     //Search for eyes
-                    storage.Clear();
-                    img.SetROI(left);
-                    CvAvgComp[] leyes = BorrowCascade((int)vals[0] == 0 ? ("RightEyeCascade") : ("Eye"), c => Cv.HaarDetectObjects(img, c, storage, 1.0850, (int)vals[1], 0, minEyeSize, new CvSize(0, 0)).ToArrayAndDispose());
-                    //Array.Sort<CvAvgComp>(leyes, CompareByNeighbors);
+                    var clampedLeft = ClampRect(left, img.Width, img.Height);
+                    if (clampedLeft.Width > 0 && clampedLeft.Height > 0) {
+                        using (var leftRoi = new Mat(img, clampedLeft)) {
+                            Rect[] leyes = BorrowCascade((int)vals[0] == 0 ? ("RightEyeCascade") : ("Eye"), c => c.DetectMultiScale(leftRoi, 1.0850, (int)vals[1], 0, minEyeSize, new OpenCvSharp.Size(0, 0)));
 
-                    if (leyes.Length > 0) {
-                        eyes.Add(new ObjRect(leyes[0].Rect.Offset(left.Location).ToRectangleF(), FeatureType.Eye));
-                        minEyeSize = new CvSize(leyes[0].Rect.Width / 4, leyes[0].Rect.Width / 4);
-                        foundLeft = true;
+                            if (leyes.Length > 0) {
+                                eyes.Add(new ObjRect(leyes[0].OffsetRect(new OpenCvSharp.Point(clampedLeft.X, clampedLeft.Y)).ToRectangleF(), FeatureType.Eye));
+                                minEyeSize = new OpenCvSharp.Size(leyes[0].Width / 4, leyes[0].Width / 4);
+                                foundLeft = true;
+                            }
+                        }
                     }
-
                 }
 
                 if (!foundRight) {
-                    storage.Clear();
-                    img.SetROI(right);
-                    CvAvgComp[] reyes = BorrowCascade((int)vals[0] == 0 ? ("LeftEyeCascade") : ("Eye"), c => Cv.HaarDetectObjects(img,c, storage, 1.0850, (int)vals[1], 0, minEyeSize, new CvSize(0, 0)).ToArrayAndDispose());
-                    //Array.Sort<CvAvgComp>(reyes, CompareByNeighbors);
+                    var clampedRight = ClampRect(right, img.Width, img.Height);
+                    if (clampedRight.Width > 0 && clampedRight.Height > 0) {
+                        using (var rightRoi = new Mat(img, clampedRight)) {
+                            Rect[] reyes = BorrowCascade((int)vals[0] == 0 ? ("LeftEyeCascade") : ("Eye"), c => c.DetectMultiScale(rightRoi, 1.0850, (int)vals[1], 0, minEyeSize, new OpenCvSharp.Size(0, 0)));
 
-                    if (reyes.Length > 0) {
-                        eyes.Add(new ObjRect(reyes[0].Rect.Offset(right.Location).ToRectangleF(), FeatureType.Eye));
-                        minEyeSize = new CvSize(reyes[0].Rect.Width / 4, reyes[0].Rect.Width / 4);
-                        foundRight = true;
+                            if (reyes.Length > 0) {
+                                eyes.Add(new ObjRect(reyes[0].OffsetRect(new OpenCvSharp.Point(clampedRight.X, clampedRight.Y)).ToRectangleF(), FeatureType.Eye));
+                                minEyeSize = new OpenCvSharp.Size(reyes[0].Width / 4, reyes[0].Width / 4);
+                                foundRight = true;
+                            }
+                        }
                     }
                 }
                 if (foundLeft && foundRight) break;
@@ -265,6 +273,13 @@ namespace ImageResizer.Plugins.RedEye {
 
         }
 
+        static Rect ClampRect(Rect r, int imgWidth, int imgHeight) {
+            int x = Math.Max(0, r.X);
+            int y = Math.Max(0, r.Y);
+            int right = Math.Min(imgWidth, r.X + r.Width);
+            int bottom = Math.Min(imgHeight, r.Y + r.Height);
+            return new Rect(x, y, Math.Max(0, right - x), Math.Max(0, bottom - y));
+        }
 
 
     }

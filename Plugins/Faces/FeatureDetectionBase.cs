@@ -3,29 +3,39 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using System;
+using System;
 using System.Collections.Generic;
  using System.Diagnostics;
  using System.Linq;
 using System.Text;
 using System.Drawing;
 using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System.IO;
 
 namespace ImageResizer.Plugins.Faces {
+
+    /// <summary>
+    /// Represents a detected feature with its bounding rectangle and confidence.
+    /// Replaces CvAvgComp from OpenCvSharp 2.x.
+    /// </summary>
+    public struct DetectedObject {
+        public Rect Rect;
+        public int Neighbors;
+
+        public DetectedObject(Rect rect, int neighbors) {
+            Rect = rect;
+            Neighbors = neighbors;
+        }
+    }
+
     public static class OpenCvExtensions {
-        public static RectangleF ToRectangleF(this CvRect rect) {
+        public static RectangleF ToRectangleF(this Rect rect) {
             return new RectangleF(rect.X, rect.Y, rect.Width, rect.Height);
         }
-        public static CvAvgComp[] ToArrayAndDispose(this CvSeq<CvAvgComp> seq) {
-            using (seq)
-            {
-                return seq.ToArray();
-            }
-        }
 
-        public static CvRect Offset(this CvRect rect, CvPoint offset) {
-            return new CvRect(rect.X + offset.X, rect.Y + offset.Y, rect.Width, rect.Height);
+        public static Rect OffsetRect(this Rect rect, OpenCvSharp.Point offset) {
+            return new Rect(rect.X + offset.X, rect.Y + offset.Y, rect.Width, rect.Height);
         }
     }
     /// <summary>
@@ -51,7 +61,7 @@ namespace ImageResizer.Plugins.Faces {
     }
 
     /// <summary>
-    /// Not thread safe. 
+    /// Not thread safe.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class FeatureDetectionBase<T>  where T : IFeature {
@@ -63,8 +73,8 @@ namespace ImageResizer.Plugins.Faces {
         }
 
         protected Dictionary<string, string> fileNames;
-        
-        protected TR BorrowCascade<TR>(string fileNameKey, Func<CvHaarClassifierCascade, TR> operation)
+
+        protected TR BorrowCascade<TR>(string fileNameKey, Func<CascadeClassifier, TR> operation)
         {
             string name;
             if (fileNames != null && fileNames.TryGetValue(fileNameKey, out name) == true) {
@@ -76,7 +86,7 @@ namespace ImageResizer.Plugins.Faces {
                 "Failed to find a file name associated with key " + fileNameKey);
         }
 
-      
+
 
         /// <summary>
         /// Large images will be scaled down to less than scaledBounds X scaledBounds for feature detection.
@@ -90,28 +100,15 @@ namespace ImageResizer.Plugins.Faces {
             List<T> features;
 
             //Type Initializer Exception occurs if you reuse an appdomain. Always restart the server.
-            
-            IplImage orig = null;
-            IplImage gray = null;
-            IplImage gray2 = null;
-            IplImage small = null;
-            try {
-                
-                orig = OpenCvSharp.Extensions.BitmapConverter.ToIplImage(b);
-                
-                
-                gray = new IplImage(orig.Size, BitDepth.U8, 1);
-                //gray2 = new IplImage(orig.Size, BitDepth.U8, 1);
 
+            using (var orig = BitmapConverter.ToMat(b))
+            using (var gray = new Mat())
+            {
                 //Make grayscale version
-                Cv.CvtColor(orig, gray, ColorConversion.BgrToGray); //TODO, try a different color space
-                //Cv.EqualizeHist(gray, gray2);
+                Cv2.CvtColor(orig, gray, ColorConversionCodes.BGR2GRAY);
 
                 var w = orig.Width;
                 var h = orig.Height;
-                Cv.ReleaseImage(orig);
-                orig = null;
-
 
                 var ratio =  w /  h;
                 double scale = 1;
@@ -119,22 +116,15 @@ namespace ImageResizer.Plugins.Faces {
                 if (ratio <= 1) scale =  h / (double) scaledBounds;
                 scale = Math.Min(1, 1 / scale);
 
-
-                small = new IplImage(new CvSize(Cv.Round(w * scale), Cv.Round(h * scale)), BitDepth.U8, 1);
-                
-                //Resize to smaller version
-                Cv.Resize(gray, small, Interpolation.Area); //TODO: try a better algorithm
-                Cv.ReleaseImage(gray);
-                gray = null;
-
-                features = StoragePool.Shared.Borrow("features", s =>
+                using (var small = new Mat())
                 {
-                    s.Clear();
+                    //Resize to smaller version
+                    Cv2.Resize(gray, small, new OpenCvSharp.Size((int)Math.Round(w * scale), (int)Math.Round(h * scale)), 0, 0, InterpolationFlags.Area);
+
                     watch.Stop();
-                    var f =  DetectFeatures(small, s);
+                    features = DetectFeatures(small);
                     watch.Start();
-                    return f;
-                }, 3000);
+                }
 
                 //Scale all rectangles by factor to restore to original resolution
                 foreach (IFeature e in features) {
@@ -143,11 +133,6 @@ namespace ImageResizer.Plugins.Faces {
                     e.Y2 = (float) Math.Min(h, e.Y2 / scale);
                     e.X2 = (float) Math.Min(w, e.X2 / scale);
                 }
-            } finally {
-                if (gray != null) Cv.ReleaseImage(gray);
-                if (gray2 != null) Cv.ReleaseImage(gray2);
-                if (orig != null) Cv.ReleaseImage(orig);
-                if (small != null) Cv.ReleaseImage(small);
             }
             watch.Stop();
             Debug.WriteLine($"Face detection prep time: {watch.ElapsedMilliseconds}ms");
@@ -155,12 +140,12 @@ namespace ImageResizer.Plugins.Faces {
             return features;
         }
 
-        protected  abstract List<T> DetectFeatures(IplImage img, CvMemStorage storage);
+        protected  abstract List<T> DetectFeatures(Mat img);
 
-        protected int CompareByNeighbors(CvAvgComp a, CvAvgComp b) {
+        protected int CompareByNeighbors(DetectedObject a, DetectedObject b) {
             return b.Neighbors.CompareTo(a.Neighbors);
         }
 
-      
+
     }
 }

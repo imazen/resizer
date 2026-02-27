@@ -10,8 +10,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Runtime.InteropServices;
 using ImageResizer.Plugins.Faces;
 using ImageResizer.Plugins.RedEye;
 using Newtonsoft.Json;
@@ -55,163 +53,42 @@ namespace ImageResizer.Plugins.Faces.Tests
 
     #endregion
 
-    #region OpenCV fixture — downloads cascades and native DLLs
+    #region OpenCV fixture — OpenCvSharp4 native DLLs via NuGet, cascades via embedded resources
 
     /// <summary>
-    /// Shared fixture that ensures OpenCV cascade files and native DLLs are
-    /// available for detection tests. Downloads from CDN on first run.
-    ///
-    /// Native DLLs are stored in architecture-specific subdirectories
-    /// (opencv_native_x86/ and opencv_native_x64/) so x86 and x64 test runs
-    /// never clobber each other even when sharing the same output directory.
-    ///
-    /// Note: The CDN's x64 directory has broken DLLs (5 of 10 are actually
-    /// x86 copies). The fixture validates DLL architecture after download and
-    /// will report failure if any DLL doesn't match the running process.
-    /// Run as x86 for reliable results with OpenCvSharp 2.x.
+    /// Shared fixture that ensures OpenCV cascade files are available for
+    /// detection tests. With OpenCvSharp4, native DLLs are delivered via the
+    /// OpenCvSharp4.runtime.win NuGet package and appear in the output
+    /// directory automatically. Cascade XML files are embedded as gzip-compressed
+    /// resources in the plugin assemblies and extracted to a temp directory
+    /// by FileLocator on first use.
     /// </summary>
     public class OpenCvFixture : IDisposable
     {
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern bool SetDllDirectory(string lpPathName);
-
-        private static readonly string[] CascadeFiles =
-        {
-            "haarcascade_frontalface_default.xml",
-            "haarcascade_frontalface_alt.xml",
-            "haarcascade_frontalface_alt2.xml",
-            "haarcascade_frontalface_alt_tree.xml",
-            "haarcascade_profileface.xml",
-            "haarcascade_eye.xml",
-            "haarcascade_mcs_lefteye.xml",
-            "haarcascade_mcs_righteye.xml",
-            "haarcascade_mcs_eyepair_big.xml",
-            "haarcascade_mcs_eyepair_small.xml",
-        };
-
-        private static readonly string[] NativeDlls =
-        {
-            "opencv_core2410.dll",
-            "opencv_imgproc2410.dll",
-            "opencv_objdetect2410.dll",
-            "opencv_highgui2410.dll",
-            "opencv_features2d2410.dll",
-            "opencv_calib3d2410.dll",
-            "opencv_flann2410.dll",
-            "opencv_legacy2410.dll",
-            "opencv_ml2410.dll",
-            "opencv_gpu2410.dll",
-        };
-
-        private const string CdnBase = "https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10";
-
         /// <summary>Base output directory (AppDomain.BaseDirectory).</summary>
         public string OutputDir { get; }
-        /// <summary>Architecture-specific subdirectory where native DLLs live.</summary>
-        public string NativeDllDir { get; }
         public bool IsReady { get; }
         public string SetupError { get; }
 
         public OpenCvFixture()
         {
             OutputDir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\', '/');
-            var arch = Environment.Is64BitProcess ? "x64" : "x86";
-            NativeDllDir = Path.Combine(OutputDir, "opencv_native_" + arch);
 
             try
             {
-                Directory.CreateDirectory(NativeDllDir);
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                DownloadCascades();
-                DownloadNativeDlls(arch);
-                var badDlls = ValidateNativeDllArchitecture();
-                if (badDlls != null)
-                {
-                    IsReady = false;
-                    SetupError = $"Architecture mismatch (process is {arch}): {badDlls}\n" +
-                        "The CDN's x64 OpenCV 2.4.10 DLLs are partially broken (some are x86 copies). " +
-                        "Run tests as x86 for reliable results.";
-                }
-                else
-                {
-                    // Point P/Invoke search at the arch-specific subdir
-                    SetDllDirectory(NativeDllDir);
-                    IsReady = true;
-                    SetupError = null;
-                }
+                // Ensure the RedEye assembly's cascade resources are registered
+                // (EyeDetection constructor does this, but we need to trigger it
+                // before any tests run). The Faces assembly registers itself via
+                // CascadePool's static constructor.
+                var _ = new EyeDetection();
+
+                IsReady = true;
+                SetupError = null;
             }
             catch (Exception ex)
             {
                 IsReady = false;
-                SetupError = $"OutputDir={OutputDir}, NativeDllDir={NativeDllDir}, Arch={arch}\n{ex}";
-            }
-        }
-
-        private void DownloadCascades()
-        {
-            using (var client = new WebClient())
-            {
-                foreach (var cascade in CascadeFiles)
-                {
-                    var localPath = Path.Combine(OutputDir, cascade);
-                    if (!File.Exists(localPath))
-                        client.DownloadFile($"{CdnBase}/cascades/{cascade}", localPath);
-                }
-            }
-        }
-
-        private void DownloadNativeDlls(string arch)
-        {
-            using (var client = new WebClient())
-            {
-                foreach (var dll in NativeDlls)
-                {
-                    var localPath = Path.Combine(NativeDllDir, dll);
-                    if (!File.Exists(localPath))
-                        client.DownloadFile($"{CdnBase}/{arch}/{dll}", localPath);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Reads the PE header of each native DLL and verifies it matches
-        /// the current process architecture. Returns null if all OK, or a
-        /// description of mismatched DLLs.
-        /// </summary>
-        private string ValidateNativeDllArchitecture()
-        {
-            bool expect64 = Environment.Is64BitProcess;
-            var mismatched = new List<string>();
-
-            foreach (var dll in NativeDlls)
-            {
-                var path = Path.Combine(NativeDllDir, dll);
-                if (!File.Exists(path)) { mismatched.Add(dll + " (missing)"); continue; }
-
-                bool isDll64 = IsPE64(path);
-                if (isDll64 != expect64)
-                    mismatched.Add($"{dll} (is {(isDll64 ? "x64" : "x86")}, need {(expect64 ? "x64" : "x86")})");
-            }
-
-            return mismatched.Count > 0 ? string.Join(", ", mismatched) : null;
-        }
-
-        /// <summary>
-        /// Returns true if the PE file at the given path is 64-bit (PE32+).
-        /// </summary>
-        private static bool IsPE64(string path)
-        {
-            using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var reader = new BinaryReader(fs))
-            {
-                // DOS header: e_lfanew at offset 0x3C
-                fs.Seek(0x3C, SeekOrigin.Begin);
-                int peOffset = reader.ReadInt32();
-                // PE signature + COFF header: Machine field at PE+4
-                fs.Seek(peOffset + 4, SeekOrigin.Begin);
-                ushort machine = reader.ReadUInt16();
-                // 0x8664 = AMD64, 0x14c = i386
-                return machine == 0x8664;
+                SetupError = $"OutputDir={OutputDir}\n{ex}";
             }
         }
 
@@ -314,9 +191,9 @@ namespace ImageResizer.Plugins.Faces.Tests
     public class OpenCvExtensionTests
     {
         [Fact]
-        public void CvRect_ToRectangleF_ConvertsCorrectly()
+        public void Rect_ToRectangleF_ConvertsCorrectly()
         {
-            var rect = new CvRect(10, 20, 100, 200);
+            var rect = new Rect(10, 20, 100, 200);
             var result = rect.ToRectangleF();
 
             Assert.Equal(10f, result.X);
@@ -326,9 +203,9 @@ namespace ImageResizer.Plugins.Faces.Tests
         }
 
         [Fact]
-        public void CvRect_ToRectangleF_ZeroRect()
+        public void Rect_ToRectangleF_ZeroRect()
         {
-            var rect = new CvRect(0, 0, 0, 0);
+            var rect = new Rect(0, 0, 0, 0);
             var result = rect.ToRectangleF();
 
             Assert.Equal(0f, result.X);
@@ -338,11 +215,11 @@ namespace ImageResizer.Plugins.Faces.Tests
         }
 
         [Fact]
-        public void CvRect_Offset_OffsetsCorrectly()
+        public void Rect_OffsetRect_OffsetsCorrectly()
         {
-            var rect = new CvRect(10, 20, 100, 200);
-            var offset = new CvPoint(5, 15);
-            var result = rect.Offset(offset);
+            var rect = new Rect(10, 20, 100, 200);
+            var offset = new OpenCvSharp.Point(5, 15);
+            var result = rect.OffsetRect(offset);
 
             Assert.Equal(15, result.X);
             Assert.Equal(35, result.Y);
@@ -351,11 +228,11 @@ namespace ImageResizer.Plugins.Faces.Tests
         }
 
         [Fact]
-        public void CvRect_Offset_NegativeOffset()
+        public void Rect_OffsetRect_NegativeOffset()
         {
-            var rect = new CvRect(50, 60, 100, 200);
-            var offset = new CvPoint(-10, -20);
-            var result = rect.Offset(offset);
+            var rect = new Rect(50, 60, 100, 200);
+            var offset = new OpenCvSharp.Point(-10, -20);
+            var result = rect.OffsetRect(offset);
 
             Assert.Equal(40, result.X);
             Assert.Equal(40, result.Y);
@@ -364,11 +241,11 @@ namespace ImageResizer.Plugins.Faces.Tests
         }
 
         [Fact]
-        public void CvRect_Offset_ZeroOffset()
+        public void Rect_OffsetRect_ZeroOffset()
         {
-            var rect = new CvRect(10, 20, 100, 200);
-            var offset = new CvPoint(0, 0);
-            var result = rect.Offset(offset);
+            var rect = new Rect(10, 20, 100, 200);
+            var offset = new OpenCvSharp.Point(0, 0);
+            var result = rect.OffsetRect(offset);
 
             Assert.Equal(10, result.X);
             Assert.Equal(20, result.Y);
@@ -377,12 +254,12 @@ namespace ImageResizer.Plugins.Faces.Tests
         }
 
         [Fact]
-        public void CvRect_ToRectangleF_ThenOffset_RoundTrip()
+        public void Rect_ToRectangleF_ThenOffset_RoundTrip()
         {
-            // Verify Offset + ToRectangleF produces expected result
-            var rect = new CvRect(10, 20, 100, 200);
-            var offset = new CvPoint(30, 40);
-            var result = rect.Offset(offset).ToRectangleF();
+            // Verify OffsetRect + ToRectangleF produces expected result
+            var rect = new Rect(10, 20, 100, 200);
+            var offset = new OpenCvSharp.Point(30, 40);
+            var result = rect.OffsetRect(offset).ToRectangleF();
 
             Assert.Equal(40f, result.X);
             Assert.Equal(60f, result.Y);
