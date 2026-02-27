@@ -1,21 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1FE6E440-F9CB-412A-9D1D-E78850D0F0AC}</ProjectGuid>
+    <ProjectGuid>{D1E2F3A4-AAAA-BBBB-CCCC-DDDDEEEEFFFF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageResizer.Core.Tests</RootNamespace>
-    <AssemblyName>ImageResizer.Core.Tests</AssemblyName>
+    <RootNamespace>ImageResizer.Plugins.Watermark.Tests</RootNamespace>
+    <AssemblyName>ImageResizer.Plugins.Watermark.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
@@ -37,52 +34,36 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImageBuilderTest.cs" />
-    <Compile Include="ImageJobTests.cs" />
-    <Compile Include="ImageLayoutEngineTests.cs" />
-    <Compile Include="PluginConfigTests.cs" />
-    <Compile Include="PresetPluginTest.cs" />
-    <Compile Include="InstructionsTests.cs" />
-    <Compile Include="PathUtilsTests.cs" />
+    <Compile Include="DistanceUnitTests.cs" />
+    <Compile Include="LayerTests.cs" />
+    <Compile Include="WatermarkPluginTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResizeSettingsExpandedTests.cs" />
-    <Compile Include="ResizeSettingsTest.cs" />
-    <Compile Include="SeekableStreamWrapperTests.cs" />
-    <Compile Include="TestPolygonMath.cs" />
-    <Compile Include="TestSiteBuilder.cs" />
-    <Compile Include="XmlTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
+      <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
+      <Name>ImageResizer.Plugins.Watermark</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="xunit">
       <Version>2.9.3</Version>
     </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio">
+      <Version>2.8.2</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

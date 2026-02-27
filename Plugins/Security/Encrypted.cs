@@ -55,6 +55,7 @@ namespace ImageResizer.Plugins.Encrypted {
             : base("Encrypted plugin") {
             VirtualPrefix = prefix;
             _encryptionKey = UTF8Encoding.UTF8.GetBytes(key);
+            _enc = new SimpleSecureEncryption(_encryptionKey);
         }
 
         public EncryptedPlugin(NameValueCollection args):base("Encrypted plugin") {

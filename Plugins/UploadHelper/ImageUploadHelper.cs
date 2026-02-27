@@ -34,7 +34,11 @@ namespace ImageResizer
         /// <returns></returns>
         public string GetExtension(string path)
         {
-            int lastDot = path.LastIndexOfAny(new char[] { '.', '/', ' ', '\\', '?', '&', ':' });
+            // Truncate at querystring or fragment before searching for extension
+            int qIndex = path.IndexOfAny(new char[] { '?', '&', '#' });
+            if (qIndex > -1) path = path.Substring(0, qIndex);
+
+            int lastDot = path.LastIndexOfAny(new char[] { '.', '/', ' ', '\\', ':' });
             if (lastDot > -1 && path[lastDot] == '.') return path.Substring(lastDot + 1);
             else return null;
         }

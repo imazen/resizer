@@ -70,7 +70,9 @@
     <Compile Include="CustomDiskCacheTest.cs" />
     <!-- IntegrationTests.cs excluded: requires LibCassini (not in repo) -->
     <!-- <Compile Include="IntegrationTests.cs" /> -->
+    <Compile Include="CleanupStrategyTests.cs" />
     <Compile Include="LockProviderTest.cs" />
+    <Compile Include="UrlHasherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
