@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
+using ImageResizer.Configuration.Plugins;
 using ImageResizer.Plugins.Faces;
 using ImageResizer.Plugins.RedEye;
 using Newtonsoft.Json;
@@ -59,11 +60,9 @@ namespace ImageResizer.Plugins.Faces.Tests
 
     /// <summary>
     /// Shared fixture that ensures OpenCV cascade files and native DLLs are
-    /// available for detection tests. Downloads from CDN on first run.
-    ///
-    /// Native DLLs are stored in architecture-specific subdirectories
-    /// (opencv_native_x86/ and opencv_native_x64/) so x86 and x64 test runs
-    /// never clobber each other even when sharing the same output directory.
+    /// available for detection tests. Uses the project's built-in
+    /// NativeDependencyManager to download from CDN on first run — the same
+    /// code path that production plugins use.
     ///
     /// Note: The CDN's x64 directory has broken DLLs (5 of 10 are actually
     /// x86 copies). The fixture validates DLL architecture after download and
@@ -75,40 +74,8 @@ namespace ImageResizer.Plugins.Faces.Tests
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern bool SetDllDirectory(string lpPathName);
 
-        private static readonly string[] CascadeFiles =
-        {
-            "haarcascade_frontalface_default.xml",
-            "haarcascade_frontalface_alt.xml",
-            "haarcascade_frontalface_alt2.xml",
-            "haarcascade_frontalface_alt_tree.xml",
-            "haarcascade_profileface.xml",
-            "haarcascade_eye.xml",
-            "haarcascade_mcs_lefteye.xml",
-            "haarcascade_mcs_righteye.xml",
-            "haarcascade_mcs_eyepair_big.xml",
-            "haarcascade_mcs_eyepair_small.xml",
-        };
-
-        private static readonly string[] NativeDlls =
-        {
-            "opencv_core2410.dll",
-            "opencv_imgproc2410.dll",
-            "opencv_objdetect2410.dll",
-            "opencv_highgui2410.dll",
-            "opencv_features2d2410.dll",
-            "opencv_calib3d2410.dll",
-            "opencv_flann2410.dll",
-            "opencv_legacy2410.dll",
-            "opencv_ml2410.dll",
-            "opencv_gpu2410.dll",
-        };
-
-        private const string CdnBase = "https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10";
-
-        /// <summary>Base output directory (AppDomain.BaseDirectory).</summary>
+        /// <summary>Base output directory where NativeDependencyManager places files.</summary>
         public string OutputDir { get; }
-        /// <summary>Architecture-specific subdirectory where native DLLs live.</summary>
-        public string NativeDllDir { get; }
         public bool IsReady { get; }
         public string SetupError { get; }
 
@@ -116,14 +83,20 @@ namespace ImageResizer.Plugins.Faces.Tests
         {
             OutputDir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\', '/');
             var arch = Environment.Is64BitProcess ? "x64" : "x86";
-            NativeDllDir = Path.Combine(OutputDir, "opencv_native_" + arch);
 
             try
             {
-                Directory.CreateDirectory(NativeDllDir);
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                DownloadCascades();
-                DownloadNativeDlls(arch);
+
+                // Use the project's NativeDependencyManager — same code path as production.
+                // Reads [assembly: NativeDependencies("Native.xml")] from each plugin assembly,
+                // filters by process bitness, and downloads missing files to the assembly directory.
+                var ndm = new NativeDependencyManager();
+                ndm.EnsureLoaded(typeof(FaceDetection).Assembly);
+                ndm.EnsureLoaded(typeof(EyeDetection).Assembly);
+
+                // Validate that downloaded native DLLs actually match our process architecture.
+                // The CDN's x64 OpenCV 2.4.10 DLLs are partially broken, so this catches that.
                 var badDlls = ValidateNativeDllArchitecture();
                 if (badDlls != null)
                 {
@@ -134,8 +107,7 @@ namespace ImageResizer.Plugins.Faces.Tests
                 }
                 else
                 {
-                    // Point P/Invoke search at the arch-specific subdir
-                    SetDllDirectory(NativeDllDir);
+                    SetDllDirectory(OutputDir);
                     IsReady = true;
                     SetupError = null;
                 }
@@ -143,54 +115,26 @@ namespace ImageResizer.Plugins.Faces.Tests
             catch (Exception ex)
             {
                 IsReady = false;
-                SetupError = $"OutputDir={OutputDir}, NativeDllDir={NativeDllDir}, Arch={arch}\n{ex}";
-            }
-        }
-
-        private void DownloadCascades()
-        {
-            using (var client = new WebClient())
-            {
-                foreach (var cascade in CascadeFiles)
-                {
-                    var localPath = Path.Combine(OutputDir, cascade);
-                    if (!File.Exists(localPath))
-                        client.DownloadFile($"{CdnBase}/cascades/{cascade}", localPath);
-                }
-            }
-        }
-
-        private void DownloadNativeDlls(string arch)
-        {
-            using (var client = new WebClient())
-            {
-                foreach (var dll in NativeDlls)
-                {
-                    var localPath = Path.Combine(NativeDllDir, dll);
-                    if (!File.Exists(localPath))
-                        client.DownloadFile($"{CdnBase}/{arch}/{dll}", localPath);
-                }
+                SetupError = $"OutputDir={OutputDir}, Arch={arch}\n{ex}";
             }
         }
 
         /// <summary>
-        /// Reads the PE header of each native DLL and verifies it matches
-        /// the current process architecture. Returns null if all OK, or a
-        /// description of mismatched DLLs.
+        /// Scans OutputDir for opencv_*2410.dll files and verifies each one
+        /// matches the current process architecture via PE header inspection.
+        /// Returns null if all OK, or a description of mismatched DLLs.
         /// </summary>
         private string ValidateNativeDllArchitecture()
         {
             bool expect64 = Environment.Is64BitProcess;
             var mismatched = new List<string>();
 
-            foreach (var dll in NativeDlls)
+            foreach (var path in Directory.GetFiles(OutputDir, "opencv_*2410.dll"))
             {
-                var path = Path.Combine(NativeDllDir, dll);
-                if (!File.Exists(path)) { mismatched.Add(dll + " (missing)"); continue; }
-
+                var name = Path.GetFileName(path);
                 bool isDll64 = IsPE64(path);
                 if (isDll64 != expect64)
-                    mismatched.Add($"{dll} (is {(isDll64 ? "x64" : "x86")}, need {(expect64 ? "x64" : "x86")})");
+                    mismatched.Add($"{name} (is {(isDll64 ? "x64" : "x86")}, need {(expect64 ? "x64" : "x86")})");
             }
 
             return mismatched.Count > 0 ? string.Join(", ", mismatched) : null;
