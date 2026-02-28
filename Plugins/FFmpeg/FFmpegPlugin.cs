@@ -4,6 +4,7 @@
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
 ﻿using ImageResizer.Configuration;
+using ImageResizer.Configuration.Issues;
 using ImageResizer.Resizing;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.FFmpeg
 {
-    public class FFmpegPlugin : IVirtualImageProvider, IPlugin, IFileExtensionPlugin, IQuerystringPlugin
+    public class FFmpegPlugin : IVirtualImageProvider, IPlugin, IFileExtensionPlugin, IQuerystringPlugin, IIssueProvider
 
     {
 
@@ -109,6 +110,29 @@ namespace ImageResizer.Plugins.FFmpeg
            return mgr.GetFrameStream(c,virtualPath, queryString);
         }
 
+        /// <summary>
+        /// Returns issues related to FFmpeg availability and installation.
+        /// </summary>
+        public IEnumerable<IIssue> GetIssues() {
+            var issues = new List<IIssue>();
+            bool ffmpegFound = false;
+            try {
+                mgr.GetFFmpegPath();
+                mgr.GetFFprobePath();
+                ffmpegFound = true;
+            } catch (FileNotFoundException) { }
+
+            if (!ffmpegFound) {
+                issues.Add(new Issue(
+                    "FFmpeg: ffmpeg.exe and/or ffprobe.exe were not found. " +
+                    "Install FFmpeg and ensure it is on your system PATH, or place the executables in the application bin directory.",
+                    "Install FFmpeg via: winget install Gyan.FFmpeg, scoop install ffmpeg, " +
+                    "or download from https://www.gyan.dev/ffmpeg/builds/. " +
+                    "The FFmpeg plugin no longer downloads binaries automatically.",
+                    IssueSeverity.Error));
+            }
+            return issues;
+        }
     }
 
 

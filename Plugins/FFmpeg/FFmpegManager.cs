@@ -58,15 +58,27 @@ namespace ImageResizer.Plugins.FFmpeg
                 List<string> searchFolders = new List<string>() { };
 
                 var a = this.GetType().Assembly;
-                //Use CodeBase if it is physical; this means we don't re-download each time we recycle. 
+                //Use CodeBase if it is physical; this means we don't re-download each time we recycle.
                 //If it's a URL, we fall back to Location, which is often the shadow-copied version.
                 var searchFolder = a.CodeBase.StartsWith("file:///", StringComparison.OrdinalIgnoreCase)
                                     ? a.CodeBase
                                     : a.Location;
-                //Convert UNC paths 
+                //Convert UNC paths
                 searchFolder = Path.GetDirectoryName(searchFolder.Replace("file:///", "").Replace("/", "\\"));
 
                 searchFolders.Add(searchFolder);
+
+                // Also search directories on the system PATH
+                var pathEnv = Environment.GetEnvironmentVariable("PATH");
+                if (!string.IsNullOrEmpty(pathEnv))
+                {
+                    foreach (var dir in pathEnv.Split(';'))
+                    {
+                        var trimmed = dir.Trim();
+                        if (trimmed.Length > 0 && Directory.Exists(trimmed))
+                            searchFolders.Add(trimmed);
+                    }
+                }
 
                 foreach (string basePath in searchFolders)
                 {
@@ -82,8 +94,14 @@ namespace ImageResizer.Plugins.FFmpeg
                     }
 
                 }
-                if (ffmpegPath == null) throw new FileNotFoundException("Failed to locate ffmpeg.exe in the bin folder");
-                if (ffprobePath == null) throw new FileNotFoundException("Failed to locate ffprobe.exe in the bin folder");
+                if (ffmpegPath == null) throw new FileNotFoundException(
+                    "Failed to locate ffmpeg.exe. Install FFmpeg via: winget install Gyan.FFmpeg, " +
+                    "scoop install ffmpeg, or download from https://www.gyan.dev/ffmpeg/builds/ " +
+                    "and ensure it is on your system PATH.");
+                if (ffprobePath == null) throw new FileNotFoundException(
+                    "Failed to locate ffprobe.exe. Install FFmpeg via: winget install Gyan.FFmpeg, " +
+                    "scoop install ffmpeg, or download from https://www.gyan.dev/ffmpeg/builds/ " +
+                    "and ensure it is on your system PATH.");
             }
         }
 
