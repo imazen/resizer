@@ -81,7 +81,8 @@ When you get this error, you'll need to add a mime-type mapping in web.config
 ### v4.3 (current)
 
 * libwebp native library upgraded from 0.6.0 to 1.6.1.
-* CDN auto-download removed; native binaries now come from NuGet runtime packages (win-x64, win-x86, win-arm64, linux-x64, linux-arm64, osx-x64, osx-arm64).
+* CDN auto-download removed; native binaries now come from NuGet runtime packages (win-x64, win-x86, win-arm64).
+* **Note:** NuGet `.targets`-based native DLL copying works for direct package references, but may not propagate transitively through project references on older .NET Framework projects. If you reference a class library that depends on this plugin, you may need to install the `Imazen.WebP.NativeRuntime.win-*` package directly in your startup/web project.
 * ARM64 (win-arm64) support added.
 * Imazen.WebP managed wrapper upgraded from 10.0.1 to 11.0.0.
 * All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2).

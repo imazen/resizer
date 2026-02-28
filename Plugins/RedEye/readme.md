@@ -33,7 +33,9 @@ You **must** disable overlapped recycling on the application pool running this p
 1. Add the ImageResizer.Plugins.RedEye NuGet package to your project. This will install all required dependencies including the Faces plugin, OpenCvSharp4, and its native OpenCV binaries.
 2. Add `<add name="RedEye" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
 
-No manual binary copying is needed. The OpenCvSharp4 NuGet packages handle native OpenCV binary deployment automatically. Haar cascade XML files are embedded as gzipped resources within the plugin assembly.
+The OpenCvSharp4 NuGet packages include `.targets` files that copy native OpenCV binaries to the output directory automatically. Haar cascade XML files are embedded as gzipped resources within the plugin assembly.
+
+**Note:** NuGet `.targets`-based native DLL copying works for direct package references, but may not propagate transitively through project references on older .NET Framework projects. If you reference a class library that depends on this plugin, you may need to install the `OpenCvSharp4.runtime.win` package directly in your startup/web project.
 
 
 

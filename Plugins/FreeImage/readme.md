@@ -34,7 +34,7 @@ Aliases: /plugins/freeimage
 
 * `ImageResizer.Plugins.FreeImage.dll` (dlls\release)
 * `FreeImageNET.dll` (dlls\release)
-* `FreeImage.dll` ([download x86 here](http://dyn.imageresizing.net/freeimage/3.15.1.0-custom/x86/FreeImage.dll) or [the 64-bit version here](http://dyn.imageresizing.net/freeimage/3.15.1.0-custom/x64/FreeImage.dll))  **NOTE - you must copy the right bitness for your application pool!** You can use the downloadNativeDependencies="true" attribute on any of the FreeImage plugins instead of manually downloading those images.
+* `FreeImage.dll` ([download x86 here](http://dyn.imageresizing.net/freeimage/3.15.1.0-custom/x86/FreeImage.dll) or [the 64-bit version here](http://dyn.imageresizing.net/freeimage/3.15.1.0-custom/x64/FreeImage.dll))  **NOTE - you must copy the right bitness for your application pool!** On v4.2.8 and prior, you could use the `downloadNativeDependencies="true"` attribute on any of the FreeImage plugins instead of manually downloading. This CDN auto-download was removed in v4.3.
 
 ## FreeImageDecoder
 

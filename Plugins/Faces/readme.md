@@ -66,7 +66,9 @@ All tuning parameters are identical between the URL and Managed API.
 1. Add the ImageResizer.Plugins.Faces NuGet package to your project. This will install all required dependencies including OpenCvSharp4 and its native OpenCV binaries.
 2. Add `<add name="Faces" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
 
-No manual binary copying is needed. The OpenCvSharp4 NuGet packages handle native OpenCV binary deployment automatically. Haar cascade XML files are embedded as gzipped resources within the plugin assembly.
+The OpenCvSharp4 NuGet packages include `.targets` files that copy native OpenCV binaries to the output directory automatically. Haar cascade XML files are embedded as gzipped resources within the plugin assembly.
+
+**Note:** NuGet `.targets`-based native DLL copying works for direct package references, but may not propagate transitively through project references on older .NET Framework projects. If you reference a class library that depends on this plugin, you may need to install the `OpenCvSharp4.runtime.win` package directly in your startup/web project.
 
 
 
@@ -117,7 +119,7 @@ For RedEye results, only rectangles where Feature=0 are eyes. Feature=1 means Ey
 * Haar cascade XML files now embedded as gzipped resources instead of downloaded from CDN
 * `downloadNativeDependencies="true"` attribute no longer needed (NuGet handles native dependencies)
 * Internal API: `DetectedObject` struct replaces `CvAvgComp`. `DetectFeatures()` takes `Mat` instead of `IplImage`.
-* Newtonsoft.Json upgraded from 7.0.1 to 13.0.3
+* Newtonsoft.Json upgraded from 7.0.1 to 13.0.4
 * Added System.Drawing.Common 8.0.0
 * Retargeted to .NET Framework 4.7.2
 
