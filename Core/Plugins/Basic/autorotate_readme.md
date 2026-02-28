@@ -4,22 +4,32 @@ Edition: free
 Tagline: Use the Exif rotation data from the camera to auto-rotate your images.
 Aliases: /plugins/autorotate
 
-# Rotate images by Exif data
+# AutoRotate (built into core since v4)
 
-Automatically rotate images based on the Exif Orientation flag embedded by the camera.
+Automatically rotates images based on the Exif Orientation flag embedded by the camera. This corrects the common problem of portrait photos from phones appearing rotated 90 degrees.
 
-## Enable autorotation for all images by default via Web.config
+Since ImageResizer v4, autorotation is built into the core (`ImageResizer.dll`). You do **not** need to install a separate plugin. The `AutoRotate` plugin class still exists for backwards compatibility but is marked `[Obsolete]` and does nothing.
 
-            <pipeline defaultCommands="autorotate.default=true" />
+## Enabling autorotation
 
+Autorotation is **off by default**. You must opt in.
 
-The default is "false"
+### For all images (recommended)
 
-## Via URL 
+Add this to your `<resizer>` section in Web.config:
 
-`&autorotate=false` or `&autorotate=true` will override the default. 
+```xml
+<pipeline defaultCommands="autorotate.default=true" />
+```
 
+### Per-request
 
-### Historical note
+Append `&autorotate=true` to the image URL. This overrides the default.
 
-ImageResizer v4 has subsumed AutoRotate into the core; it is no longer a plugin. 
+`&autorotate=false` can be used to disable autorotation for a specific request when the default is enabled.
+
+## Common issues
+
+* **Images appear rotated 90 degrees** — You need autorotation enabled. Most phone cameras embed an Exif Orientation flag instead of physically rotating the pixel data.
+* **PNG files are not rotated** — PNG does not support Exif metadata. If you convert from JPEG to PNG, apply `&autorotate=true` during the conversion so the rotation is baked into the pixels.
+* **`<add name="AutoRotate" />` in plugins section** — This is harmless but unnecessary in v4. The plugin does nothing; remove it to avoid confusion.
