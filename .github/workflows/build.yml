@@ -226,6 +226,9 @@ jobs:
             exit 1
           }
 
+          Write-Host "Test DLL directory contents:"
+          Get-ChildItem (Split-Path $fsTest) | ForEach-Object { Write-Host "  $($_.Name)  ($($_.Length) bytes)" }
+
           Write-Host "Running FastScaling managed tests (ARM64):"
           Write-Host "  $fsTest"
 
