@@ -169,3 +169,65 @@ jobs:
             dlls/release/**/*.pdb
             dlls/release/**/*.xml
           if-no-files-found: warn
+
+  test-fastscaling-arm64:
+    runs-on: windows-11-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Disable license enforcement
+        run: copy Plugins\LicenseVerifier\LicensingOff.cs Plugins\LicenseVerifier\LicensingOn.cs
+        shell: cmd
+
+      - name: NuGet restore (main solution)
+        run: nuget restore AppVeyor.sln
+
+      - name: NuGet restore (FastScaling solution)
+        run: nuget restore Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
+
+      - name: Install xunit runner
+        run: nuget install xunit.runner.console -Version 2.9.3 -OutputDirectory Packages
+
+      - name: Patch assembly info
+        id: patch_version
+        shell: pwsh
+        run: scripts/patch-assembly-info.ps1 -BuildNumber ${{ github.run_number }}
+
+      - name: Build main solution
+        shell: cmd
+        run: msbuild AppVeyor.sln /p:Configuration=Release /p:Platform="Any CPU" /p:Optimize=True /p:DebugSymbols=True /p:NoWarn="1591;1573;0618" /m /verbosity:minimal
+
+      - name: Build FastScaling (ARM64)
+        shell: cmd
+        run: msbuild Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln /p:Configuration=Release /p:Platform=ARM64 /p:Optimize=True /p:DebugSymbols=True /m /verbosity:minimal
+
+      - name: Run native FastScaling tests (ARM64)
+        shell: cmd
+        run: Plugins\FastScaling\ARM64\Release\NativeFastScaling.Test.exe -d yes
+
+      - name: Run FastScaling managed tests (ARM64)
+        shell: pwsh
+        run: |
+          $xunit = "Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe"
+          $fsTest = "Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.Tests.dll"
+
+          if (-not (Test-Path $fsTest)) {
+            Write-Error "FastScaling ARM64 test DLL not found at $fsTest"
+            exit 1
+          }
+
+          Write-Host "Running FastScaling managed tests (ARM64):"
+          Write-Host "  $fsTest"
+
+          & $xunit $fsTest -nologo
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
