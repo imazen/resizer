@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
+/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
 using System;
 using System.Collections.Specialized;
 using System.Web;
@@ -8,14 +8,13 @@ using System.Collections.Generic;
 using ImageResizer.Configuration.Issues;
 using System.Security;
 using ImageResizer.Configuration.Xml;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using ImageResizer.Storage;
 using ImageResizer.ExtensionMethods;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Azure;
 using System.Configuration;
 using System.Diagnostics;
 
@@ -23,7 +22,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
     public class AzureReader2Plugin : BlobProviderBase, IMultiInstancePlugin {
 
-        public CloudBlobClient CloudBlobClient { get; set; }
+        public BlobServiceClient BlobServiceClient { get; set; }
         string blobStorageConnection;
         string blobStorageEndpoint;
 
@@ -45,40 +44,44 @@ namespace ImageResizer.Plugins.AzureReader2 {
         }
 
 
-        protected Task<ICloudBlob> GetBlobRefAsync(string virtualPath)
+        protected Task<BlobClient> GetBlobRefAsync(string virtualPath)
         {
             string subPath = StripPrefix(virtualPath).Trim('/', '\\');
 
-            string relativeBlobURL = string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), subPath);
+            // The subpath format is "container/blob/path" — split on the first slash
+            int slashIndex = subPath.IndexOf('/');
+            if (slashIndex < 0)
+            {
+                // No slash means the path is just a container name with no blob
+                throw new FileNotFoundException("Invalid blob path: no blob name specified");
+            }
 
-            return CloudBlobClient.GetBlobReferenceFromServerAsync(new Uri(relativeBlobURL));
+            string containerName = subPath.Substring(0, slashIndex);
+            string blobName = subPath.Substring(slashIndex + 1);
+
+            var blobClient = BlobServiceClient
+                .GetBlobContainerClient(containerName)
+                .GetBlobClient(blobName);
+
+            return Task.FromResult(blobClient);
         }
         public override async Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
         {
-            
+
             try
             {
-                var cloudBlob = await GetBlobRefAsync(virtualPath);
-                
+                var blobClient = await GetBlobRefAsync(virtualPath);
+                var properties = await blobClient.GetPropertiesAsync();
+
                 var meta = new BlobMetadata();
-                meta.Exists = true; //Otherwise an exception would have happened at FetchAttributes
-                var utc = cloudBlob.Properties.LastModified;
-                if (utc != null)
-                {
-                    meta.LastModifiedDateUtc = utc.Value.UtcDateTime;
-                }
+                meta.Exists = true;
+                var utc = properties.Value.LastModified;
+                meta.LastModifiedDateUtc = utc.UtcDateTime;
                 return meta;
             }
-            catch (StorageException e)
+            catch (RequestFailedException e) when (e.Status == 404)
             {
-                if (e.RequestInformation.HttpStatusCode == 404)
-                {
-                    return new BlobMetadata() { Exists = false };
-                }
-                else
-                {
-                    throw;
-                }
+                return new BlobMetadata() { Exists = false };
             }
         }
 
@@ -87,20 +90,14 @@ namespace ImageResizer.Plugins.AzureReader2 {
             var time = Stopwatch.StartNew();
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
 
-            // Synchronously download
             try
             {
-                var cloudBlob = await GetBlobRefAsync(virtualPath); //TODO: Skip a round trip and skip getting the blob reference.
-                await cloudBlob.DownloadToStreamAsync(ms);
+                var blobClient = await GetBlobRefAsync(virtualPath);
+                await blobClient.DownloadToAsync(ms);
             }
-            catch (StorageException e)
+            catch (RequestFailedException e) when (e.Status == 404)
             {
-                if (e.RequestInformation.HttpStatusCode == 404)
-                {
-                    throw new FileNotFoundException("Azure blob file not found", e);
-                }
-                throw;
-                
+                throw new FileNotFoundException("Azure blob file not found", e);
             }
 
             ms.Seek(0, SeekOrigin.Begin); // Reset to beginning
@@ -113,29 +110,32 @@ namespace ImageResizer.Plugins.AzureReader2 {
             if (string.IsNullOrEmpty(blobStorageConnection))
                 throw new InvalidOperationException("AzureReader2 requires a named connection string or a connection string to be specified with the 'connectionString' attribute.");
 
-            // Setup the connection to Windows Azure Storage
-            // for compatibility, look up the appSetting first.
-            var connectionString = CloudConfigurationManager.GetSetting(blobStorageConnection);
+            // Resolve the connection string: check appSettings first (backwards compat), then connectionStrings, then use raw value
+            var connectionString = ConfigurationManager.AppSettings[blobStorageConnection];
             if (string.IsNullOrEmpty(connectionString))
             {
                 connectionString = ConfigurationManager.ConnectionStrings[blobStorageConnection]?.ConnectionString;
             }
 
             if (string.IsNullOrEmpty(connectionString)) { connectionString = blobStorageConnection; }
-            
 
-            CloudStorageAccount cloudStorageAccount;
-            if (CloudStorageAccount.TryParse(connectionString, out cloudStorageAccount)){
-                if (string.IsNullOrEmpty(blobStorageEndpoint)){
-                    blobStorageEndpoint = cloudStorageAccount.BlobEndpoint.ToString();
+            try
+            {
+                BlobServiceClient = new BlobServiceClient(connectionString);
+
+                if (string.IsNullOrEmpty(blobStorageEndpoint))
+                {
+                    blobStorageEndpoint = BlobServiceClient.Uri.ToString();
                 }
-            }else{
-                throw new InvalidOperationException("Invalid AzureReader2 connectionString value; rejected by Azure SDK.");
             }
+            catch (Exception ex) when (ex is FormatException || ex is ArgumentException || ex is UriFormatException)
+            {
+                throw new InvalidOperationException("Invalid AzureReader2 connectionString value; rejected by Azure SDK.", ex);
+            }
+
             if (!blobStorageEndpoint.EndsWith("/"))
                 blobStorageEndpoint += "/";
 
-            CloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
             // Register rewrite
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
 

@@ -108,3 +108,13 @@ In 3.1.5 and higher, spaces are supported in URLs, but to support '+' characters
 ## Non-ASCII URLs
 
 .NET versions prior to 4.5 require [a tiny bit of configuration to allow non-ASCII characters in remote URLs](http://stackoverflow.com/questions/6107621/uri-iswellformeduristring-needs-to-be-updated).
+
+## Version history
+
+### v4.3 (current)
+
+All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2). No functional changes to this plugin.
+
+### v4.2.8 and prior
+
+This plugin has been stable since its initial release. No breaking changes.

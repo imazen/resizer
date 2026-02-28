@@ -1,0 +1,15 @@
+namespace ImageResizer.Plugins.AzureReader2
+{
+    public class AzureReader2Plugin : ImageResizer.Storage.BlobProviderBase, ImageResizer.Plugins.IMultiInstancePlugin
+    {
+        public AzureReader2Plugin() { }
+        public AzureReader2Plugin(System.Collections.Specialized.NameValueCollection args) { }
+        public Azure.Storage.Blobs.BlobServiceClient BlobServiceClient { get; set; }
+        public bool RedirectToBlobIfUnmodified { get; set; }
+        public override System.Threading.Tasks.Task<ImageResizer.Storage.IBlobMetadata> FetchMetadataAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        protected System.Threading.Tasks.Task<Azure.Storage.Blobs.BlobClient> GetBlobRefAsync(string virtualPath) { }
+        public override ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public override System.Threading.Tasks.Task<System.IO.Stream> OpenAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public override bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+}

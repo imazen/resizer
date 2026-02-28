@@ -12,10 +12,10 @@ We [have a guide for using Slimmage and ImageResizer together](http://imageresiz
 
 ## Security note
 
-* Do NOT use this plugin with untrusted data. This plugin is a thin wrapper over `libwebp`, which is written in C, and has not yet reached version 1.0.
-* Specifically, it is a thin wrapper over this set of bindings:  https://github.com/imazen/libwebp-net
-* **You are responsible for locating and using the latest version of `libwebp.dll`. The included copy is most likely out of date, and may not contain the latest security fixes.** ImageResizer 4.1.0 uses libwebp 0.6.0.
-* You can [monitor libwebp releases are here](https://github.com/webmproject/libwebp/releases) and [search CVEs for the keyword webp](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=webp).
+* Do NOT use this plugin with untrusted data. This plugin is a thin wrapper over `libwebp`, which is written in C.
+* Specifically, it is a thin wrapper over this set of bindings: https://github.com/imazen/libwebp-net
+* As of v4.3, native libwebp binaries (v1.6.1) are delivered via NuGet runtime packages and no longer require manual management. Keep your NuGet packages updated to get the latest security fixes.
+* You can [monitor libwebp releases here](https://github.com/webmproject/libwebp/releases) and [search CVEs for the keyword webp](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=webp).
 
 ## Installation
 
@@ -75,4 +75,22 @@ When you get this error, you'll need to add a mime-type mapping in web.config
       </staticContent>
       </system.webServer>
     </configuration>
+
+## Version history
+
+### v4.3 (current)
+
+* libwebp native library upgraded from 0.6.0 to 1.6.1.
+* CDN auto-download removed; native binaries now come from NuGet runtime packages (win-x64, win-x86, win-arm64, linux-x64, linux-arm64, osx-x64, osx-arm64).
+* ARM64 (win-arm64) support added.
+* Imazen.WebP managed wrapper upgraded from 10.0.1 to 11.0.0.
+* All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2).
+
+### v4.2.8 and prior
+
+* Used libwebp 0.6.0 (pre-1.0).
+* Native DLLs were downloaded from a CDN or manually placed in `/bin`.
+* Only x86 and x64 platforms were supported (no ARM64).
+* Imazen.WebP 10.0.1.
+* Targeted .NET 4.5/4.5.2.
 

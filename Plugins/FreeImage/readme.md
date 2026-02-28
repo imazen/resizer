@@ -6,6 +6,8 @@ Aliases: /plugins/freeimage
 
 # FreeImage Plugins
 
+> **DEPRECATED (v4.3):** All four FreeImage plugin classes (`FreeImageDecoder`, `FreeImageEncoder`, `FreeImageBuilder`, `FreeImageResizer`) are marked `[Obsolete]` and emit Critical diagnostic issues at runtime. CDN auto-download of native FreeImage DLLs has been removed. These plugins will not be carried forward to future major versions. Consider migrating to Imageflow.
+
 *PLEASE NOTE*
 * **These plugins are not forwards-compatible. Avoid usage for maximum compatibility with Imageflow and future major ImageResizer releases.**
 * **Do NOT use with untrusted data. These plugin pass source files to FreeImage, which has a history of vulnerabilities.**
@@ -74,3 +76,17 @@ Activated by adding &fi.scale=bicubic&#124;bilinear&#124;box&#124;bspline&#124;c
 ## License
 
 This set of plugins is part of the [Design](/plugins) bundle, and licensed accordingly. The underlying [native FreeImage DLLs are licensed under the FreeImage License](http://freeimage.sourceforge.net/freeimage-license.txt).
+
+## Version history
+
+### v4.3 (current)
+
+* **DEPRECATED:** All four FreeImage plugin classes are now marked `[Obsolete]` and emit Critical diagnostic issues at runtime.
+* CDN auto-download of native FreeImage DLLs (`downloadNativeDependencies="true"`) has been removed.
+* All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2).
+
+### v4.2.8 and prior
+
+* Plugins were active and not deprecated.
+* Native FreeImage DLLs could be automatically downloaded from a CDN via `downloadNativeDependencies="true"`.
+* Targeted .NET 4.5/4.5.2.

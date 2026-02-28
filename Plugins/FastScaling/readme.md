@@ -142,7 +142,7 @@ If you are working with a format other than 32-bit BGRA, 32-bit BGR, or 24-bit B
 
 FastScaling is a self-contained mixed-mode DLL. You will need to install the correct NuGet package depending upon whether your application is run as a 32-bit program or as a 64-bit program. IIS Express can run in either mode, and different installations of Visual Studio can have different results. 
 
-You will also need into install the [Visual C++ 2013 Redistributable package](https://www.microsoft.com/en-us/download/details.aspx?id=40784) if it is not already installed. 
+You will also need to install the [Visual C++ 2015-2022 Redistributable package](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) if it is not already installed.
 
 `Install-Package ImageResizer.Plugins.FastScaling.x64`
 
@@ -165,8 +165,20 @@ After installing the nuget package or dll, you will need to install the plugin. 
 
 If you are installing via code instead of XML, call `new ImageResizer.Plugins.FastScaling.FastScalingPlugin().Install(Config.Current);` during application startup. You will need to explicitly specify `&fastscale=true` on every image job or request in order to activate the plugin.
 
+## Version history
 
+### v4.3 (current)
 
+* ARM64 platform support added
+* PlatformToolset upgraded from v140 (VS 2015) to v142/v143
+* Visual C++ Redistributable requirement updated from 2013 to 2015-2022
+* Retargeted to .NET Framework 4.7.2
+* No functional code changes
 
+### v4.2.8 and prior
+
+* x86 and x64 platforms only (no ARM64)
+* Built with PlatformToolset v140 (VS 2015)
+* Required the Visual C++ 2013 Redistributable
 
 

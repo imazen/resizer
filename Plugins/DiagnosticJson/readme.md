@@ -17,3 +17,13 @@ Either run `Install-Package ImageResizer.Plugins.DiagnosticJson` in the NuGet pa
 
 1. Add a reference to ImageResizer.Plugins.DiagnosticJson.dll in your project.
 2. Add `<add name="DiagnosticJsonPlugin" />` in the `<plugins>` section of Web.Config
+
+## Version history
+
+### v4.3 (current)
+
+All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2). No functional changes to this plugin.
+
+### v4.2.8 and prior
+
+This plugin has been stable since its initial release. No breaking changes.

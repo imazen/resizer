@@ -80,3 +80,13 @@ If false, `fant` will be substituted for `highqualitycubic` (the default).
 ## License
 
 This set of plugins is part of the [Design](/plugins) bundle, and licensed accordingly.
+
+## Version history
+
+### v4.3 (current)
+
+All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2). No functional changes to this plugin.
+
+### v4.2.8 and prior
+
+This plugin has been stable since its initial release. No breaking changes.

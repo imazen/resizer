@@ -32,3 +32,19 @@ You must specify a [valid connection string that includes both the database name
   <add name="MongoReader" prefix="~/gridfs" connectionString="mongodb://user:password@servername/database" />
 
 * connectionString - A [valid MongoDB connection string](http://www.mongodb.org/display/DOCS/Connections).
+
+## Version history
+
+### v4.3 (current)
+
+* **BREAKING:** MongoDB.Driver upgraded from 2.1.0 to 3.6.0.
+* **BREAKING:** Constructor signature changed: `MongoReaderPlugin(string prefix, MongoDatabase db, MongoGridFSSettings gridSettings)` is now `MongoReaderPlugin(string prefix, IMongoDatabase db, string bucketName = null)`.
+* **BREAKING:** `GridFS` property renamed to `GridFSBucket` (type `GridFSBucket`).
+* All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2).
+
+### v4.2.8 and prior
+
+* Used MongoDB.Driver 2.1.0.
+* Constructor accepted `MongoDatabase` and `MongoGridFSSettings` parameters.
+* `GridFS` property was of the legacy GridFS type.
+* Targeted .NET 4.5/4.5.2.

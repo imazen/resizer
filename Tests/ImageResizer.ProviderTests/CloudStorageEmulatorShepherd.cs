@@ -2,45 +2,42 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+using System;
 using System.Diagnostics;
-using System.IO;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
-using System.Linq;
+using Azure;
+using Azure.Storage.Blobs;
 
 namespace ImageResizer.ProviderTests {
     public static class CloudStorageEmulatorShepherd {
         /// <summary>
-        /// Start the developer azure service if it is not started already.
+        /// Ensure Azurite (or legacy Azure Storage Emulator) is running.
+        /// Tries to connect; if that fails, attempts to start Azurite.
         /// </summary>
         public static void Start() {
             try {
-                CloudStorageAccount storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
-
-                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-                CloudBlobContainer container = blobClient.GetContainerReference("image-resizer");
-                container.CreateIfNotExists(
-                    new BlobRequestOptions() {
-                        RetryPolicy = new NoRetry(),
-                        ServerTimeout = new TimeSpan(0, 0, 0, 1)
-                    });
+                var client = new BlobServiceClient("UseDevelopmentStorage=true");
+                var container = client.GetBlobContainerClient("image-resizer");
+                container.CreateIfNotExists();
             }
-            catch (Microsoft.WindowsAzure.Storage.StorageException) {
-                
-                string path = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator";
-                var filenames = new string[] { "AzureStorageEmulator.exe", "WAStorageEmulator.exe" }.Select(name => Path.Combine(path, name));
+            catch (RequestFailedException) {
+                // Azurite not running — try to start it
+                try {
+                    ProcessStartInfo processStartInfo = new ProcessStartInfo() {
+                        FileName = "azurite",
+                        Arguments = "--silent",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                    };
 
-                string filename = filenames.First(n => File.Exists(n));
+                    Process.Start(processStartInfo);
 
-                ProcessStartInfo processStartInfo = new ProcessStartInfo() {
-                    FileName = filename,
-                    Arguments = @"start",
-                };
-
-                using (Process process = Process.Start(processStartInfo)) {
-                    process.WaitForExit();
+                    // Give Azurite a moment to start
+                    System.Threading.Thread.Sleep(2000);
+                }
+                catch (Exception ex) {
+                    throw new InvalidOperationException(
+                        "Could not connect to Azurite and failed to start it. " +
+                        "Install Azurite with: npm install -g azurite", ex);
                 }
             }
         }

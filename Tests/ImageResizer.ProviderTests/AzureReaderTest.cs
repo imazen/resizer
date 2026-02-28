@@ -2,16 +2,17 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using Azure;
+using Azure.Storage.Blobs;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.AzureReader2;
 using ImageResizer.Storage;
-using Microsoft.WindowsAzure.Storage;
 using NSubstitute;
 using Xunit;
 
@@ -22,14 +23,12 @@ namespace ImageResizer.ProviderTests {
     /// <remarks>
     /// <para>
     /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
-    /// implemented by <see cref="AzureReader2Plugin"/>. Also The method 
+    /// implemented by <see cref="AzureReader2Plugin"/>. Also The method
     /// implementations of <see cref="IVirtualFile"/>.
     /// </para>
     /// <para>
-    /// These tests require Microsoft Azure 2.4 to be installed on the machine 
-    /// and port 10000 to be free for its use. See 
-    /// http://stackoverflow.com/questions/23318350/azure-storage-emulator-error-and-does-not-start
-    /// for any problems.
+    /// Integration tests require Azurite to be running on port 10000.
+    /// Install with: npm install -g azurite
     /// </para>
     /// </remarks>
     [Trait("requiresazure","true")]
@@ -128,48 +127,6 @@ namespace ImageResizer.ProviderTests {
             // Assert
             Assert.Equal<bool>(expected, actual);
         }
-
-        ///// <summary>
-        ///// Test <see cref="AzureReader2Plugin"/> Issues.
-        ///// Simple constructor should not create any issues.
-        ///// </summary>
-        //[Fact]
-        //public void WithoutIssuesTest() {
-        //    // Arrange
-        //    int expected = 0; // No issues to report.
-        //    var settings = this.Settings;
-        //    var target = new AzureReader2Plugin(settings);
-
-        //    // Act
-        //    //var actual = target.GetIssues().ToList().Count;
-
-        //    // Assert
-        //    //Assert.Equal<int>(expected, actual);
-        //}
-
-        ///// <summary>
-        ///// Test <see cref="AzureReader2Plugin"/> Issues.
-        ///// Config.Install(...) should create one issues.
-        ///// </summary>
-        //[Fact]
-        //public void WithIssuesTest() {
-        //    // Arrange
-        //    int expected = 1; // Should generate one issue.
-        //    var rs = new ResizerSection(ConfigXml);
-        //    var c = new Config(rs);
-        //    IVirtualImageProvider target = c.Plugins.Get<AzureReader2Plugin>();
-
-        //    // Act
-        //    var actual = 0;
-        //    foreach (var provider in c.Plugins.GetAll<IIssueProvider>()) {
-        //        if (provider is AzureReader2Plugin) {
-        //            actual = provider.GetIssues().ToList().Count;
-        //        }
-        //    }
-
-        //    // Assert
-        //    Assert.Equal<int>(expected, actual);
-        //}
 
         /// <summary>
         /// Test <see cref="AzureReader2Plugin"/> constructor and install capabilities.
@@ -426,7 +383,7 @@ namespace ImageResizer.ProviderTests {
         /// Call the FileExists method with a virtualPath that does include
         /// the PathPrefix and a record id that does exist. The call is
         /// forced to check the database. The connection string is not valid
-        /// and should generate a StorageException.
+        /// and should generate a RequestFailedException.
         /// </summary>
         [Fact]
         public void FileExistsNotFastModeFileExistingStorageException() {
@@ -439,16 +396,16 @@ namespace ImageResizer.ProviderTests {
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
-            var actual = Assert.Throws<StorageException>(() => target.FileExists(virtualPath, null));
+            var actual = Assert.Throws<RequestFailedException>(() => target.FileExists(virtualPath, null));
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<StorageException>(actual);
+            Assert.IsType<RequestFailedException>(actual);
         }
 
         /// <summary>
         /// Call the GetFile method with a virtualPath that does include
-        /// the PathPrefix and a record id that does not exist. Do not 
+        /// the PathPrefix and a record id that does not exist. Do not
         /// check the database.
         /// </summary>
         [Fact]
@@ -471,7 +428,7 @@ namespace ImageResizer.ProviderTests {
 
         /// <summary>
         /// Call the GetFile method with a virtualPath that does include
-        /// the PathPrefix and a record id that does not exist. Do  
+        /// the PathPrefix and a record id that does not exist. Do
         /// check the database.
         /// </summary>
         [Fact]
@@ -494,7 +451,7 @@ namespace ImageResizer.ProviderTests {
         /// <summary>
         /// Call the GetFile method with a virtualPath that does include
         /// the PathPrefix and a record id that does exist. Do check
-        /// the database. The connection string should generate a StorageException.
+        /// the database. The connection string should generate a RequestFailedException.
         /// </summary>
         [Fact]
         public void GetFileInvalidNotFastModeStorageException() {
@@ -507,11 +464,11 @@ namespace ImageResizer.ProviderTests {
             string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
 
             // Act
-            var actual = Assert.Throws<StorageException>(() => target.GetFile(virtualPath, null));
+            var actual = Assert.Throws<RequestFailedException>(() => target.GetFile(virtualPath, null));
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<StorageException>(actual);
+            Assert.IsType<RequestFailedException>(actual);
         }
 
         /// <summary>
@@ -563,7 +520,7 @@ namespace ImageResizer.ProviderTests {
         /// <summary>
         /// Call the GetFile method with a virtualPath that does include
         /// the PathPrefix and a record id that does exist. Do check
-        /// the database. The connection string should generate a StorageException.
+        /// the database. The connection string should generate a RequestFailedException.
         /// </summary>
         [Fact]
         public void GetFileValidNotFastModeStorageException() {
@@ -576,16 +533,16 @@ namespace ImageResizer.ProviderTests {
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
-            var actual = Assert.Throws<StorageException>(() => target.GetFile(virtualPath, null));
+            var actual = Assert.Throws<RequestFailedException>(() => target.GetFile(virtualPath, null));
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<StorageException>(actual);
+            Assert.IsType<RequestFailedException>(actual);
         }
 
         /// <summary>
         /// Call the GetFile method with a virtualPath that does not include
-        /// the PathPrefix and a record id that does not exist. 
+        /// the PathPrefix and a record id that does not exist.
         /// </summary>
         [Fact]
         public void GetFileWithoutVirtualPathPrefix() {
@@ -622,7 +579,7 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with an empty string for the virtualPath parameter. 
+        /// Call the GetFile method with an empty string for the virtualPath parameter.
         /// </summary>
         [Fact]
         public void GetFileWithEmptyVirtualPath() {
@@ -640,7 +597,7 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the Open method with a virtualPath to a database record that 
+        /// Call the Open method with a virtualPath to a database record that
         /// does exist.
         /// </summary>
         [Fact]
@@ -661,7 +618,7 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the Open method with a virtualPath to a database record that 
+        /// Call the Open method with a virtualPath to a database record that
         /// does not exist.
         /// </summary>
         [Fact]
@@ -683,7 +640,7 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the Open method with a virtualPath to a database record that 
+        /// Call the Open method with a virtualPath to a database record that
         /// does not exist.
         /// </summary>
         [Fact]
@@ -729,20 +686,165 @@ namespace ImageResizer.ProviderTests {
             using (var image = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(name))) {
                 using (MemoryStream ms = new MemoryStream()) {
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    ms.Seek(0, SeekOrigin.Begin);
 
-                    var storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
-                    var blobClient = storageAccount.CreateCloudBlobClient();
+                    var client = new BlobServiceClient("UseDevelopmentStorage=true");
 
                     // Get and create the container
-                    var blobContainer = blobClient.GetContainerReference("image-resizer");
-                    blobContainer.CreateIfNotExists();
+                    var containerClient = client.GetBlobContainerClient("image-resizer");
+                    containerClient.CreateIfNotExists();
 
-                    // upload a text blob
-                    var blob = blobContainer.GetBlockBlobReference("rose-leaf.jpg");
-                    byte[] data = ms.ToArray();
-                    blob.UploadFromByteArray(ms.ToArray(), 0, data.Length);
+                    // Upload the blob
+                    var blobClient = containerClient.GetBlobClient("rose-leaf.jpg");
+                    blobClient.Upload(ms, overwrite: true);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Unit tests for AzureReader2Plugin that do not require Azure infrastructure.
+    /// </summary>
+    public class AzureReader2UnitTests {
+
+        [Fact]
+        public void DefaultConstructor_SetsDefaults() {
+            var target = new AzureReader2Plugin();
+
+            // Without ASP.NET hosting context, ~ is not resolved
+            Assert.EndsWith("/azure/", target.VirtualFilesystemPrefix);
+        }
+
+        [Fact]
+        public void NameValueConstructor_ParsesAllSettings() {
+            var args = new NameValueCollection();
+            args["connectionstring"] = "UseDevelopmentStorage=true";
+            args["blobstorageendpoint"] = "http://127.0.0.1:10000/devstoreaccount1/";
+            args["prefix"] = "~/myblobs";
+            args["lazyExistenceCheck"] = "true";
+            args["vpp"] = "false";
+            args["redirectToBlobIfUnmodified"] = "false";
+
+            var target = new AzureReader2Plugin(args);
+
+            Assert.EndsWith("/myblobs/", target.VirtualFilesystemPrefix);
+            Assert.True(target.LazyExistenceCheck);
+            Assert.False(target.ExposeAsVpp);
+            Assert.False(target.RedirectToBlobIfUnmodified);
+        }
+
+        [Fact]
+        public void NameValueConstructor_EndpointFallback() {
+            var args = new NameValueCollection();
+            args["connectionstring"] = "UseDevelopmentStorage=true";
+            args["endpoint"] = "http://127.0.0.1:10000/devstoreaccount1/";
+            args["prefix"] = "~/azure";
+
+            // Should not throw — endpoint is used as fallback for blobstorageendpoint
+            var target = new AzureReader2Plugin(args);
+            Assert.NotNull(target);
+        }
+
+        [Fact]
+        public void Belongs_WithMatchingPrefix_ReturnsTrue() {
+            // Use a prefix without ~ so it works without ASP.NET hosting
+            var args = new NameValueCollection();
+            args["connectionstring"] = "UseDevelopmentStorage=true";
+            args["prefix"] = "/azure";
+            var target = new AzureReader2Plugin(args);
+
+            Assert.True(target.Belongs("/azure/container/blob.jpg"));
+        }
+
+        [Fact]
+        public void Belongs_WithNonMatchingPrefix_ReturnsFalse() {
+            var args = new NameValueCollection();
+            args["connectionstring"] = "UseDevelopmentStorage=true";
+            args["prefix"] = "/azure";
+            var target = new AzureReader2Plugin(args);
+
+            Assert.False(target.Belongs("/other/container/blob.jpg"));
+        }
+
+        [Fact]
+        public void FileExists_LazyMode_ReturnsTrueForMatchingPrefix() {
+            var args = new NameValueCollection();
+            args["connectionstring"] = "UseDevelopmentStorage=true";
+            args["endpoint"] = "http://127.0.0.1:10000/devstoreaccount1/";
+            args["prefix"] = "/azure";
+
+            var target = new AzureReader2Plugin(args);
+            var c = new Config();
+            target.Install(c);
+            target.LazyExistenceCheck = true;
+
+            bool result = ((IVirtualImageProvider)target).FileExists("/azure/container/blob.jpg", null);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void FileExists_LazyMode_ReturnsFalseForNonMatchingPrefix() {
+            var args = new NameValueCollection();
+            args["connectionstring"] = "UseDevelopmentStorage=true";
+            args["endpoint"] = "http://127.0.0.1:10000/devstoreaccount1/";
+            args["prefix"] = "/azure";
+
+            var target = new AzureReader2Plugin(args);
+            var c = new Config();
+            target.Install(c);
+            target.LazyExistenceCheck = true;
+
+            bool result = ((IVirtualImageProvider)target).FileExists("/other/blob.jpg", null);
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void Install_SetsBlobServiceClient() {
+            var args = new NameValueCollection();
+            args["connectionstring"] = "UseDevelopmentStorage=true";
+            args["endpoint"] = "http://127.0.0.1:10000/devstoreaccount1/";
+            args["prefix"] = "~/azure";
+
+            var target = new AzureReader2Plugin(args);
+            Assert.Null(target.BlobServiceClient);
+
+            var c = new Config();
+            target.Install(c);
+
+            Assert.NotNull(target.BlobServiceClient);
+            Assert.IsType<BlobServiceClient>(target.BlobServiceClient);
+        }
+
+        [Fact]
+        public void Install_InvalidConnectionString_Throws() {
+            var args = new NameValueCollection();
+            args["connectionstring"] = "this-is-not-a-valid-connection-string";
+            args["prefix"] = "~/azure";
+
+            var target = new AzureReader2Plugin(args);
+            var c = new Config();
+
+            Assert.Throws<InvalidOperationException>(() => target.Install(c));
+        }
+
+        [Fact]
+        public void MetadataCache_Integration() {
+            var args = new NameValueCollection();
+            args["connectionstring"] = "UseDevelopmentStorage=true";
+            args["endpoint"] = "http://127.0.0.1:10000/devstoreaccount1/";
+            args["prefix"] = "~/azure";
+
+            var target = new AzureReader2Plugin(args);
+            var c = new Config();
+            target.Install(c);
+
+            var cache = Substitute.For<IMetadataCache>();
+            cache.Get(Arg.Any<string>()).Returns(x => null);
+            target.MetadataCache = cache;
+            target.CacheMetadata = true;
+
+            Assert.NotNull(target.MetadataCache);
+            Assert.IsAssignableFrom<IMetadataCache>(target.MetadataCache);
         }
     }
 }

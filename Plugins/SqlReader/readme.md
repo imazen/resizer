@@ -72,5 +72,15 @@ Built-in support is included for the following kinds of keys in the URL. If you 
 * **blobQuery** - A SQL query that returns the binary image data based on the ID. Defaults to `SELECT Content FROM Images WHERE ImageID=@id`
 * **modifiedQuery** - A query that returns the modified and created date of the image.  Defaults to `Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id`. Of all the dates returned by the query, the first non-empty date is used - this allows fallback if no modified date is available.
 * **existsQuery** - A query that returns whether an image exists or not. Defaults to `Select COUNT(ImageID) From Images WHERE ImageID=@id`
-* **extensionPartOfId** - (defaults false) If you are using a string ID type for the image, and the file extension is part of that ID, set this to true. 
+* **extensionPartOfId** - (defaults false) If you are using a string ID type for the image, and the file extension is part of that ID, set this to true.
+
+## Version history
+
+### v4.3 (current)
+
+All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2). No functional changes to this plugin.
+
+### v4.2.8 and prior
+
+This plugin has been stable since its initial release. No breaking changes.
 

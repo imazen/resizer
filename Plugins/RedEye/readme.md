@@ -30,30 +30,53 @@ You **must** disable overlapped recycling on the application pool running this p
 
 ## Installation
 
-1. Add ImageResizer.Plugins.RedEye.dll to your project using Visual Studio. If you copy & paste to /bin, you'll need to also copy the files listed under Managed Dependencies.
-2. Add `<add name="RedEye" downloadNativeDependencies="true" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
-3. If you're not comfortable allowing the plugin to automatically download the correct bitness versions of the unmanaged dependencies, then set downloadNativeDependencies="false" and keep reading.
-3. Manually copy the required XML files to the /bin folder of your application (see *Feature classification files*)
-4. Manually copy all required DLLs to the /bin folder of your application. (see *Using the 2.3.1 pre-compiled binaries*)
+1. Add the ImageResizer.Plugins.RedEye NuGet package to your project. This will install all required dependencies including the Faces plugin, OpenCvSharp4, and its native OpenCV binaries.
+2. Add `<add name="RedEye" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
+
+No manual binary copying is needed. The OpenCvSharp4 NuGet packages handle native OpenCV binary deployment automatically. Haar cascade XML files are embedded as gzipped resources within the plugin assembly.
 
 
 
 ## Managed Dependencies
 
 * ImageResizer.dll
-* ImageResizer.Plugin.Faces.dll
+* ImageResizer.Plugins.Faces.dll
 * AForge.dll
 * AForge.Math.dll
 * AForge.Imaging.dll
-* AForge.Imaging.Formats.dll 
-* OpenCvSharp.dll
-* OpenCvSharp.dll.config
+* AForge.Imaging.Formats.dll
+* OpenCvSharp4 (via NuGet)
+* OpenCvSharp4.Extensions (via NuGet)
+* OpenCvSharp4.runtime.win (via NuGet)
 * Newtonsoft.Json.dll
+* System.Drawing.Common.dll
 
 
-## Feature classification files
+## Version history
 
-[You can download all the XML files](http://downloads.imageresizing.net/OpenCV-2.3.1-all-cascades.zip) in a single .ZIP file. You only need to copy the following into the /bin folder.
+### v4.3 (current)
+
+* **BREAKING**: OpenCvSharp 2.x replaced with OpenCvSharp4 4.10.0 (OpenCV 2.x to 4.x), same migration as the Faces plugin
+* CDN auto-download of OpenCV native binaries removed. Binaries now come from NuGet packages.
+* Haar cascade XML files now embedded as gzipped resources instead of downloaded from CDN
+* `downloadNativeDependencies="true"` attribute no longer needed (NuGet handles native dependencies)
+* Retargeted to .NET Framework 4.7.2
+
+### v4.2.8 and prior
+
+Previous versions used OpenCvSharp wrapping OpenCV 2.3.1 and required manual binary management or CDN auto-download.
+
+**Installation (v4.2.8):**
+
+1. Add ImageResizer.Plugins.RedEye.dll to your project. Copy files listed under Managed Dependencies to /bin.
+2. Add `<add name="RedEye" downloadNativeDependencies="true" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
+3. If not using auto-download, manually copy the required XML files and DLLs (see below).
+
+**Managed Dependencies (v4.2.8):** ImageResizer.dll, ImageResizer.Plugins.Faces.dll, AForge.dll, AForge.Math.dll, AForge.Imaging.dll, AForge.Imaging.Formats.dll, OpenCvSharp.dll, OpenCvSharp.dll.config, Newtonsoft.Json.dll
+
+**Feature classification files (v4.2.8):**
+
+[Download all XML files](http://downloads.imageresizing.net/OpenCV-2.3.1-all-cascades.zip) - the following were needed in /bin:
 
 * haarcascade\_frontalface\_default.xml
 * haarcascade\_mcs\_lefteye.xml
@@ -61,34 +84,11 @@ You **must** disable overlapped recycling on the application pool running this p
 * haarcascade\_mcs\_eyepair_big.xml
 * haarcascade\_mcs\_eyepair\_small.xml
 
-## Using the 2.3.1 pre-compiled binaries
+**Pre-compiled OpenCV binaries (v4.2.8):**
 
-All DLLs must match in bitness. All DLLs are bitness specific. You can't run OpenCV x86 on an x64 app pool or vice versa.
+All DLLs had to match in bitness. You could not run OpenCV x86 on an x64 app pool or vice versa.
 
-* [Download 32-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x86.zip).
-* [Download 64-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x64.zip).
+* [Download 32-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x86.zip)
+* [Download 64-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x64.zip)
 
-## Manually getting the binaries
-
-The provided binaries are for OpenCV 2.3.1. If a newer version is released, you can get it yourself. 
-
-1. Download either the [x86](http://code.google.com/p/opencvsharp/downloads/detail?name=OpenCvSharp-2.3.1-x86-20120218.zip&can=2&q=) or [x64](http://code.google.com/p/opencvsharp/downloads/detail?name=OpenCvSharp-2.3.1-x64-20120218.zip&can=2&q=) build of OpenCvSharp.
-2. Extract to a folder, and copy OpenCvSharp.dll and OpenCvSharp.dll.config. The x86 and x64 builds are actually identical. 
-3. Go to SourceForge, the opencvlibrary project, the Files section, the opencv-win folder \[[Link](http://sourceforge.net/projects/opencvlibrary/files/opencv-win/)\].
-4. Select the latest version and download the OpenCV-[Version]-win-superpack.exe file. 
-5. Extract it somewhere (you'll want to delete it later, it's over 1GB uncompressed)
-
-### Files to copy from extracted OpenCV-2.3.1-win-superpack package
-
-* tbb.dll (From opencv\build\common\tbb\ia32\vc9 or opencv\build\common\tbb\intel64\vc9
-* opencv\_calib3d231.dll (From opencv\build\x64\vc9\bin or opencv\build\x86\vc9\bin)
-* opencv\_core231.dll
-* opencv\_features2d231.dll
-* opencv\_flann231.dll
-* opencv\_gpu231.dll
-* opencv\_highgui231.dll
-* opencv\_imgproc231.dll
-* opencv\_legacy231.dll
-* opencv\_ml231.dll
-* opencv\_objdetect231.dll
-* opencv\_ts231.dll
+Required native DLLs included: tbb.dll, opencv\_calib3d231.dll, opencv\_core231.dll, opencv\_features2d231.dll, opencv\_flann231.dll, opencv\_gpu231.dll, opencv\_highgui231.dll, opencv\_imgproc231.dll, opencv\_legacy231.dll, opencv\_ml231.dll, opencv\_objdetect231.dll, opencv\_ts231.dll

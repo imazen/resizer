@@ -45,6 +45,13 @@ jobs:
         shell: pwsh
         run: scoop install ffmpeg
 
+      - name: Install and start Azurite
+        shell: pwsh
+        run: |
+          npm install -g azurite
+          Start-Process azurite -ArgumentList '--silent' -NoNewWindow
+          Start-Sleep -Seconds 2
+
       - name: Install xunit runner
         run: nuget install xunit.runner.console -Version 2.9.3 -OutputDirectory Packages
 
@@ -95,7 +102,7 @@ jobs:
           Write-Host "Running $($testDlls.Count) test assemblies (x64):"
           $testDlls | ForEach-Object { Write-Host "  $_" }
 
-          & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -notrait "requiresinfra=true" -nologo
+          & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresinfra=true" -nologo
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run tests (x86)
@@ -123,7 +130,7 @@ jobs:
           Write-Host "Running $($testDlls.Count) test assemblies (x86):"
           $testDlls | ForEach-Object { Write-Host "  $_" }
 
-          & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresazure=true" -notrait "requiresinfra=true" -nologo
+          & $xunit @testDlls -notrait "requiresmongo=true" -notrait "requiresinfra=true" -nologo
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run IIS Express integration tests (x64)

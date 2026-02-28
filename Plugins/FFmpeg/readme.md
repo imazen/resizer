@@ -40,3 +40,20 @@ You should use the latest release of FFmpeg for optimal security.
 * `ffmpeg.seconds=45.3` - Will grab the frame 45.3 seconds into the video file. Fastest way to grab an image.
 * `ffmpeg.percent=50.1` - Will grab the frame 50.1 percent through the video file (slower, as the videos length must be queried)
 * `ffmpeg.skipblankframes=true` - Even slower - if the acquired frame is blank, another frame 5 seconds later will be chosen, and so on, up to 4 times.
+
+## Version history
+
+### v4.3 (current)
+
+* **BREAKING:** CDN auto-download of `ffmpeg.exe`/`ffprobe.exe` binaries has been removed. You must install FFmpeg manually (see Prerequisites above).
+* The system PATH is now searched for `ffmpeg.exe` and `ffprobe.exe`.
+* Improved error messages when FFmpeg is not found (suggests winget, scoop, or gyan.dev).
+* Process deadlock fix: stdout/stderr are now read asynchronously.
+* Plugin now implements `IIssueProvider` and emits a diagnostic error when FFmpeg is missing.
+* All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2).
+
+### v4.2.8 and prior
+
+* FFmpeg binaries were automatically downloaded from a CDN via `downloadNativeDependencies="true"`.
+* Targeted .NET 4.5/4.5.2.
+* stdout/stderr were read synchronously, which could cause process deadlocks.

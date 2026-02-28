@@ -129,3 +129,21 @@ Changing the `cleanupStrategy` settings may void your warranty - it's tricky bus
 Times are parsed in the following format:  `{ s \| d.hh:mm[:ss[.ff]] \| hh:mm[:ss[.ff]] }`. If you just enter a number, it's considered seconds.
 
 
+## Version history
+
+### v4.3 (current)
+
+* Bug fix: `asyncFailed` flag was inverted, so sync fallback was not being logged correctly.
+* Bug fix: `QueueAsync` return type changed from `bool` to `AsyncQueueResult` enum. Duplicate writes now return `AlreadyPresent` instead of failing.
+* Bug fix: Async write exception safety improved - queue entries are now cleaned up in a `finally` block.
+* Bug fix: Subfolder hash bit clearing in `UrlHasher.getSubfolder()`.
+* Race condition mitigation: `FlushAccessedDate` is now delayed by 10 seconds to avoid interfering with concurrent reads.
+* All .NET Framework projects now target .NET 4.7.2 (previously 4.5/4.5.2).
+
+### v4.2.8 and prior
+
+* Targeted .NET 4.5/4.5.2.
+* `QueueAsync` returned `bool` (true/false) rather than a descriptive enum.
+* The async write bugs listed above were present.
+
+
