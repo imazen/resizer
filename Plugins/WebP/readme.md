@@ -76,6 +76,11 @@ When you get this error, you'll need to add a mime-type mapping in web.config
       </system.webServer>
     </configuration>
 
+## Common issues
+
+* **Decoding WebP from a MemoryStream or byte array** — When using the managed API (`ImageBuilder.Build()`) with a `MemoryStream` or `byte[]` source, add `&decoder=webp` to your instructions. Without a `.webp` file extension, the decoder cannot auto-detect the format.
+* **Bitness mismatch** — The native `libwebp` DLL must match your application's bitness. If your app pool runs in 32-bit mode, you need the win-x86 native package. In v4.3, NuGet installs the correct native DLLs automatically; ensure you have the `Imazen.WebP.NativeRuntime.win-x64` and/or `Imazen.WebP.NativeRuntime.win-x86` packages referenced.
+
 ## Version history
 
 ### v4.3 (current)

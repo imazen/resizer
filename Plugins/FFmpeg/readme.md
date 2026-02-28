@@ -31,7 +31,8 @@ You should use the latest release of FFmpeg for optimal security.
 
 1. Add ImageResizer.Plugins.FFmpeg.dll to your project using Visual Studio.
 2. Add `<add name="FFmpeg" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
-3. During `Application_Start`, call  `ImageResizer.Configuration.Config.Current.Plugins.LoadPlugins()` to ensure that ffmpeg is detected before the application starts accepting requests.
+3. Add `<pipeline vppUsage="Always" />` inside `<resizer>` in Web.config. This is required because the FFmpeg plugin is a VirtualPathProvider — without this setting, physical video files are served directly by IIS and bypass the FFmpeg frame-extraction pipeline.
+4. During `Application_Start`, call  `ImageResizer.Configuration.Config.Current.Plugins.LoadPlugins()` to ensure that ffmpeg is detected before the application starts accepting requests.
 
 ## Use
 

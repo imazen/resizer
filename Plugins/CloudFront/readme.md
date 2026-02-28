@@ -11,6 +11,16 @@ This plugin is **NOT** required to use Amazon CloudFront. It exists for historic
 
 Today, just enable querystring support/preservation when you create a 'distribution' or 'endpoint'. If you can do that, you don't need this plugin.
 
+## Setting up CloudFront with ImageResizer
+
+Your CloudFront distribution must use a **Custom Origin** pointing to your ImageResizer server (not an S3 origin). ImageResizer processes images on the origin server, and CloudFront caches the results at edge locations.
+
+1. Create a CloudFront distribution with a Custom Origin set to your server's hostname (e.g., `images.example.com`).
+2. Under **Cache behavior**, set **Query String Forwarding** to "Forward all" so that ImageResizer's querystring parameters (`?width=100&height=200`) reach your origin.
+3. Optionally configure a CNAME for friendlier URLs.
+
+With query string forwarding enabled, standard ImageResizer URLs work through CloudFront without any plugin. The CloudFront plugin below is only needed if your CDN strips querystrings.
+
 ## Installation
 
 Either run `Install-Package ImageResizer.Plugins.CloudFront` in the NuGet package manager, or:

@@ -84,7 +84,9 @@ All other exceptions are WebExceptions
 
 ## Limitations of human-friendly syntax
 
-The human-friendly syntax has to go through the IIS and ASP.NET request filtering/normalization system, which may cause issues if your URLs have special characters or spaces.
+The human-friendly syntax always uses HTTP (not HTTPS). If the remote server requires HTTPS, you must use the signed URL approach (`CreateSignedUrl()`), which preserves the full URL including the scheme.
+
+The human-friendly syntax also has to go through the IIS and ASP.NET request filtering/normalization system, which may cause issues if your URLs have special characters or spaces.
 
 In 3.1.5 and higher, spaces are supported in URLs, but to support '+' characters in remote URLs, you have to [make a change in Web.config](http://stackoverflow.com/questions/1453218/is-enabling-double-escaping-dangerous), as IIS considers '+' dangerous by default ... for unknown reasons.
 
@@ -104,10 +106,6 @@ In 3.1.5 and higher, spaces are supported in URLs, but to support '+' characters
         </defaultProxy>
       </system.net>
     </configuration>
-
-## Non-ASCII URLs
-
-.NET versions prior to 4.5 require [a tiny bit of configuration to allow non-ASCII characters in remote URLs](http://stackoverflow.com/questions/6107621/uri-iswellformeduristring-needs-to-be-updated).
 
 ## Version history
 

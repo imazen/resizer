@@ -89,7 +89,7 @@ Should be in virtual path form, like `/vdir/cache` or `~/imagecache`.
 ### autoClean
 
 When true, will keep a background thread running to 'clean' unused items from the disk cache. This background thread uses smart 'activity sensing' to avoid doing cleanup work when the site is busy. 
-Defaults to false, since the cleanup system is still in beta.
+Defaults to false. The cleanup system is stable and production-ready.
 
 ### enabled
 
@@ -128,6 +128,13 @@ Changing the `cleanupStrategy` settings may void your warranty - it's tricky bus
 
 Times are parsed in the following format:  `{ s \| d.hh:mm[:ss[.ff]] \| hh:mm[:ss[.ff]] }`. If you just enter a number, it's considered seconds.
 
+
+## Common issues
+
+* **`<diskcache>` placement** — `<diskcache>` and `<cleanupStrategy>` are children of `<resizer>`, not children of `<plugins>`. They sit alongside `<plugins>`, not inside it.
+* **Cache invalidation** — DiskCache keys are based on the URL and querystring. Changing the source image will create a new cache entry (if `hashModifiedDate="true"`, the default). To force a re-render, change the URL (e.g., append `&v=2`). Deleting the `~/imagecache` folder is safe while the application is stopped.
+* **Licensing cache** — After changing your license key, the `/imagecache/` folder may contain images rendered with the old license status (e.g., a red dot watermark). Delete the cache folder or wait for `autoClean` to cycle out stale entries.
+* **Web Gardens / Web Farms** — Keep `hashModifiedDate="true"` (the default) in Web Garden or overlapped-recycle scenarios. Setting it to false risks file-lock contention on high-traffic servers.
 
 ## Version history
 
