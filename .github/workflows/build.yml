@@ -215,28 +215,13 @@ jobs:
         shell: cmd
         run: Plugins\FastScaling\ARM64\Release\NativeFastScaling.Test.exe -d yes
 
-      - name: Diagnose ARM64 runtime environment
+      - name: Run FastScaling managed tests (ARM64)
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=arm64 -no_logo
 
-          echo class D{static void Main(){System.Console.WriteLine(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture);}}> diag.cs
-          csc /nologo /platform:anycpu diag.cs
-          echo AnyCPU ProcessArchitecture:
-          diag.exe
+          echo using System;class R{static int Main(string[] a){var r=new string[a.Length-1];Array.Copy(a,1,r,0,r.Length);return AppDomain.CurrentDomain.ExecuteAssembly(a[0],r);}}> arm64host.cs
+          csc /nologo /platform:arm64 /out:arm64host.exe arm64host.cs
 
-          echo === CorFlags: xunit runner ===
-          corflags Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe
-          echo === CorFlags: C++/CLI FastScaling DLL ===
-          corflags Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.dll
-          echo === CorFlags: managed test DLL ===
-          corflags Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.Tests.dll
-
-          echo === dumpbin /headers on C++/CLI DLL (first 30 lines) ===
-          dumpbin /headers Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.dll 2>&1 | findstr /i "machine PE magic arm"
-
-      - name: Run FastScaling managed tests (ARM64)
-        shell: cmd
-        run: |
-          Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.Tests.dll -nologo
+          arm64host.exe Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.Tests.dll -nologo
           if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
