@@ -283,13 +283,22 @@ namespace ImageResizer.Plugins.FFmpeg
 
             using (Process p = Process.Start(info))
             {
+                // Read streams asynchronously to avoid deadlock when the OS pipe
+                // buffer fills up before the process exits.
+                var stderr = new StringBuilder();
+                var stdout = new StringBuilder();
+                p.ErrorDataReceived += (s, e) => { if (e.Data != null) stderr.AppendLine(e.Data); };
+                p.OutputDataReceived += (s, e) => { if (e.Data != null) stdout.AppendLine(e.Data); };
+                p.BeginErrorReadLine();
+                p.BeginOutputReadLine();
+
                 bool result = p.WaitForExit(timeout);
                 if (!result)
                 {
                     p.Kill(); //Kill the process if it times out.
                     throw new Exception("FFmpeg failed due to timeout.");
                 }
-                string messages = p.StandardError.ReadToEnd() + p.StandardOutput.ReadToEnd();
+                string messages = stderr.ToString() + stdout.ToString();
                 if (p.ExitCode != 0)
                     throw new Exception("FFmpeg failed: " + messages);
                 return messages;

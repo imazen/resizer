@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{00D9FEC9-F33A-4C7C-AECF-76C08E7D8D9C}</ProjectGuid>
+    <ProjectGuid>{A2B3C4D5-FFEE-DDCC-BBAA-998877665544}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageResizer.Plugins.Pdf.Tests</RootNamespace>
-    <AssemblyName>ImageResizer.Plugins.Pdf.Tests</AssemblyName>
+    <RootNamespace>ImageResizer.Plugins.FFmpeg.Tests</RootNamespace>
+    <AssemblyName>ImageResizer.Plugins.FFmpeg.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\Tests\binaries\debug\</OutputPath>
+    <OutputPath>..\..\Tests\binaries\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\Tests\binaries\release\</OutputPath>
+    <OutputPath>..\..\Tests\binaries\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -40,21 +40,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PdfDecoderTests.cs" />
-    <Compile Include="Ghostscript\PdfInfoTests.cs" />
+    <Compile Include="FFmpegTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Test.pdf" />
+    <EmbeddedResource Include="TestVideo.mp4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\ImageResizer.csproj">
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj">
-      <Project>{7C8A13F7-5C00-4074-B16E-45D0E231B70D}</Project>
-      <Name>ImageResizer.Plugins.Pdf</Name>
+    <ProjectReference Include="..\..\Plugins\FFmpeg\ImageResizer.Plugins.FFmpeg.csproj">
+      <Project>{41E1FB1A-826B-4C35-9034-8C44D2402941}</Project>
+      <Name>ImageResizer.Plugins.FFmpeg</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

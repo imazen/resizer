@@ -11,6 +11,7 @@ using ImageResizer.Plugins.PdfRenderer.Ghostscript;
 
 namespace ImageResizer.Plugins.Pdf.Tests
 {
+    [Trait("requiresghostscript", "true")]
     public class PdfRendererTests
     {
         private PdfRendererPlugin _decoder;

@@ -33,6 +33,18 @@ jobs:
       - name: NuGet restore (FastScaling solution)
         run: nuget restore Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
 
+      - name: Install Scoop
+        shell: pwsh
+        run: iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+
+      - name: Install Ghostscript
+        shell: pwsh
+        run: scoop install ghostscript
+
+      - name: Install FFmpeg
+        shell: pwsh
+        run: scoop install ffmpeg
+
       - name: Install xunit runner
         run: nuget install xunit.runner.console -Version 2.9.3 -OutputDirectory Packages
 
@@ -66,9 +78,9 @@ jobs:
           $xunit = "Packages\xunit.runner.console.2.9.3\tools\net472\xunit.console.exe"
 
           # Discover AnyCPU test DLLs (mirrors Build.fsx glob)
-          # Exclude: CoreFSharp (F#), FakeBuilder (needs FSharp.Core), PdfiumRenderer (needs native pdfium.dll)
+          # Exclude: CoreFSharp (F#), FakeBuilder (needs FSharp.Core)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|FakeBuilder|PdfiumRenderer|IISExpressTests" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|FakeBuilder|IISExpressTests" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x64 managed tests
@@ -95,9 +107,8 @@ jobs:
           # (mirrors Build.fsx exclusions for x86 run)
           # Exclude: FakeBuilder (needs FSharp.Core), AllPlugins/CopyMetadata/TinyCache (x86 incompatible)
           # LicenseVerifier excluded from x86 (race condition in Test_Revocations; fully covered in x64)
-          # PdfiumRenderer excluded (needs native pdfium.dll)
           $testDlls = @(Get-ChildItem "Tests\binaries\release\*Tests.dll" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|FakeBuilder|LicenseVerifier|PdfiumRenderer|IISExpressTests" } |
+            Where-Object { $_.Name -notmatch "CoreFSharp|AllPlugins|CopyMetadata|TinyCache|FakeBuilder|LicenseVerifier|IISExpressTests" } |
             Select-Object -ExpandProperty FullName)
 
           # Add FastScaling x86 managed tests
