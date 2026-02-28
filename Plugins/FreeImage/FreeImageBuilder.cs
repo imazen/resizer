@@ -23,8 +23,10 @@ using System.Diagnostics;
 
 namespace ImageResizer.Plugins.FreeImageBuilder {
     /// <summary>
-    /// Provides an alternate resizing pipeline that never touches GDI. Only supports width/maxwidth/height/maxheight/scale/marginWidth/paddingWidth/fi.scale settings. Only operates on requests specifying builder=freeimage
+    /// Provides an alternate resizing pipeline that never touches GDI. Only supports width/maxwidth/height/maxheight/scale/marginWidth/paddingWidth/fi.scale settings. Only operates on requests specifying builder=freeimage.
+    /// The FreeImage library was discontinued in 2015 and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline or a maintained alternative.
     /// </summary>
+    [Obsolete("The FreeImage library is discontinued and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline.")]
     public class FreeImageBuilderPlugin :BuilderExtension, IPlugin, IIssueProvider {
 
         /// <summary>
@@ -52,11 +54,11 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
-            
+
         }
 
         /// <summary>
-        /// Adds alternate pipeline based on FreeImage. Invoked by &amp;builder=freeimage. 
+        /// Adds alternate pipeline based on FreeImage. Invoked by &amp;builder=freeimage.
         /// This method doesn't handle job.DisposeSource or job.DesposeDest or settings filtering, that's handled by ImageBuilder.
         /// All the bitmap processing is handled by buildFiBitmap, this method handles all the I/O
         /// </summary>
@@ -157,7 +159,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
 
 
         /// <summary>
-        /// Builds an FIBitmap from the stream and job.Settings 
+        /// Builds an FIBitmap from the stream and job.Settings
         /// </summary>
         /// <param name="original"></param>
         /// <param name="supportsTransparency"></param>
@@ -220,18 +222,23 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                 job.ResultInfo["final.width"] = (int)FreeImage.GetWidth(final);
                 job.ResultInfo["final.height"] = (int)FreeImage.GetHeight(final);
             }
-            
+
             return final;
 
         }
 
 
         /// <summary>
-        /// Returns the issue "The FreeImage library is not available! All FreeImage plugins will be disabled" if the FreeImage library is not available.
+        /// Returns deprecation and availability issues for the FreeImage plugin.
         /// </summary>
         /// <returns></returns>
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
+            issues.Add(new Issue("FreeImageBuilder: the FreeImage library was discontinued in 2015 and has known security vulnerabilities (CVEs). " +
+                "Remove all FreeImage plugins and migrate to the built-in GDI/WIC pipeline or a maintained alternative.",
+                "FreeImage has not received security patches since 2015. Continued use exposes your application to known image parsing vulnerabilities. " +
+                "Remove the FreeImageBuilder, FreeImageDecoder, FreeImageEncoder, and FreeImageScaling plugins from your configuration.",
+                IssueSeverity.Critical));
             if (!FreeImageAPI.FreeImage.IsAvailable()) issues.Add(new Issue("The FreeImage library is not available! All FreeImage plugins will be disabled.", IssueSeverity.Error));
             return issues;
         }

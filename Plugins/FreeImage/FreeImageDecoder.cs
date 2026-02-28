@@ -3,7 +3,7 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Resizing;
@@ -23,6 +23,11 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         Drago,
         Fattal
     }
+    /// <summary>
+    /// Provides decoding support for all FreeImage-supported formats.
+    /// The FreeImage library was discontinued in 2015 and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline or a maintained alternative.
+    /// </summary>
+    [Obsolete("The FreeImage library is discontinued and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline.")]
     public class FreeImageDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider, IQuerystringPlugin {
         public FreeImageDecoderPlugin() {
         }
@@ -79,7 +84,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         public override System.Drawing.Bitmap DecodeStreamFailed(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
             try {
                  return Decode(s,settings);
-                 
+
             } catch (Exception){
                 return null;
             }
@@ -124,7 +129,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
             if (!string.IsNullOrEmpty(settings["frame"]) && !int.TryParse(settings["frame"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out frame))
                 frame = 0;
 
-            if (page == 0 && frame != 0) page = frame; 
+            if (page == 0 && frame != 0) page = frame;
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -134,7 +139,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
                 FIMULTIBITMAP mb = FreeImage.OpenMultiBitmapFromStream(s, ref fmt, flags);
                 //Prevent asking for a non-existent page
                 int pages = FreeImage.GetPageCount(mb);
-                if (page > pages) page = pages; 
+                if (page > pages) page = pages;
                 try {
                     if (mb.IsNull) return null;
                     FIBITMAP bPage = FreeImage.LockPage(mb, page - 1);
@@ -187,7 +192,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
 
                 return callback(ref m, true);
             } finally {
-                if (!m.IsNull) FreeImage.UnloadEx(ref m); 
+                if (!m.IsNull) FreeImage.UnloadEx(ref m);
             }
         }
 
@@ -198,16 +203,21 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
 
         /// <summary>
-        /// Returns the issue "The FreeImage library is not available! All FreeImage plugins will be disabled" if the FreeImage library is not available.
+        /// Returns deprecation and availability issues for the FreeImage plugin.
         /// </summary>
         /// <returns></returns>
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
+            issues.Add(new Issue("FreeImageDecoder: the FreeImage library was discontinued in 2015 and has known security vulnerabilities (CVEs). " +
+                "Remove all FreeImage plugins and migrate to the built-in GDI/WIC pipeline or a maintained alternative.",
+                "FreeImage has not received security patches since 2015. Continued use exposes your application to known image parsing vulnerabilities. " +
+                "Remove the FreeImageBuilder, FreeImageDecoder, FreeImageEncoder, and FreeImageScaling plugins from your configuration.",
+                IssueSeverity.Critical));
             if (!FreeImageAPI.FreeImage.IsAvailable()) issues.Add(new Issue("The FreeImage library is not available! All FreeImage plugins will be disabled.", IssueSeverity.Error));
             return issues;
         }
         /// <summary>
-        /// Returns the querystrings command keys supported by this plugin. 
+        /// Returns the querystrings command keys supported by this plugin.
         /// </summary>
         /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {

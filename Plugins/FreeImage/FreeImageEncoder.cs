@@ -3,10 +3,11 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Encoding;
+using ImageResizer.Configuration.Issues;
 using FreeImageAPI;
 using System.Drawing;
 using ImageResizer.Plugins.Basic;
@@ -16,8 +17,10 @@ using System.Globalization;
 namespace ImageResizer.Plugins.FreeImageEncoder {
     /// <summary>
     /// FreeImageEncoder can encode JPEGs 2-3x as fast as GDI can, and offers more encoding options.
+    /// The FreeImage library was discontinued in 2015 and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline or a maintained alternative.
     /// </summary>
-    public class FreeImageEncoderPlugin : IPlugin, IEncoder {
+    [Obsolete("The FreeImage library is discontinued and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline.")]
+    public class FreeImageEncoderPlugin : IPlugin, IEncoder, IIssueProvider {
 
         FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_JPEG;
 
@@ -53,7 +56,7 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             if (string.IsNullOrEmpty(settings["quality"]) || !int.TryParse(settings["quality"], NumberStyles.Number, NumberFormatInfo.InvariantInfo, out quality)) quality = 90;
             if (format == FREE_IMAGE_FORMAT.FIF_JPEG) {
                 if (quality >= 100) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYSUPERB;
-                else if (quality >= 75) 
+                else if (quality >= 75)
                     encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD;
                 else if (quality >= 50) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYNORMAL;
                 else if (quality >= 25) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYAVERAGE;
@@ -73,7 +76,7 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             if (format == FREE_IMAGE_FORMAT.FIF_GIF) {
                 //encodingOptions = FREE_IMAGE_SAVE_FLAGS.
             }
-            
+
 
         }
         int colors = -1;
@@ -99,7 +102,7 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
         }
 
         public IEncoder CreateIfSuitable(ResizeSettings settings, object original) {
-            
+
             ImageFormat requestedFormat = DefaultEncoder.GetRequestedFormat(settings.Format, ImageFormat.Jpeg);
             if (requestedFormat == null || !IsValidOutputFormat(requestedFormat)) return null; //An unsupported format was explicitly specified.
             if (!"freeimage".Equals(settings["encoder"], StringComparison.OrdinalIgnoreCase)) return null;
@@ -148,6 +151,20 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
         /// </summary>
         public string Extension {
             get { return FreeImage.GetPrimaryExtensionFromFIF(Format); }
+        }
+
+        /// <summary>
+        /// Returns deprecation and availability issues for the FreeImage plugin.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>();
+            issues.Add(new Issue("FreeImageEncoder: the FreeImage library was discontinued in 2015 and has known security vulnerabilities (CVEs). " +
+                "Remove all FreeImage plugins and migrate to the built-in GDI/WIC pipeline or a maintained alternative.",
+                "FreeImage has not received security patches since 2015. Continued use exposes your application to known image parsing vulnerabilities. " +
+                "Remove the FreeImageBuilder, FreeImageDecoder, FreeImageEncoder, and FreeImageScaling plugins from your configuration.",
+                IssueSeverity.Critical));
+            return issues;
         }
     }
 }

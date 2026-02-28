@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Resizing;
+using ImageResizer.Configuration.Issues;
 using FreeImageAPI;
 using System.Drawing.Drawing2D;
 using ImageResizer.Util;
@@ -15,13 +16,19 @@ using ImageResizer.Plugins.FreeImageResizer;
 using ImageResizer.Plugins.FreeImageScaling;
 
 /// Adds support for FreeImage resizing algorithms, which include CatmullRom, Lanczos3, bspline, box, bicubic, and bilinear filters.
-namespace ImageResizer.Plugins.FreeImageResizer { public class FreeImageResizerPlugin : FreeImageScalingPlugin { public FreeImageResizerPlugin() { } } }
+/// The FreeImage library was discontinued in 2015 and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline or a maintained alternative.
+namespace ImageResizer.Plugins.FreeImageResizer {
+    [Obsolete("The FreeImage library is discontinued and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline.")]
+    public class FreeImageResizerPlugin : FreeImageScalingPlugin { public FreeImageResizerPlugin() { } }
+}
 
 namespace ImageResizer.Plugins.FreeImageScaling {
     /// <summary>
     /// Adds support for scaling.
+    /// The FreeImage library was discontinued in 2015 and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline or a maintained alternative.
     /// </summary>
-    public class FreeImageScalingPlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
+    [Obsolete("The FreeImage library is discontinued and has known security vulnerabilities. Migrate to the built-in GDI/WIC pipeline.")]
+    public class FreeImageScalingPlugin : BuilderExtension, IPlugin, IQuerystringPlugin, IIssueProvider {
         /// <summary>
         /// Creates a new instance of the FreeImageScaling plugin.
         /// </summary>
@@ -117,6 +124,20 @@ namespace ImageResizer.Plugins.FreeImageScaling {
             
 
             return RequestedAction.Cancel;
+        }
+
+        /// <summary>
+        /// Returns deprecation and availability issues for the FreeImage plugin.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>();
+            issues.Add(new Issue("FreeImageScaling: the FreeImage library was discontinued in 2015 and has known security vulnerabilities (CVEs). " +
+                "Remove all FreeImage plugins and migrate to the built-in GDI/WIC pipeline or a maintained alternative.",
+                "FreeImage has not received security patches since 2015. Continued use exposes your application to known image parsing vulnerabilities. " +
+                "Remove the FreeImageBuilder, FreeImageDecoder, FreeImageEncoder, and FreeImageScaling plugins from your configuration.",
+                IssueSeverity.Critical));
+            return issues;
         }
     }
 }
