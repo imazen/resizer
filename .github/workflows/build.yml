@@ -215,25 +215,28 @@ jobs:
         shell: cmd
         run: Plugins\FastScaling\ARM64\Release\NativeFastScaling.Test.exe -d yes
 
-      - name: Run FastScaling managed tests (ARM64)
+      - name: Diagnose ARM64 runtime environment
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=arm64 -no_logo
 
-          echo === Diagnostic: .NET Framework exe architecture ===
-          echo class D{static void Main(){System.Console.WriteLine(System.IntPtr.Size);}}> diag.cs
+          echo class D{static void Main(){System.Console.WriteLine(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture);}}> diag.cs
           csc /nologo /platform:anycpu diag.cs
-          echo AnyCPU IntPtr.Size:
+          echo AnyCPU ProcessArchitecture:
           diag.exe
-          csc /nologo /platform:arm64 /out:diag64.exe diag.cs
-          echo ARM64 IntPtr.Size:
-          diag64.exe
 
-          echo === Fix xunit runner PE format for ARM64 ===
+          echo === CorFlags: xunit runner ===
           corflags Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe
-          corflags /PE32- /32BITPREF- /Force Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe
-          corflags Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe
+          echo === CorFlags: C++/CLI FastScaling DLL ===
+          corflags Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.dll
+          echo === CorFlags: managed test DLL ===
+          corflags Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.Tests.dll
 
-          echo === Running managed tests ===
+          echo === dumpbin /headers on C++/CLI DLL (first 30 lines) ===
+          dumpbin /headers Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.dll 2>&1 | findstr /i "machine PE magic arm"
+
+      - name: Run FastScaling managed tests (ARM64)
+        shell: cmd
+        run: |
           Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.Tests.dll -nologo
           if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
