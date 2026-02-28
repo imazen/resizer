@@ -215,6 +215,9 @@ jobs:
         shell: cmd
         run: Plugins\FastScaling\ARM64\Release\NativeFastScaling.Test.exe -d yes
 
+      # .NET Framework 4.8.1 runs AnyCPU (ILONLY) assemblies as x64 on ARM64 Windows,
+      # so the stock xunit runner can't load the ARM64 C++/CLI DLL. We compile a tiny
+      # ARM64 host exe that runs xunit via ExecuteAssembly, forcing the native ARM64 CLR.
       - name: Run FastScaling managed tests (ARM64)
         shell: cmd
         run: |
