@@ -226,8 +226,17 @@ jobs:
             exit 1
           }
 
-          Write-Host "Test DLL directory contents:"
-          Get-ChildItem (Split-Path $fsTest) | ForEach-Object { Write-Host "  $($_.Name)  ($($_.Length) bytes)" }
+          # Diagnose .NET Framework version and architecture
+          $ndp = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full'
+          Write-Host ".NET Framework Release: $($ndp.Release), Version: $($ndp.Version)"
+          Write-Host "OS Architecture: $([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)"
+
+          # Force xunit runner to PE32+ (64-bit) so it runs as ARM64, not x86 under WoW64
+          Write-Host "CorFlags before:"
+          & corflags $xunit 2>&1 | Write-Host
+          & corflags /PE32- /32BITPREF- /Force $xunit 2>&1 | Write-Host
+          Write-Host "CorFlags after:"
+          & corflags $xunit 2>&1 | Write-Host
 
           Write-Host "Running FastScaling managed tests (ARM64):"
           Write-Host "  $fsTest"
