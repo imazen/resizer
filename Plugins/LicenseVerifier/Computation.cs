@@ -237,10 +237,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
                                     .FirstOrDefault() ?? DefaultNetworkGraceMinutes;
 
             // Success will automatically replace this instance. Warn immediately.
-            Debug.Assert(mgr.FirstHeartbeat != null, "mgr.FirstHeartbeat != null");
+            var heartbeat = mgr.FirstHeartbeat ?? clock.GetUtcNow();
 
             // NetworkGraceMinutes Expired?
-            var expires = mgr.FirstHeartbeat.Value.AddMinutes(graceMinutes);
+            var expires = heartbeat.AddMinutes(graceMinutes);
             if (expires < clock.GetUtcNow()) {
                 permanentIssues.AcceptIssue(new Issue($"Grace period of {graceMinutes}m expired for license {chain.Id}",
                     $"License {chain.Id} was not found in the disk cache and could not be retrieved from the remote server within {graceMinutes} minutes.",
@@ -249,7 +249,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
 
             // Less than 30 seconds since boot time?
-            var thirtySeconds = mgr.FirstHeartbeat.Value.AddSeconds(30);
+            var thirtySeconds = heartbeat.AddSeconds(30);
             if (thirtySeconds > clock.GetUtcNow()) {
                 AcceptIssue(new Issue($"Fetching license {chain.Id} (not found in disk cache).",
                     $"Network grace period expires in {graceMinutes} minutes", IssueSeverity.Warning));

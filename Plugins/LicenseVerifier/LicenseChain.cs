@@ -18,7 +18,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
     class LicenseChain : ILicenseChain
     {
         static readonly string[] DefaultLicenseServers = {
-            "https://s3-us-west-2.amazonaws.com/licenses.imazen.net/",
+            "https://s3.us-west-2.amazonaws.com/licenses.imazen.net/",
             "https://licenses-redirect.imazen.net/",
             "https://licenses.imazen.net/",
             "https://licenses2.imazen.net"

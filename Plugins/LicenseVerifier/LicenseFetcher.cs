@@ -144,7 +144,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
                         var networkFailure = NetworkFailures.Any(s => s == status);
                         results.Add(new FetchResult {
-                            FetchError = (Exception) web ?? rex,
+                            FetchError = web as Exception ?? rex,
                             FullUrl = url,
                             ShortUrl = baseUrl,
                             FailureKind = status,

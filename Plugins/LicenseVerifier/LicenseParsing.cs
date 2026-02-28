@@ -216,20 +216,24 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             return trustedKeys.Any(p =>
             {
-                var signature = b.Signature;
-                var hash = new SHA512Managed().ComputeHash(b.Data);
-                var decryptedBytes = p.DecryptPublic(signature);
-                var valid = hash.SequenceEqual(decryptedBytes);
+                using (var hash = SHA512.Create())
+                {
+                    var hashBytes = hash.ComputeHash(b.Data);
 
-                log?.AppendLine("Using public exponent " + p.Exponent.ToString() + " and modulus " +
-                                p.Modulus.ToString());
-                log?.AppendLine("Encrypted bytes: " + BitConverter.ToString(signature).ToLower().Replace("-", ""));
-                log?.AppendLine("Decrypted sha512: " +
-                                BitConverter.ToString(decryptedBytes).ToLower().Replace("-", ""));
-                log?.AppendLine("Expected sha512: " + BitConverter.ToString(hash).ToLower().Replace("-", ""));
-                log?.AppendLine(valid ? "Success!" : "Not a match.");
+                    var signature = b.Signature;
+                    var decryptedBytes = p.DecryptPublic(signature);
+                    var valid = hashBytes.SequenceEqual(decryptedBytes);
 
-                return valid;
+                    log?.AppendLine("Using public exponent " + p.Exponent.ToString() + " and modulus " +
+                                    p.Modulus.ToString());
+                    log?.AppendLine("Encrypted bytes: " + BitConverter.ToString(signature).ToLower().Replace("-", ""));
+                    log?.AppendLine("Decrypted sha512: " +
+                                    BitConverter.ToString(decryptedBytes).ToLower().Replace("-", ""));
+                    log?.AppendLine("Expected sha512: " + BitConverter.ToString(hashBytes).ToLower().Replace("-", ""));
+                    log?.AppendLine(valid ? "Success!" : "Not a match.");
+
+                    return valid;
+                }
             });
         }
 
@@ -329,13 +333,18 @@ namespace ImageResizer.Plugins.LicenseVerifier
         static bool Validate(string licenseStr, BigInteger mod, BigInteger exp, StringBuilder log)
         {
             var blob = LicenseBlob.Deserialize(licenseStr);
-            log?.AppendLine("---------------------------------------------");
-            log?.AppendLine("Parsed info: " + blob.Fields);
-            log?.AppendLine("Plaintext hash: " + BitConverter
-                                .ToString(new SHA512Managed().ComputeHash(blob.Data))
-                                .ToLower()
-                                .Replace("-", ""));
-            return blob.VerifySignature(new[] {new RSADecryptPublic(mod, exp)}, log);
+            using (var hash = SHA512.Create())
+            {
+                var hashBytes = hash.ComputeHash(blob.Data);
+
+                log?.AppendLine("---------------------------------------------");
+                log?.AppendLine("Parsed info: " + blob.Fields);
+                log?.AppendLine("Plaintext hash: " + BitConverter
+                                    .ToString(hashBytes)
+                                    .ToLower()
+                                    .Replace("-", ""));
+                return blob.VerifySignature(new[] {new RSADecryptPublic(mod, exp)}, log);
+            }
         }
 
         static string ReadStdin()
