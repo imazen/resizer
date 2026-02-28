@@ -215,31 +215,25 @@ jobs:
         shell: cmd
         run: Plugins\FastScaling\ARM64\Release\NativeFastScaling.Test.exe -d yes
 
-      - name: Diagnose ARM64 .NET Framework environment
-        shell: pwsh
-        run: |
-          $ndp = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full'
-          Write-Host ".NET Framework Release: $($ndp.Release), Version: $($ndp.Version)"
-          Write-Host "OS Architecture: $([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)"
-
-          # Compile a tiny .NET Framework exe to check runtime architecture
-          $src = "class D{static void Main(){System.Console.WriteLine(System.IntPtr.Size);}}"
-          $src | Set-Content diag.cs
-          & csc /nologo /platform:anycpu diag.cs
-          Write-Host "AnyCPU IntPtr.Size: $(& .\diag.exe)"
-          & csc /nologo /platform:arm64 /out:diag64.exe diag.cs
-          Write-Host "ARM64 IntPtr.Size: $(& .\diag64.exe)"
-
-      - name: Force xunit runner to PE32+ for ARM64
+      - name: Run FastScaling managed tests (ARM64)
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=arm64 -no_logo
+
+          echo === Diagnostic: .NET Framework exe architecture ===
+          echo class D{static void Main(){System.Console.WriteLine(System.IntPtr.Size);}}> diag.cs
+          csc /nologo /platform:anycpu diag.cs
+          echo AnyCPU IntPtr.Size:
+          diag.exe
+          csc /nologo /platform:arm64 /out:diag64.exe diag.cs
+          echo ARM64 IntPtr.Size:
+          diag64.exe
+
+          echo === Fix xunit runner PE format for ARM64 ===
           corflags Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe
           corflags /PE32- /32BITPREF- /Force Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe
           corflags Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe
 
-      - name: Run FastScaling managed tests (ARM64)
-        shell: cmd
-        run: |
+          echo === Running managed tests ===
           Packages\xunit.runner.console.2.9.3\tools\net481\xunit.console.exe Tests\binaries\release\ARM64\ImageResizer.Plugins.FastScaling.Tests.dll -nologo
           if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
