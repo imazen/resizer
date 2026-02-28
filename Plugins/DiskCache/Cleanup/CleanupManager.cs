@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using ImageResizer.Plugins.DiskCache.Cleanup;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Configuration.Logging;
@@ -81,10 +82,25 @@ namespace ImageResizer.Plugins.DiskCache {
         public void UsedFile(string relativePath, string physicalPath) {
             //Bump the date in memory
             cache.Index.bumpDateIfExists(relativePath);
-            //Make sure the 'flush' job for the file is in the queue somewhere, so the access date will get written to disk.
-            queue.QueueIfUnique(new CleanupWorkItem(CleanupWorkItem.Kind.FlushAccessedDate, relativePath, physicalPath));
-            //In case it's paused
-            worker.MayHaveWork();
+
+            // Wait 10 seconds before flushing last accessed date to disk.
+            // This drastically reduces race conditions where a SetLastAccessTimeUtc
+            // call prevents a cached file from being read by the request thread.
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(10000);
+                    //Make sure the 'flush' job for the file is in the queue somewhere, so the access date will get written to disk.
+                    queue.QueueIfUnique(new CleanupWorkItem(CleanupWorkItem.Kind.FlushAccessedDate, relativePath, physicalPath));
+                    //In case it's paused
+                    worker.MayHaveWork();
+                }
+                catch
+                {
+                    // Swallow exceptions in fire-and-forget task
+                }
+            });
         }
 
 

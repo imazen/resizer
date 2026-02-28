@@ -91,23 +91,38 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         /// <returns></returns>
         public delegate void WriterDelegate(AsyncWrite w);
 
+        public enum AsyncQueueResult
+        {
+            Enqueued,
+            AlreadyPresent,
+            QueueFull
+        }
+
         /// <summary>
-        /// Returns false when (a) the specified AsyncWrite value already exists or (b) the queue is full
+        /// Tries to enqueue the given async write and callback.
+        /// Returns AlreadyPresent if a write for the same key is already queued,
+        /// QueueFull if the memory limit would be exceeded, or Enqueued on success.
         /// </summary>
         /// <param name="w"></param>
         /// <param name="writerDelegate"></param>
         /// <returns></returns>
-        public bool QueueAsync(AsyncWrite w, AsyncWriterDelegate writerDelegate ){
+        public AsyncQueueResult QueueAsync(AsyncWrite w, AsyncWriterDelegate writerDelegate ){
             lock (_sync) {
-                if (GetQueuedBufferBytes() + w.GetBufferLength() > MaxQueueBytes) return false; //Because we would use too much ram.
-                if (c.ContainsKey(w.Key)) return false; //We already have a queued write for this data.
+                if (GetQueuedBufferBytes() + w.GetBufferLength() > MaxQueueBytes) return AsyncQueueResult.QueueFull; //Because we would use too much ram.
+                if (c.ContainsKey(w.Key)) return AsyncQueueResult.AlreadyPresent; //We already have a queued write for this data.
                 c.Add(w.Key, w);
                 Task.Run(
                     async () => {
-                        await writerDelegate(w);
-                        Remove(w);
+                        try
+                        {
+                            await writerDelegate(w);
+                        }
+                        finally
+                        {
+                            Remove(w);
+                        }
                     }).ConfigureAwait(false);
-                return true;
+                return AsyncQueueResult.Enqueued;
             }
         }
 

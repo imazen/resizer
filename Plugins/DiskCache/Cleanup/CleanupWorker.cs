@@ -254,7 +254,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 FlushAccessedDate(item);
 
             if (lp.Logger != null) sw.Stop();
-            if (lp.Logger != null) lp.Logger.Trace("{2}ms: Executing task {0} {1} ({3} tasks remaining)", item.Task.ToString(), item.RelativePath, sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), queue.Count.ToString(NumberFormatInfo.InvariantInfo));
+            if (lp.Logger != null) lp.Logger.Trace("{0}ms: Executing task {1} {2} ({3} tasks remaining)", sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), item.Task.ToString(), item.RelativePath, queue.Count.ToString(NumberFormatInfo.InvariantInfo));
 
             
         }

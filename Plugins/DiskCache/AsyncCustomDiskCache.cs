@@ -152,10 +152,10 @@ namespace ImageResizer.Plugins.DiskCache {
                             ms.Position = 0;
 
                             AsyncWrite w = new AsyncWrite(CurrentWrites,ms, physicalPath, relativePath);
-                            if (CurrentWrites.QueueAsync(w, async delegate(AsyncWrite job) {
+                            var queueResult = CurrentWrites.QueueAsync(w, async delegate(AsyncWrite job) {
                                 try {
                                     Stopwatch swio = new Stopwatch();
-                                    
+
                                     swio.Start();
                                     //We want this to run synchronously, since it's in a background thread already.
                                     if (!await TryWriteFile(null, job.PhysicalPath, job.Key,
@@ -168,7 +168,7 @@ namespace ImageResizer.Plugins.DiskCache {
                                         swio.Stop();
                                         //We failed to lock the file.
                                         if (lp.Logger != null)
-                                            lp.Logger.Warn("Failed to flush async write, timeout exceeded after {1}ms - {0}", result.RelativePath, swio.ElapsedMilliseconds);
+                                            lp.Logger.Warn("Failed to flush async write, timeout exceeded after {0}ms - {1}", swio.ElapsedMilliseconds, result.RelativePath);
 
                                     }
                                     else
@@ -182,22 +182,22 @@ namespace ImageResizer.Plugins.DiskCache {
                                     if (lp.Logger != null) {
                                         lp.Logger.Error("Failed to flush async write, {0} {1}\n{2}",ex.ToString(), result.RelativePath,ex.StackTrace);
                                     }
-                                } finally {
-                                    CurrentWrites.Remove(job); //Remove from the queue, it's done or failed. 
                                 }
 
-                            })) {
-                                //We queued it! Send back a read-only memory stream
+                            });
+                            if (queueResult == AsyncWriteCollection.AsyncQueueResult.Enqueued ||
+                                queueResult == AsyncWriteCollection.AsyncQueueResult.AlreadyPresent) {
+                                //We queued it (or an identical write is already queued)! Send back a read-only memory stream
                                 result.Data = w.GetReadonlyStream();
                             } else {
-                                asyncFailed = false;
-                                //We failed to queue it - either the ThreadPool was exhausted or we exceeded the MB limit for the write queue.
+                                asyncFailed = true;
+                                //We failed to queue it - we exceeded the MB limit for the write queue.
                                 //Write the MemoryStream to disk using the normal method.
                                 //This is nested inside a queuelock because if we failed here, the next one will also. Better to force it to wait until the file is written to disk.
                                 if (!await TryWriteFile(result, physicalPath, relativePath, async delegate(Stream s) { await ms.CopyToAsync(s); }, timeoutMs, false)) {
                                     if (lp.Logger != null)
                                         lp.Logger.Warn("Failed to queue async write, also failed to lock for sync writing: {0}", result.RelativePath);
-                                        
+
                                 }
                             }
 
@@ -211,7 +211,12 @@ namespace ImageResizer.Plugins.DiskCache {
             }
             if (lp.Logger != null) {
                 sw.Stop();
-                lp.Logger.Trace("{0}ms: {3}{1} for {2}, Key: {4}", sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), result.Result.ToString(), result.RelativePath, asynchronous ? (asyncFailed ? "AsyncHttpMode, fell back to sync write  " : "AsyncHttpMode+AsyncWrites ") : "AsyncHttpMode", keyBasis);
+                lp.Logger.Trace("{0}ms: {1}{2} for {3}, Key: {4}",
+                    sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4),
+                    asynchronous ? (asyncFailed ? "AsyncHttpMode, fell back to sync write  " : "AsyncHttpMode+AsyncWrites ") : "AsyncHttpMode",
+                    result.Result.ToString(),
+                    result.RelativePath,
+                    keyBasis);
             }
             //Fire event
             if (CacheResultReturned != null) CacheResultReturned(this, result);

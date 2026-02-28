@@ -52,7 +52,8 @@ namespace ImageResizer.Plugins.DiskCache {
 
             byte[] subfolder = new byte[(int)Math.Ceiling((double)bits / 8.0)]; //Round up to bytes.
             Array.Copy(hash, hash.Length - subfolder.Length, subfolder, 0, subfolder.Length);
-            subfolder[0] = (byte)((int)subfolder[0] >> ((subfolder.Length * 8) - bits)); //Set extra bits to 0.
+            int bitsToClear = (subfolder.Length * 8) - bits;
+            subfolder[0] = (byte)((byte)(subfolder[0] << bitsToClear) >> bitsToClear); //Set extra bits to 0.
             return Base16Encode(subfolder);
             
         }
