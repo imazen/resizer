@@ -170,7 +170,8 @@ namespace ImageResizer.Plugins.HybridCache
             
             // And respond using the stream
             await new NewModuleHelpers().ProcessWithStreamCache(_logger, this._cache, context, plan);
-          
+           // Complete request
+           context.ApplicationInstance.CompleteRequest();
         }
 
 
